@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-row">
+    <div class="layui-col-md5">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                    <input type="hidden" name="id" th:value="${user.id}">
+                    <input type="text" name="username" lay-verify="required" autocomplete="off"
+                           class="layui-input" th:value="${user.username}" disabled="disabled">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">昵称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="nickname" lay-verify="required" autocomplete="off" placeholder="请输入昵称"
+                           class="layui-input" th:value="${user.nickname}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">电话</label>
+                <div class="layui-input-block">
+                    <input type="text" name="phone" autocomplete="off" placeholder="请输入电话" class="layui-input"
+                           th:value="${user.phone}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-block">
+                    <input type="text" name="email" autocomplete="off" placeholder="请输入邮箱" class="layui-input"
+                           th:value="${user.email}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">真实姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="realname" lay-verify="required" autocomplete="off" placeholder="请输入真实姓名"
+                           class="layui-input" th:value="${user.realname}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">性别</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="sex" value="MALE" title="男" th:checked="${user.sex}=='MALE'?true:false">
+                    <input type="radio" name="sex" value="FEMALE" title="女"
+                           th:checked="${user.sex}=='FEMALE'?true:false">
+                    <input type="radio" name="sex" value="UNKOWN" title="保密"
+                           th:checked="${user.sex}=='UNKOWN'?true:false">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">年龄</label>
+                <div class="layui-input-block">
+                    <input type="number" name="age" min="1" max="200" lay-verify="required" autocomplete="off"
+                           placeholder="请输入年龄"
+                           class="layui-input" th:value="${user.age}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择地区</label>
+                <div class="layui-input-inline" style="width: 177px;">
+                    <select name="province" lay-filter="province">
+                        <option value="">请选择省</option>
+                        <option th:if="${not #lists.isEmpty(user.areas)}" th:value="${user.areas[0].id}"
+                                selected="selected"
+                                th:text="${user.areas[0].text}"></option>
+                        <option th:each="area:${areas}" th:value="${area.id}" th:text="${area.text}"></option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 177px;">
+                    <select name="city" id="city" lay-filter="city">
+                        <option value="">请选择市</option>
+                        <option th:if="${not #lists.isEmpty(user.areas)}" th:value="${user.areas[1].id}"
+                                selected="selected"
+                                th:text="${user.areas[1].text}"></option>
+                    </select>
+                </div>
+                <div class="layui-input-inline" style="width: 177px;">
+                    <select name="areaId" id="area" lay-filter="area">
+                        <option value="">请选择县/区</option>
+                        <option th:if="${not #lists.isEmpty(user.areas)}" th:value="${user.areas[2].id}"
+                                selected="selected"
+                                th:text="${user.areas[2].text}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">生日</label>
+                <div class="layui-input-block">
+                    <input type="text" name="birthday" id="birthday" class="layui-input" th:value="${user.birthday}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">身份证号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="idcard" placeholder="请输入身份证号" autocomplete="off"
+                           class="layui-input" th:value="${user.idcard}">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="userAdd">提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'jquery', 'layer', 'laydate'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+            , laydate = layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#birthday'
+            , type: 'date'
+        });
+
+        // 地址监听-省
+        form.on('select(province)', function (data) {
+            gs("city", data.value);
+        });
+        // 地址监听-市
+        form.on('select(city)', function (data) {
+            gs("area", data.value);
+        });
+
+        function gs(eid, pid) {
+            $("#" + eid).empty();
+            $.ajax({
+                type: "post",
+                url: basePath + "/sys/area/findChildArea",
+                data: {pid: pid},
+                dataType: "json",
+                success: function (data) {
+                    $.each(data.list, function (i, item) {
+                        $("#" + eid).append("<option value='" + item.id + "'>" + item.text + "</option>");
+                    });
+                    form.render()
+                }
+            });
+        }
+
+        //监听提交
+        form.on('submit(userAdd)', function (data) {
+            $.ajax({
+                url: basePath + '/sys/user/editUserInfo',
+                data: data.field,
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    layer.msg(data.retInfo);
+                    if (data.retCode == '0000') {
+                        parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.personDatagrid.reload();
+                        parent.layer.closeAll();
+                    }
+                }
+            })
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

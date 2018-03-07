@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-row">
+    <div class="layui-col-md4">
+        <form class="layui-form" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                    <input type="hidden" name="userId" id="userId" th:value="${uid}"/>
+                    <input type="text" name="username" lay-verify="required" autocomplete="off"
+                           class="layui-input" th:value="${username}" disabled="disabled">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">旧密码</label>
+                <div class="layui-input-block">
+                    <input type="password" lay-verify="password" name="password" placeholder="请输入旧密码" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">手机号</label>
+                <div class="layui-input-block">
+                    <input lay-verify="phone" id="phone" name="phone" placeholder="请输入手机号" autocomplete="off"
+                           class="layui-input" style="width: 260px;display:inline;margin-right: 26px;">
+                    <button class="layui-btn" id="getSmsCode">获取验证码</button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">短信验证码</label>
+                <div class="layui-input-block">
+                    <input lay-verify="smsCode" name="smsCode" placeholder="请输入短信验证码" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">新密码</label>
+                <div class="layui-input-block">
+                    <input type="password" lay-verify="newPwd" name="newPwd" id="newPwd" autocomplete="off"
+                           placeholder="请输入新密码" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">确认密码</label>
+                <div class="layui-input-block">
+                    <input type="password" lay-verify="confirmPwd" name="confirmPwd" id="confirmPwd" autocomplete="off"
+                           placeholder="请再次输入密码"
+                           class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="changePwd">提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'jquery', 'layer', 'laydate'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+            , laydate = layui.laydate;
+        form.verify({
+            password: function (value) {
+                return validateWord(value)
+            },
+            smsCode:function (value) {
+                return validateSmsCode(value);
+            }
+            ,
+            newPwd: function (value) {
+                return verifyPassWord(value)
+            },
+            confirmPwd: function (value) {
+                var newPwd = $("input[name='newPwd']").val();
+                if (value && value != newPwd) {
+                    return '两次密码不一致！';
+                } else if (!value) {
+                    return '确认密码不能为空！'
+                }
+            }
+        });
+        //监听提交
+        form.on('submit(changePwd)', function (data) {
+            $.ajax({
+                url: basePath + '/sys/user/doUpdateWord',
+                data: data.field,
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                success: function (res) {
+                    if (res.retCode == '0000') {
+                        layer.msg('密码修改成功，请重新登录！',{time: 1000}, function () {
+                            window.parent.document.getElementsByClassName('signOut')[1].click();
+                        });
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+    var phoneRest = /^0?(13[0-9]|145|147|149|15[0-3]|15[5-9]|166|17[1-3]|17[5-8]|18[0-9]|198|199)[0-9]{8}$/;
+    var numTime = 60;
+    var timer;
+    $("#getSmsCode").on("click",function () {
+        var self=this;
+        $(self).attr("disabled", "disabled");
+        var phoneNum=$("#phone").val();
+        if(phoneNum){
+            if(phoneRest.test(phoneNum)){
+                $.ajax({
+                    url: basePath + '/sys/user/getSmsCode',
+                    type:"POST",
+                    dataType:"json",
+                    data:{'userId':$("#userId").val(),'phone':phoneNum},
+                    async: false,
+                    success:function (res) {
+                        if (res.status == 'error') {
+                            layer.alert(res.msg);
+                        }else{
+                            timer = setInterval(function () {
+                                numTime--;
+                                $(self).html("已发送(" + numTime + "s)");
+                                if (numTime <= 0) {
+                                    numTime = 60;
+                                    $(self).html("重新获取");
+                                    $(self).removeAttr("disabled");
+                                    clearInterval(timer);
+                                }
+                            }, 1000);
+                        }
+                    }
+                });
+
+            }else{
+                layer.alert('手机号格式错误！');
+                $(self).removeAttr("disabled");
+                return false;
+        }
+        }else{
+            layer.alert('请输入手机号！');
+            $(self).removeAttr("disabled"); $(self).removeAttr("disabled");
+            return false;
+        }
+    });
+
+    function validateSmsCode(value) {
+        if (!value) {
+            return '验证码不能为空，请确认！'
+        } else {
+            var flag = false;
+            var msg =""
+            var phone = $("#phone").val();
+            $.ajax({
+                url: basePath + '/sys/user/doValidateSmsCode',
+                data: {"phone": phone,"smsCode":value},
+                dataType: "json",
+                type: "post",
+                async: false,
+                success: function (res) {
+                    if (res.status=="error") {
+                         msg = res.msg;
+                    }
+                }
+            });
+            if (!flag) {
+                return msg;
+            }
+        }
+    }
+
+    function validateWord(value) {
+        if (!value) {
+            return '密码不能为空，请确认！'
+        } else {
+            var flag = false;
+            var userId = $("input[name='userId']").val();
+            var newPwd = $("input[name='newPwd']").val();
+            var param = {"userId": userId, "password": value, "newPwd": newPwd};
+            $.ajax({
+                url: basePath + '/sys/user/doValidatePwd',
+                data: param,
+                dataType: "json",
+                type: "post",
+                async: false,
+                success: function (res) {
+                    if (res.retCode == '0000') {
+                        flag = true;
+                    }
+                }
+            });
+            if (!flag) {
+                return '密码输入错误，请确认！';
+            }
+        }
+    }
+</script>
+<script type="text/javascript" src="../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
+</body>
+</html>

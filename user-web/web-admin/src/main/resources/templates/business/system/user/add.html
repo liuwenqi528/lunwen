@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" th:action="@{/sys/user/doSave}">
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="required|username" lay-verType="msg"
+                   class="layui-input">
+            <div class="layui-form-mid layui-word-aux">字母、数字、下划线组成，且长度必须为4-18位</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="password" lay-verify="required|password" lay-verType="msg"
+                   class="layui-input">
+            <div class="layui-form-mid layui-word-aux">密码只能为由英文+数字组成，且长度为6-20位</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" lay-verify="required|email" lay-verType="msg"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" lay-verify="required|phone" lay-verType="msg"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">昵称</label>
+        <div class="layui-input-block">
+            <input type="text" name="nickname" lay-verify="nickname" lay-verType="msg"
+                   class="layui-input">
+            <div class="layui-form-mid layui-word-aux">不能包含特殊字符，且长度不能大于16位</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="realname" lay-verify="realname" lay-verType="msg"
+                   class="layui-input">
+            <div class="layui-form-mid layui-word-aux">只能由中文组成</div>
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理员</label>
+        <div class="layui-input-block">
+            <input type="radio" name="admin" value="true" title="是" >
+            <input type="radio" name="admin" value="false" title="否" checked="">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="userAdd">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'jquery', 'layer', 'laydate', 'layedit'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+            , laydate = layui.laydate
+            , layedit = layui.layedit;
+
+        //自定义验证规则
+        form.verify({
+            username: function (value) {
+                return verifyAccount(value, "username");
+            }
+            , password: function (value) {
+                return verifyPassWord(value)
+            }
+            , email: function (value) {
+                return verifyAccount(value, "email");
+            }
+            , phone: function (value) {
+                return verifyAccount(value, "phone");
+            }
+            , nickname: function (value) {
+                return verifyNickName(value, '昵称')
+            }
+            , realname: function (value) {
+                return verifyRealName(value)
+            }
+        })
+
+        //监听提交
+        form.on('submit(userAdd)', function (data) {
+            layer.confirm('是否确认添加?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                $.ajax({
+                    url: basePath + '/sys/user/doSave',
+                    data: data.field,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000') {
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.userDatagrid.reload();
+                            parent.layer.closeAll();
+                        }
+                        parent.layer.msg(data.retInfo);
+                    }
+                })
+            });
+            return false;
+        });
+    });
+
+    //验证账号（用户名/邮箱/手机号）格式是否正确、异步验证账号是否存在
+    function verifyAccount(value, type) {
+        var msg = "";
+        if (type == "username") {
+            msg = "用户名";
+            if (!new RegExp('^[a-zA-Z0-9_]{4,18}$').test(value)) {
+                return '用户名必须由字母、数字、下划线组成，且长度必须为4-18位';
+            }
+        } else if (type == "email") {
+            msg = "邮箱";
+            if (!new RegExp('^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$').test(value)) {
+                return '邮箱格式不正确!';
+            }
+        } else if (type == "phone") {
+            msg = "手机号";
+            if (!new RegExp('^((13[0-9])|(14[5-9])|(15([0-9]))|(17([(01)|(3-8]))|(18[0-9])|(166)|(19[89]))\\d{8}$').test(value)) {
+                return '手机号码格式错误!';
+            }
+        }
+        var isExist = false;
+        $.ajax({
+            url: basePath + '/sys/user/doVerify',
+            data: {value: value, type: type},
+            dataType: "json",
+            async: false,
+            type: "post",
+            success: function (data) {
+                if (data == 0)
+                    isExist = true;
+            }
+        })
+        if (!isExist)
+            return msg + '已存在,请重新填写！';
+    }
+</script>
+<script type="text/javascript" src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
+</body>
+</html>

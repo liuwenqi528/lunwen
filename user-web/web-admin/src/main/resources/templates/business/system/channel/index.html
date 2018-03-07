@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/base::baseHead">
+</head>
+<body class="childrenBody">
+<div class="layui-elem-quote news_search xy-toolbar changeBg">
+    <form class="layui-form" id="channelSearchForm">
+        <!--<div class="layui-form">-->
+        <div class="layui-inline">
+            <input type="text" placeholder="渠道名称" class="layui-input" name="name">
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="timeRange" id="channel_date" placeholder="渠道创建时间范围"
+                   autocomplete="off" class="layui-input">
+            <input type="hidden" name="beginTime"/>
+            <input type="hidden" name="endTime"/>
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-sm" lay-submit="" id="channelSearch" lay-filter="channelSearch">搜索</button>
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-sm layui-btn-primary" id="channelReset" type="reset">重置</button>
+        </div>
+        <!--</div>-->
+    </form>
+</div>
+<div class="resourcesContent">  <!--嵌套一层-->
+    <div class="btnsOperation">
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm layui-btn-normal"
+               data-type="channelAdd">添加</a>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm layui-btn-danger" data-type="channelRemove">删除</a>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm" data-type="resourceFlush">刷新</a>
+        </div>
+    </div>
+    <div class="td">
+        <table class="layui-hide" id="channelDatagrid" lay-filter="channelDatagrid"></table>
+    </div>
+</div>
+</body>
+<script type="text/javascript" th:inline="none">
+    var channelDatagrid,currentPage=1,ServerRows=1;
+    layui.use(['layer', 'table', 'form', 'laydate'], function () {
+        var layer = layui.layer, form = layui.form,
+            table = layui.table, $ = layui.jquery, laydate = layui.laydate;
+        laydate.render({
+            elem: '#channel_date'
+            , type: 'datetime'
+            , range: '至'
+        });
+        channelDatagrid = initTable(table,{
+            elem: '#channelDatagrid'
+            , url: basePath + '/sys/channel/doDatagrid?orderBy=id=desc'
+            , cols: [[ //表头
+                {field: 'id', type: 'checkbox'}
+                , {field: 'name', title: '渠道名称', width: '15%'}
+                , {field: 'deliveryImageURL', title: '投放图URL', width: '15%'}
+                , {field: 'deliveryCost', title: '投放成本', width: '20%'}
+                , {field: 'gmtCreate', title: '创建日期', width: '10%'}
+                , {field: 'description', title: '渠道描述', width: '15%'}
+                , {fixed: 'right', title: '操作', align: 'center', toolbar: '#channelBar'}
+            ]]
+            , done: function (res, curr, count) {
+                //如果是异步请求数据方式，res即为你接口返回的信息。
+                ServerRows=res.rows.length;
+                currentPage=curr;
+            }
+        })
+        //触发事件
+        //触发事件
+        var channel = {
+            channelAdd: function () {
+                openLayer('添加渠道', basePath + '/sys/channel/toAddPage');
+            }, channelEdit: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                    openLayer('编辑渠道', basePath + '/sys/channel/toEditPage' + param);
+                }
+            }, channelRemove: function (id) {
+                var ids = [];
+                if (id != undefined) {
+                    ids.push(id);
+                } else {
+                    var checkStatus = table.checkStatus('channelDatagrid')
+                        , data = checkStatus.data;
+                    for (var i = 0; i < data.length; i++) {
+                        ids.push(data[i].id);
+                    }
+                }
+                if (ids.length < 1) {
+                    layer.alert("至少选择一行数据进行删除", {
+                        title: '警告'
+                    });
+                } else {
+                    layer.confirm('是否确认删除?', {
+                        btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+                    }, function (index) {//点击保存执行的函数
+                        $.ajax({
+                            url: basePath + '/sys/channel/doRemove',
+                            data: {ids: ids.join(",")},
+                            dataType: "json",
+                            type: "post",
+                            success: function (data) {
+                                layer.msg(data.retInfo);
+                                //如果大于第一页
+                                if((currentPage>1) && (ServerRows==ids.length)){
+                                    --currentPage;
+                                }
+                                channelDatagrid.reload({
+                                    page: {
+                                        curr: currentPage
+                                    }
+                                });
+                                layer.close(index);
+                            }
+                        })
+
+                    });
+                }
+            }, channelSearch: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                    openLayer('渠道详情', basePath + '/sys/channel/toInfoPage?id=' + id);
+                }
+            }, channelFlush: function () {
+                channelDatagrid.reload();
+            }
+        };
+        //上部按钮点击事件
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            channel[type] ? channel[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(channelDatagrid)', function (obj) {
+            var data = obj.data;
+            channel[obj.event] ? channel[obj.event].call(this, data.id) : '';
+        });
+        //监听提交
+        form.on('submit(channelSearch)', function (data) {
+            parseDatetoSplit(data);
+            var param = data.field;
+            channelDatagrid.reload({
+                where: param, page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            })
+            return false;
+        });
+        $('#channelReset').on('click', function () {
+            $('#channelSearchForm')[0].reset();
+            $('#channelSearch').click();
+        })
+    });
+
+
+</script>
+<script type="text/html" id="channelBar">
+    <a class="layui-btn layui-btn-sm" lay-event="channelSearch" title="详情"><i class="iconfont icon-chakan"></i></a>
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="channelEdit" title="编辑"><i
+            class="iconfont icon-xiugai1"></i></a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="channelRemove" title="删除"><i
+            class="iconfont icon-shanchu"></i></a>
+</script>
+</body>
+</html>

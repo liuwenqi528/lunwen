@@ -1,0 +1,23 @@
+apply plugin: 'maven-publish'
+
+dependencies {
+    compile project(':user-common')
+
+    compile(
+            "mysql:mysql-connector-java:${mysqlConnectorVersion}",
+            "com.alibaba:druid:${druidVersion}",
+            "javax.validation:validation-api:${validationVersion}",
+
+            // querydsl
+            "com.querydsl:querydsl-root:$querydslVersion",
+            "com.querydsl:querydsl-jpa:$querydslVersion",
+            "com.querydsl:querydsl-apt:$querydslVersion:jpa"
+    )
+}
+
+idea {
+    module {
+        sourceDirs += file('generated/')
+        generatedSourceDirs += file('generated/')
+    }
+}

@@ -1,0 +1,94 @@
+<!--  Created by   liuwenqi on 2018-01-26. -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <title>无权限</title>
+    <link type="text/css" rel="stylesheet" href="//at.alicdn.com/t/font_555924_jjl0giltgainqaor.css"
+          th:href="@{//at.alicdn.com/t/font_555924_jjl0giltgainqaor.css}">
+    <script>
+        if(top.location!=self.location){
+            top.location = self.location;
+            window.parent.$("#top_tabs li.layui-this i.layui-tab-close").click();
+        }
+    </script>
+    <style type="text/css">
+        *{
+            margin: 0 auto;
+            padding: 0px;
+        }
+        html,body {
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .main {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            padding: 10px;
+            overflow: hidden;
+            display: flex; /*Flex布局*/
+            display: -webkit-flex; /* Safari */
+            align-items: center; /*指定垂直居中*/
+            background-color: rgb(249, 249, 249);
+        }
+
+        .content {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .content img, .content .content-btn, .content .content-description {
+            margin-top: 14px;
+        }
+
+        .content img {
+            margin: 0px auto;
+            height: 200px;
+        }
+
+        .content .content-btn {
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .content .content-description {
+            font-size: 20px;
+            font-weight: bold;
+            font-family: "Adobe 楷体 Std R";
+            color: #272636;
+        }
+
+        .content-btn a {
+            font-size: 15px;
+            text-decoration: none;
+            color: #272636;
+            border-radius: 2px;
+            margin-right: 15px;
+            padding: 3px 15px;
+            border: 1px solid #272636;
+        }
+
+        .content-btn a:hover {
+            color: #565c60;
+        }
+
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="content">
+        <img src="/xueyuan-user/images/error/lock.png" th:src="@{/images/error/lock.png}">
+        <div class="content-description">抱歉...您当前没有访问权限，请联系管理员</div>
+        <div class="content-btn">
+            <a class="btn1" href="javascript:history.back(-1)" ><i class="iconfont icon-fanhui"></i>返回上一页</a>
+            <!--<a class="btn2" href="/xueyuan-user"><i class="iconfont icon-home"></i>网站首页</a>-->
+        </div>
+    </div>
+</div>
+</body>
+</html>

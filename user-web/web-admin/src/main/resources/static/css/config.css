@@ -1,0 +1,71 @@
+html, body {
+    height: calc(100% - 1px);
+}
+
+.xy-form, .layui-tab-item {
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    padding-bottom: 10px;
+}
+
+#config .layui-tab {
+    height: 100%;
+    overflow: hidden;
+    margin: 0px;
+}
+
+.layui-tab-content {
+    height: calc(100% - 45px);
+    padding: 10px 10px;
+    overflow: auto;
+    background-color: #ffffff;
+}
+
+.xy-form .layui-form-item {
+    margin: 0 15px;
+}
+
+.xy-form .layui-inline {
+    width: 40%;
+    margin-top: 5px;
+}
+
+.xy-form .layui-block {
+    width: 81%;
+}
+
+.xy-form .layui-form-label {
+    width: 110px;
+    padding: 5px 15px;
+}
+
+.xy-form .layui-input-block {
+    margin-left: 150px;
+    padding-right: 50px;
+    min-height: 30px;
+}
+
+.xy-form .layui-form-mid {
+    padding: 3px 0 !important;
+    font-size: 12px;
+}
+
+.xy-form .layui-input, .xy-form .layui-select, .xy-form .layui-textarea {
+    height: 30px;
+    line-height: 1.3;
+}
+
+#config {
+    padding: 15px;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.SMS .layui-form-label {
+    width: 140px;
+}
+
+.SMS .layui-input-block {
+    margin-left: 170px;
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/base::baseHead">
+</head>
+<body class="childrenBody">
+<div class="layui-elem-quote news_search changeBg">
+    <form class="layui-form" id="roleSearchForm">
+        <div class="layui-form">
+            <div class="layui-inline">
+                <input type="text" placeholder="请输入角色名称关键字" class="layui-input" name="name">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-sm" lay-submit="" id="roleSearch" lay-filter="roleSearch">搜索</button>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-sm layui-btn-primary" id="roleReset" type="reset">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="layui-form xy-table">
+    <!--zyc add-->
+    <div class="btnsOperation">
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" data-type="roleAdd">添加</a>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm layui-btn-danger" data-type="roleRemove">删除</a>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm" data-type="roleFlush">刷新</a>
+        </div>
+    </div>
+    <!--zyc add-->
+    <table class="layui-hide" id="roleDatagrid" lay-filter="roleDatagrid"></table>
+</div>
+</body>
+<script type="text/javascript" th:inline="none">
+    var roleDatagrid,currentPage=1,ServerRows=1;
+    layui.use(['layer', 'table', 'form'], function () {
+        var layer = layui.layer, form = layui.form,
+            table = layui.table, $ = layui.jquery;
+        roleDatagrid = initTable(table,{
+            elem: '#roleDatagrid'
+            , url: basePath + '/sys/role/doDatagrid?orderBy=id=desc'
+            , cols: [[ //表头
+                {field: 'id', type: 'checkbox'}
+                , {field: 'name', title: '角色名称', width: '25%',minWidth:200}
+                , {field: 'gmtCreate', title: '创建时间', width: '25%',minWidth:200}
+                , {field: 'gmtModified', title: '修改时间', width: '22%',minWidth:200}
+                , {title: '操作',  align: 'center', toolbar: '#roleBar',minWidth:150}
+            ]]
+            ,  done: function(res, curr, count){
+                //如果是异步请求数据方式，res即为你接口返回的信息。
+                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                ServerRows=res.rows.length;
+                currentPage=curr;
+            }
+        })
+        var role = {
+            roleAdd: function () {
+                openLayer('添加角色', basePath + '/sys/role/toAddPage');
+            },
+            roleEdit: function (data) {
+                var id = data.id;
+                if (id != undefined) {
+                    var param = "?id=" + id;
+                    openLayer('编辑角色', basePath + '/sys/role/toEditPage' + param);
+                }
+            },
+            roleRemove: function (data) {
+                var id = data.id;
+                var ids = [];
+                if (id != undefined) {
+                    ids.push(id);
+                } else {
+                    var checkStatus = table.checkStatus('roleDatagrid')
+                        , data = checkStatus.data;
+                    for (var i = 0; i < data.length; i++) {
+                        ids.push(data[i].id);
+                    }
+                }
+                if (ids.length < 1) {
+                    layer.alert("至少选择一行数据进行删除", {
+                        title: '警告'
+                    });
+                } else {
+                    var msg = "<p style='text-align:center'>是否确认删除?</p>";
+                    if(data.userIds!=null && data.userIds.length>0){
+                        msg="<p style='text-align:center'>是否确认删除?<br/>此角色有分配的用户，删除需谨慎！</p>";
+                    }
+                    layer.confirm(msg, {
+                        btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+                    }, function (index) {//点击保存执行的函数
+                        $.ajax({
+                            url: basePath + '/sys/role/doRemove',
+                            data: {ids: ids.join(',')},
+                            dataType: "json",
+                            type: "post",
+                            success: function (data) {
+                                layer.msg(data.retInfo);
+                                //如果大于第一页
+                                if((currentPage>1) && (ServerRows==ids.length)){
+                                    --currentPage;
+                                }
+                                roleDatagrid.reload({
+                                    page:{
+                                        curr:currentPage
+                                    }
+                                });
+                                layer.close(index);
+                            }
+                        })
+                    });
+                }
+            },
+            roleSearch: function (data) {
+                var id = data.id;
+                if (id != undefined) {
+                    var param = "?id=" + id;
+                    openLayer('角色详情', basePath + '/sys/role/toInfoPage' + param);
+                }
+            }, setUser: function (data) {
+                var id = data.id;
+                if (id != undefined) {
+                    var param = "?id=" + id;
+                    openLayer2('分配用户', basePath + '/sys/role/toSetUserPage' + param);
+                }
+            },
+            roleFlush: function () {
+                roleDatagrid.reload();
+            },
+            setAuthority: function (data) {
+                var id = data.id;
+
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                    openLayer('设置权限', basePath + '/sys/role/toSetAuthPage' + param);
+                }
+            }
+        };
+
+        //上部按钮点击事件
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            role[type] ? role[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(roleDatagrid)', function (obj) {
+            var data = obj.data;
+            role[obj.event] ? role[obj.event].call(this, data) : '';
+        });
+        //监听提交
+        form.on('submit(roleSearch)', function (data) {
+            var param = data.field;
+            roleDatagrid.reload({
+                where: param
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            })
+            return false;
+        });
+        $('#roleReset').on('click', function () {
+            $('#roleSearchForm')[0].reset();
+            $('#roleSearch').click();
+        })
+    });
+
+
+</script>
+<script type="text/html" id="roleBar">
+    <a class="layui-btn layui-btn-normal layui-btn-sm iconfont icon-xiugai1" lay-event="roleEdit" title="编辑"></a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm iconfont icon-shanchu" lay-event="roleRemove" title="删除"></a>
+    <a class="layui-btn xy-button-light-green layui-btn-sm iconfont icon-jiaosefenpeiyonghu1" lay-event="setUser" title="分配用户"></a>
+    <a class="layui-btn xy-button-light-yellow layui-btn-sm iconfont icon-shezhiquanxian" lay-event="setAuthority" title="设置权限"></a>
+</script>

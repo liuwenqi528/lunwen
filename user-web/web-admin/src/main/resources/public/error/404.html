@@ -1,0 +1,91 @@
+<!--  Created by   liuwenqi on 2018-01-26. -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <title>页面出错了~~~</title>
+    <link type="text/css" rel="stylesheet" href="//at.alicdn.com/t/font_555924_jjl0giltgainqaor.css"
+          th:href="@{//at.alicdn.com/t/font_555924_jjl0giltgainqaor.css}">
+    <script>
+        if (top.location != self.location) {
+            top.location = self.location;
+            window.parent.$("#top_tabs li.layui-this i.layui-tab-close").click();
+        }
+
+    </script>
+    <style type="text/css">
+        * {
+            margin: 0 auto;
+            padding: 0px;
+        }
+
+        html, body {
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .main {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            text-align: center;
+
+            padding: 10px;
+            overflow: hidden;
+            display: flex; /*Flex布局*/
+            display: -webkit-flex; /* Safari */
+            align-items: center; /*指定垂直居中*/
+            background-color: rgb(249, 249, 249);
+        }
+
+        .content {
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .content img, .content .content-btn {
+            margin-top: 14px;
+        }
+
+        .content img {
+            margin: 0px auto;
+            /*height: 200px;*/
+        }
+
+        .content .content-btn {
+            height: 30px;
+            line-height: 30px;
+            box-sizing: border-box;
+            position: relative;
+            bottom: 250px;
+            left: -140px;
+        }
+
+        .content-btn a {
+            font-size: 14px;
+            text-decoration: none;
+            color: #d78600;
+            border: 1px solid #d78600;
+            margin-right: 15px;
+            padding: 3px 15px;
+
+        }
+
+
+    </style>
+</head>
+<body class="error">
+<div class="main">
+    <div class="content">
+        <img src="/xueyuan-user/images/error/01.png" th:src="@{/images/error/01.png}">
+        <div class="content-btn">
+            <a href="javascript:history.back(-1);" th:href="@{/}"><i class="iconfont icon-fanhui"></i>返回上一页</a>
+            <!--<a href="/xueyuan-user" th:href="@{/}">首页</a>-->
+        </div>
+    </div>
+</div>
+</body>
+</html>

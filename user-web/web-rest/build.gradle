@@ -1,0 +1,12 @@
+apply plugin: 'war'
+
+dependencies {
+    compile project (':user-web:web-common')
+
+    compile(
+            "org.thymeleaf:thymeleaf:${thymeleafVersion}",
+            "org.thymeleaf:thymeleaf-spring4:${thymeleafVersion}",
+            "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutVersion}",
+            'org.springframework.boot:spring-boot-devtools'
+    )
+}

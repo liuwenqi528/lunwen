@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-form">
+    <div class="layui-form-item">
+            <label class="layui-form-label">渠道名称：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${channelVM.name}"></p>
+            </div>
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">投放图URL：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${channelVM.deliveryImageURL}"></p>
+            </div>
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">投放成本：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${channelVM.deliveryCost}"></p>
+            </div>
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">创建时间：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${#dates.format(channelVM.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}"></p>
+            </div>
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">修改时间：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${#dates.format(channelVM.gmtModified, 'yyyy-MM-dd HH:mm:ss')}"></p>
+            </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">渠道描述：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${channelVM.description}"></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+// 所有模块都采用统一的版本号以及groupName
+buildscript {
+    ext {
+        springBootVersion = '1.5.8.RELEASE'
+        springVersion = '4.3.12.RELEASE'
+        validationVersion = '2.0.0.Final'
+        mapstructVersion = '1.2.0.Final'
+        shiroSpringVersion = '1.4.0'
+        bujiPac4jVersion = '3.0.0'
+        pac4jVersion = '2.2.1'
+        mysqlConnectorVersion = '5.1.44'
+        druidVersion = '1.1.2'
+        thymeleafVersion = '3.0.6.RELEASE'
+        thymeleafLayoutVersion = '2.2.2'
+        querydslVersion = '4.1.4'
+        fastjsonVersion = '1.2.38'
+        lombokVersion = '1.16.18'
+        commonslang3Version = '3.7'
+        commonsBeanutilsVersion= '1.9.3'
+        kaptchaVersion = '2.3.2'
+        easymockVersion = '3.5.1'
+        thymeleafShiroVersion = '2.0.0'
+        nekohtmlVersion = '1.9.22'
+        httpclientVersion='4.5.5'
+
+        //默认仓库
+        nexusURL ="http://192.168.1.113:8081/nexus/content/repositories/releases/"
+
+        //如果为快照版本发布到快照库
+        if(version.endsWith("-SNAPSHOT")) {
+            nexusURL ="http://192.168.1.113:8081/nexus/content/repositories/snapshots/"
+        }
+
+        nexusUserName = "${NEXUS_USERNAME}"
+        nexusPassword = "${NEXUS_PASSWORD}"
+
+        builtBy = "gradle 4.4.1"
+    }
+    repositories {
+        maven {url 'http://58.57.164.135:8081/nexus/content/groups/public'}
+//        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+allprojects {
+    group 'com.khcm'
+    version '1.0-SNAPSHOT'
+}
+
+// 为所有子模块应用插件
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'application'
+    apply plugin: 'org.springframework.boot'
+
+    sourceCompatibility = 1.8
+
+    mainClassName = 'com.khcm.user.web.admin.AdminApp'
+
+    repositories {
+        maven {url 'http://58.57.164.135:8081/nexus/content/groups/public'}
+//        mavenCentral()
+    }
+
+    dependencies {
+        compile(
+                "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+        )
+
+        testCompile ("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    }
+}

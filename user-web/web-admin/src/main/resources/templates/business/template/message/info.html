@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">模板名称：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${smsTplVM.tplName}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">模板内容：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${smsTplVM.content}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">业务类型：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:if="${smsTplVM.businessType}=='REGIST'" th:text="${'注册发送'}"></p>
+            <p class="layui-info" th:if="${smsTplVM.businessType}=='CHANGEPWD'" th:text="${'修改密码发送'}"></p>
+            <p class="layui-info" th:if="${smsTplVM.businessType}=='BACKPWD'" th:text="${'找回密码发送'}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">模板状态：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:if="${smsTplVM.templateStatus}=='PASSED'" th:text="${'已通过'}"></p>
+            <p class="layui-info" th:if="${smsTplVM.templateStatus}=='CHECKING'" th:text="${'待审核'}"></p>
+            <p class="layui-info" th:if="${smsTplVM.templateStatus}=='REJECTED'" th:text="${'已拒绝'}"></p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建时间：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${#dates.format(smsTplVM.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">修改时间：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${#dates.format(smsTplVM.gmtModified, 'yyyy-MM-dd HH:mm:ss')}"></p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${smsTplVM.remark}"></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: true
+  messages:
+      basename: language/messages
+      cache-seconds: 3600
+  datasource:
+    master:
+      driverClassName: com.mysql.jdbc.Driver
+      url: jdbc:mysql://58.57.164.135:60330/xueyuan?serverTimezone=GMT
+#      url: jdbc:mysql://192.168.1.113:3306/xueyuan?serverTimezone=GMT
+#      username: dev
+#      password: dev@khcm)^#%
+      username: root
+      password: root@khcm0635!!#
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    open-in-view: true
+    show-sql: true
+    database: mysql
+    properties:
+      hibernate.dialect: org.hibernate.dialect.MySQL57InnoDBDialect
+      hibernate.format_sql: true
+      hibernate.ejb.interceptor: com.khcm.user.dao.interceptor.TreeInterceptor
+      javax.persistence.validation.mode: none
+  thymeleaf:
+    cache: false
+    mode: LEGACYHTML5
+
+  mail:
+    host: smtp.163.com
+    username: test@163.com
+    password: test
+
+shiro:
+  cipherKey: fPimdozRt+SSSbZS8/HARA==
+  cas:
+    serviceUrl: http://localhost:${server.port}${server.context-path}
+    callbackUrl: http://localhost:${server.port}${server.context-path}/callback
+    preffixUrl: https://sso.sdkhcm.com/xueyuan-cas
+    loginUrl: https://sso.sdkhcm.com/xueyuan-cas/login
+    logoutUrl: https://sso.sdkhcm.com/xueyuan-cas/logout
+#    preffixUrl: https://sso.xueyuan.com:8443
+#    loginUrl: https://sso.xueyuan.com:8443/login
+#    logoutUrl: https://sso.xueyuan.com:8443/logout
+
+sms:
+  tencent:
+    appId: 1400066217
+    appKey: 85d48d6d82b096d8b1d7e63218ccc001
+
+logging:
+  path: log/
+  file: user-admin.log
+
+server:
+  context-path: /xueyuan-user
+  port: 8090

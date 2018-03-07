@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户名：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.username}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">昵称：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.nickname}"></p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.email}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电话：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.phone}"></p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.realname}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理员：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.admin?'是':'否'}"></p>
+        </div>
+    </div>
+
+
+    <!--<div class="layui-form-item">-->
+    <!--<div class="layui-inline">-->
+    <!--<label class="layui-form-label">身份证号</label>-->
+    <!--<div class="layui-input-block">-->
+    <!--<input type="text" class="layui-input" th:value="${userVM.idcard}"-->
+    <!--disabled>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="layui-inline">-->
+    <!--<label class="layui-form-label">生日</label>-->
+    <!--<div class="layui-input-block">-->
+    <!--<input type="text" class="layui-input" th:value="${userVM.birthday}"-->
+    <!--disabled>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">注册渠道：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${userVM.channelName}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建时间：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${#dates.format(userVM.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">修改时间：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${#dates.format(userVM.gmtModified, 'yyyy-MM-dd HH:mm:ss')}"></p>
+        </div>
+    </div>
+</div>
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script th:inline="javascript">
+    layui.use(['form', 'jquery', 'layer'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+    });
+</script>
+</body>
+</html>

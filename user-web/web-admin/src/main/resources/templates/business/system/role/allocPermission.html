@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-form" th:action="@{/sys/role/doSetting}">
+    <fieldset class="layui-elem-field">
+        <legend th:text="${roleVM.name}">角色名称:</legend>
+        <input type="hidden" name="roleId" id="roleId" class="layui-input" th:value="${roleVM.id}">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择系统</label>
+            <div class="layui-input-block">
+                <select id="appCombobox" lay-filter="appCombobox"></select>
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">权限列表</label>
+            <div class="layui-input-block">
+                <ul id="appResourceTree" class="form-tree" name="resources"></ul>
+            </div>
+        </div>
+    </fieldset>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" id="setAuth">保存</button>
+            <button class="layui-btn layui-btn-primary" id="roleSetAuth">重置</button>
+
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    var roleAuth = [[${roleVM}]].authorizations;
+    var arTree,//树形列表对象
+        appId,//记录选择的系统ID
+        flag = false;//记录树形列表是否点击过。如果点击过则切换系统时会提示是否保存。未点击直接进行切换
+    var roleId;//记录当前角色编号。
+
+    layui.use(['layer', 'form', 'element', 'jquery'], function () {
+        var layer = layui.layer, form = layui.form, element = layui.element,
+            $ = layui.jquery;
+        $.ajax({
+            url: basePath + '/sys/appRegister/doComboBox',
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                $(data).each(function () {
+                    window.sessionStorage.setItem($(this)[0].code, JSON.stringify($(this)[0]));
+                    $('#appCombobox').append("<option value='" + $(this)[0].code + "'>" + $(this)[0].name + "</option>")
+                })
+                form.render();
+                $('#appCombobox').next().find('.layui-this').click();
+            }
+        })
+        form.on('select(appCombobox)', function (data) {
+            //判断树形列表是否发生变化，如果为true表示发生编号
+            if (flag) {
+                //打开一个询问框。点击保存执行第一个function。跳过执行第二个function
+                layer.confirm('是否保存修改的权限?', {
+                    btn: ['保存', '跳过'] //设置询问框上的按钮显示的文字
+                }, function (index) {//点击保存执行的函数
+                    setAuth(data.value);//执行保存函数
+                    layer.close(index);//关闭询问框
+                }, function () {//执行跳过函数
+                    reloadTree(data.value);//获取对应系统下的资源数据
+                });
+            } else {
+                reloadTree(data.value);//获取对应系统下的资源数据
+            }
+
+        });
+    });
+
+
+    $(function () {
+        roleId = $('#roleId').val();//获取角色编号
+
+
+//        创建树形列表
+        arTree = $("#appResourceTree").tree({
+            checkbox: true,
+            onCheck: function (node, checked) {
+                //点击复选框时表示数据发生变化。将标记改为true.
+                flag = true;
+            },
+            onLoadSuccess: function (node, data) {
+                //根据系统编号，获取对应的资源编号集合、
+                var resourceIds = getResourceIds();
+                //遍历资源编号。将已有的权限进行选中
+                for (var i = 0; i < resourceIds.length; i++) {
+                    if (arTree.tree('find', resourceIds[i])) {
+                        arTree.tree('check', arTree.tree('find', resourceIds[i]).target);
+                    }
+                }
+                flag = false;
+            }
+        })
+        //提交按钮绑定点击事件
+        $('#setAuth').on('click', function () {
+            setAuth();
+        });
+        $('#roleSetAuth').on('click', function () {
+            arTree.tree('reload');
+        })
+    });
+
+    //获取树形列表数据
+    function reloadTree(code) {
+        var record = JSON.parse(window.sessionStorage.getItem(code));
+        arTree.tree('options').url = basePath + "/sys/appResource/doTreegrid?appCode=" + record.code;
+        arTree.tree('reload');
+        appId = record.id;//记录选则的系统编号
+    }
+
+    //设置权限
+    function setAuth(code) {
+        layer.confirm('是否确认保存设置的权限?', {
+            btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+        }, function (index) {//点击保存执行的函数
+            //获取选中的资源编号集合，返回一个数组
+            var checkedTree = getCheckedTree();
+            $.ajax({
+                url: basePath + '/sys/role/doSetAuth',
+                data: {appId: appId, roleId: roleId, resourceIds: checkedTree.join(',')},
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    layer.msg(data.retInfo);
+                    var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                    parent.layer.close(index);
+                    flag = false;
+                    //将旧的权限和新设置的权限进行筛选。留下新设置的，以便后面切换系统时选中
+                    roleAuth = changeRole(roleAuth, checkedTree);
+                    code != undefined ? reloadTree(code) : '';
+                }
+            })
+        });
+    }
+
+    //  将权限进行筛选
+    function changeRole(oldAuth, newAuth) {
+        for (var i = oldAuth.length - 1; i >= 0; i--) {
+            if (oldAuth[i].appId == appId && oldAuth[i].roleId == roleId) {
+                oldAuth.splice(i, 1);
+            }
+        }
+        for (var j = 0; j < newAuth.length; j++) {
+            oldAuth.push({roleId: roleId, appId: appId, resourceId: newAuth[j]});
+        }
+        return oldAuth;
+    }
+
+    //获取选中的树形列表数据编号。
+    function getCheckedTree() {
+        var checkedTree = arTree.tree('getChecked');
+        if (checkedTree == null) {
+            return null;
+        }
+        var checkedArr = new Array();
+        for (var i = 0; i < checkedTree.length; i++) {
+            checkedArr.push(checkedTree[i].id);
+        }
+        return checkedArr;
+    }
+
+    //获取此角色以及选中的系统下的权限编号数组
+    function getResourceIds() {
+        var resourceIds = [];
+        $(roleAuth).each(function () {
+            if ($(this)[0].appId == appId && $(this)[0].roleId == roleId) {
+                resourceIds.push($(this)[0].resourceId);
+            }
+        })
+        return resourceIds;
+    }
+</script>
+</body>
+
+</html>

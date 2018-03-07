@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" action="">
+    <input type="hidden" name="parentId" class="layui-input" th:if="${organizationVM!=null}"
+           th:value="${organizationVM.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">上级组织</label>
+        <div class="layui-input-block">
+            <input type="text" class="layui-input" th:value="${organizationVM!=null?organizationVM.text:'无'}" disabled>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>组织名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" lay-verType="msg"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>组织全称</label>
+        <div class="layui-input-block">
+            <input type="text" name="fullName" lay-verify="required" lay-verType="msg"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入内容" class="layui-textarea" name="description"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="orgAdd">添加</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(['form', 'jquery', 'layer'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer;
+
+        //监听提交
+        form.on('submit(orgAdd)', function (data) {
+            layer.confirm('是否确认添加?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                $.ajax({
+                    url: basePath + '/org/organization/doSave',
+                    data: data.field,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000') {
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.orgTreegrid.treegrid('reload');
+                            parent.layer.closeAll();
+                        }
+                        parent.layer.msg(data.retInfo);
+                    }
+                })
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

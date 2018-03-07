@@ -1,0 +1,19 @@
+apply plugin: 'war'
+
+dependencies {
+    compile project (':user-web:web-common')
+
+    compile(
+            "org.thymeleaf:thymeleaf:${thymeleafVersion}",
+            "net.sourceforge.nekohtml:nekohtml:${nekohtmlVersion}",
+            "org.thymeleaf:thymeleaf-spring4:${thymeleafVersion}",
+            "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:${thymeleafLayoutVersion}",
+            "com.github.theborakompanioni:thymeleaf-extras-shiro:${thymeleafShiroVersion}",
+            "org.springframework.boot:spring-boot-devtools",
+            "com.github.penggle:kaptcha:${kaptchaVersion}"
+    )
+
+    testCompile (
+            "org.easymock:easymock:${easymockVersion}"
+    )
+}

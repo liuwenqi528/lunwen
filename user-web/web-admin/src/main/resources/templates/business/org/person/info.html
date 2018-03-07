@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" action="">
+    <input type="hidden" name="id" class="layui-input" th:value="${personVM.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">人员名称：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${personVM.name}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属部门：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${personVM.departmentName}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属机构：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${personVM.organizationName}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">关联用户：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${personVM!=null?personVM.userName:''}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">人员年龄：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${personVM.age}"></p>
+        </div>
+    </div><div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">人员性别：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${personVM.sex=='1'?'男':'女'}"></p>
+        </div>
+    </div>
+</form>
+
+<script th:inline="javascript" type="text/javascript">
+
+    layui.use(['form', 'jquery', 'layer'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer;
+
+    });
+</script>
+
+</body>
+</html>

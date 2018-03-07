@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" th:action="@{/sys/user/doSetting}">
+    <fieldset class="layui-elem-field">
+        <legend th:text="${userVM.username}">用户名称:</legend>
+        <input type="hidden" name="userId" id="userId" class="layui-input" th:value="${userVM.id}">
+        <div style="width: 100%;height:320px">
+            <table lay-filter="userSetRoleDatagrid" id="userSetRoleDatagrid"></table>
+        </div>
+    </fieldset>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="settingRole">提交</button>
+            <button class="layui-btn layui-btn-primary" id="reset">重置</button>
+        </div>
+    </div>
+</form>
+<script th:inline="javascript">
+    var roleIds = [[${userVM}]].roleIds;
+</script>
+<script th:inline="none">
+
+    layui.use(['form', 'layer', 'table'], function () {
+        var form = layui.form, table = layui.table;
+        table.render({
+            elem: '#userSetRoleDatagrid'
+            , url: basePath + '/sys/role/doDatagrid'
+            , cols: [[ //表头
+                {field: 'id', type: 'checkbox'}
+                , {field: 'name', title: '用户姓名', width: 260}
+                , {field: 'description', title: '角色描述', width: 260}
+            ]]
+            , request: {
+                limitName: 'rows' //每页数据量的参数名，默认：limit
+            },
+            response: {
+                statusName: 'retCode' //数据状态的字段名称，默认：code
+                , statusCode: '0000' //成功的状态码，默认：0
+                , msgName: 'retInfo' //状态信息的字段名称，默认：msg
+                , countName: 'total' //数据总数的字段名称，默认：count
+                , dataName: 'rows' //数据列表的字段名称，默认：data
+            }
+            , height: 300
+            , done: function (data) {
+                checkBox(data);
+            }
+        })
+
+//监听提交
+        form.on('submit(settingRole)', function (data) {
+            layer.confirm('是否确认保存设置的角色?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                //获取选中数据
+                var checkStatus = table.checkStatus('userSetRoleDatagrid')
+                    , data = checkStatus.data;
+                var roleCheckedIds = getRoleCheckedIds(data);
+                $.ajax({
+                    url: basePath + '/sys/user/doSetRole',
+                    data: {userId: $('#userId').val(), roleIds: roleCheckedIds.join(',')},
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        roleIds = roleCheckedIds;
+                        var setIndex = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                        if (data.retCode == '0000') {
+                            layer.confirm(data.retInfo + ',是否关闭？', {
+                                btn: ['关闭', '取消'] //设置询问框上的按钮显示的文字
+                            }, function (index) {//点击保存执行的函数
+                                layer.close(index);
+                                parent.layer.close(setIndex);
+                            });
+                        } else {
+                            layer.msg(data.retInfo);
+                        }
+                    }
+                })
+            });
+            return false;
+        });
+        $('#reset').on('click', function () {
+            table.reload('userSetRoleDatagrid', {
+                done: function (data) {
+                    checkBox(data)
+                }
+            });
+            return false;
+        })
+    });
+
+    //默认选中已有角色
+    function checkBox(data) {
+        var roleData = data.rows;
+        var flag = true;
+        for (var i = 0; i < roleData.length; i++) {
+            if (roleIds.indexOf(parseInt(roleData[i].id)) != -1) {
+                roleData[i].LAY_CHECKED = true;
+                $("#userSetRoleDatagrid").next().find('tr[data-index=' + i + ']').find(".laytable-cell-checkbox input[type='checkbox']").attr('checked', true);
+                $("#userSetRoleDatagrid").next().find('tr[data-index=' + i + ']').find(".laytable-cell-checkbox div").addClass('layui-form-checked');
+            } else {
+                flag = false;
+            }
+        }
+        if (flag && roleData.length > 0) {
+            $("#userSetRoleDatagrid").next().find('.layui-table-header').find(".laytable-cell-checkbox input[type='checkbox']").attr('checked', true);
+            $("#userSetRoleDatagrid").next().find('.layui-table-header').find(".laytable-cell-checkbox div").addClass('layui-form-checked');
+        }
+    }
+
+    //获取选中的角色编号。
+    function getRoleCheckedIds(data) {
+        var roleIds = [];
+        for (var i = 0; i < data.length; i++) {
+            roleIds.push(data[i].id);
+        }
+        return roleIds;
+    }
+</script>
+</body>
+
+</html>

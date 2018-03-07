@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">上级部门：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${departmentVM.parentName!=null?departmentVM.parentName:'无'}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">部门名称：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${departmentVM.text}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">部门全称：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${departmentVM.fullName}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属机构：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${departmentVM.organizationName}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建时间：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${#dates.format(departmentVM.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}"></p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">修改时间：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${#dates.format(departmentVM.gmtModified, 'yyyy-MM-dd HH:mm:ss')}"></p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述：</label>
+        <div class="layui-input-block">
+            <p class="layui-info" th:text="${departmentVM.description}"></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

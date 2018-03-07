@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/base::baseHead">
+</head>
+<body class="childrenBody">
+<div class="toolbar layui-elem-quote">
+    <form class="layui-form" id="appSearchForm">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="username" placeholder="用户名关键字">
+            </div>
+            <div class="layui-form-mid">&nbsp;</div>
+            <!--点击按钮选择今日日期-->
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-btn-sm layui-btn-primary" id="today_failure">今日</a>
+            </div>
+            <!--点击按钮选择昨日日期-->
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-btn-sm layui-btn-primary" id="yesterday_failure">昨日</a>
+            </div>
+            <!--点击按钮选择当月日期-->
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-btn-sm layui-btn-primary" id="month_failure">本月</a>
+            </div>
+            <!--点击按钮选择今年日期-->
+            <div class="layui-input-inline">
+                <a class="layui-btn layui-btn-sm layui-btn-primary" id="year_failure">今年</a>
+            </div>
+            <div class="layui-form-mid">&nbsp;</div>
+            <div class="layui-input-inline">
+                <input type="text" name="timeRange" id="begin_failure" placeholder="选择日期范围"
+                       autocomplete="off" class="layui-input">
+                <input type ="hidden" name = "date">
+                <input type="hidden" name="beginTime"/>
+                <input type="hidden" name="endTime"/>
+            </div>
+            <div class="layui-form-mid">&nbsp;</div>
+            <div class="layui-input-inline">
+                <button class="iconfont icon-soushuo layui-btn layui-btn-sm" id="failureSearch" lay-submit lay-filter="failureSearch">搜索</button>
+                <button class="iconfont icon-reset layui-btn layui-btn-sm layui-btn-primary" type="reset" id="appReset">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="layui-form xy-table">
+    <!--zyc add-->
+    <div class="btnsOperation">
+        <div class="layui-inline">
+            <a class="iconfont icon-shanchu layui-btn layui-btn-sm layui-btn-danger" data-type="logFailureRemove">删除</a>
+        </div>
+        <div class="layui-inline">
+            <a class="iconfont icon-shuaxin layui-btn layui-btn-sm" data-type="logFailureFlush">刷新</a>
+        </div>
+    </div>
+    <!--zyc add-->
+
+    <table class="layui-hide" id="logFailureDatagrid" lay-filter="logFailureDatagrid"></table>
+</div>
+</body>
+<script type="text/javascript" th:inline="none">
+    $('#appReset').on('click',function () {
+        $('#appSearchForm')[0].reset();
+        $('#failureSearch').click();
+    })
+    var logFailureDatagrid,deletePage=1;
+    layui.use(['layer', 'table', 'form','laydate'], function () {
+        var layer = layui.layer, form = layui.form,laydate = layui.laydate,
+            table = layui.table, $ = layui.jquery;
+        //日期
+        laydate.render({
+            elem: '#begin_failure'
+            , type: 'datetime'
+            , range: '至'
+            ,done:function(){
+                $(".layui-btn").removeClass("changeBtn");
+            }
+        });
+        //为按钮添加绑定事件
+        $("#today_failure").click(function () {
+            $(this).addClass("changeBtn");
+            $("a:not(#today_failure)").removeClass("changeBtn");
+            var today = parseDateToStr(0);
+            $("input[name='date']").val(today);
+            $("#begin_failure").val('');//将日期范围的值置为空
+            $("#failureSearch").click();//执行搜索
+            return false;
+        });
+        $("#yesterday_failure").click(function () {
+            $(this).addClass("changeBtn");
+            $("a:not(#yesterday_failure)").removeClass("changeBtn");
+            var yesterday = parseDateToStr(1);
+            $("input[name='date']").val(yesterday);
+            $("#begin_failure").val('');
+            $("#failureSearch").click();//执行搜索
+            return false;
+        });
+        $("#month_failure").click(function () {
+            $(this).addClass("changeBtn");
+            $("a:not(#month_failure)").removeClass("changeBtn");
+            var month = parseDateToStr(2);
+            $("input[name='date']").val(month);
+            $("#begin_failure").val('');
+            $("#failureSearch").click();//执行搜索
+            return false;
+        });
+        $("#year_failure").click(function () {
+            $(this).addClass("changeBtn");
+            $("a:not(#year_failure)").removeClass("changeBtn");
+            var year = parseDateToStr(3);
+            $("input[name='date']").val(year);
+            $("#begin_failure").val('');
+            $("#failureSearch").click();//执行搜索
+            return false;
+        });
+        //监听提交
+        form.on('submit(failureSearch)', function (data) {
+//            执行模糊搜索
+            parseDatetoSplit(data);
+            logFailureDatagrid.reload({
+                where:data.field
+                ,page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            })
+            return false;
+        });
+        logFailureDatagrid = initTable(table,{
+            elem: '#logFailureDatagrid'
+            , url: basePath + '/log/loginFailure/doDatagrid?logType=LOGIN_FAILURE&orderBy=id=desc'
+            , cols: [[ //表头
+                {type: 'checkbox'}
+                , {field: 'id', title: '编号', width: '10%'}
+                , {field: 'gmtCreate', title: '登陆日期', width: '15%'}
+                , {field: 'ip', title: '用户IP', width: '17.7%'}
+                , {field: 'title', title: '日志类型', width: '17%'}
+                , {field: 'content', title: '日志内容', width: '20%'}
+                , {field: 'username', title: '登录用户', width: '17%'}
+            ]]
+            , limits: [10, 20, 50, 100]
+            ,  done: function(res, curr, count){
+                //如果是异步请求数据方式，res即为你接口返回的信息。
+                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+                if((res.rows.length==1) && (curr>1)){
+                    deletePage=curr-1;
+                }else{
+                    deletePage=curr;
+                }
+            }
+        })
+//触发事件
+        var failure = {
+            logFailureRemove: function (id) {
+                var ids = [];
+                if (id != undefined) {
+                    ids.push(id);
+                } else {
+                    var checkStatus = table.checkStatus('logFailureDatagrid')
+                        , data = checkStatus.data;
+                    for (var i = 0; i < data.length; i++) {
+                        ids.push(data[i].id);
+                    }
+                }
+                if (ids.length < 1) {
+                    layer.alert("至少选择一行数据进行删除", {
+                        title: '警告'
+                    });
+                } else {
+                    layer.confirm('确定执行删除吗？', {btn: ['确定', '删除']}, function (index) {
+                        $.ajax({
+                            url: basePath + '/log/loginFailure/doRemove',
+                            data: {ids: ids.join(",")},
+                            dataType: "json",
+                            type: "post",
+                            success: function (data) {
+                                setTimeout(function(){layer.msg("刪除成功！")});
+                                logFailureDatagrid.reload({
+                                    page:{
+                                        curr:deletePage
+                                    }
+                                });
+                                layer.closeAll()
+                            }
+                        })
+                    })
+                }
+            }, logFailureFlush: function () {
+                logFailureDatagrid.reload();
+            }
+        };
+        //上部按钮点击事件
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            failure[type] ? failure[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(logFailureDatagrid)', function (obj) {
+            var data = obj.data;
+            failure[obj.event] ? failure[obj.event].call(this, data.id) : '';
+        });
+    });
+    //点击重置按钮，使相应的值清空
+    $("button[type='reset']").on('click',function(){
+        $("input[name='date']").val('');
+        $("a").removeClass("changeBtn");
+    });
+</script>
+<script type="text/html" id="logFailureBar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="logFailureRemove"><i
+            class="iconfont icon-shanchu"></i>删除</a>
+</script>
+<style rel="stylesheet">
+    .changeBtn{
+        background: #099688;
+        color: #fff;
+    }
+</style>
+<script type="text/javascript" src=${base_Path}+"/static/js/parseDate.js" th:src="@{/js/parseDate.js}"></script>
+</html>

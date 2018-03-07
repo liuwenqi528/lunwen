@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+    <title>学缘网企业后台 - 登录入口</title>
+    <link rel="stylesheet" href="../static/css/login.css" th:href="@{/css/login.css}">
+    <script type="text/javascript" src="../static/js/jquery-1.8.1.min.js" th:src="@{/js/jquery-1.8.1.min.js}"></script>
+    <style>
+        .m-login .login-form {
+            padding: 10px 25px 0;
+        }
+
+        .m-login .logincheck {
+            width: 72px;
+            height: 32px;
+            line-height: 32px;
+            z-index: 1;
+        }
+
+
+    </style>
+</head>
+<body class="resize" style="padding-top: 101.5px;">
+<label th:text="${errorInfo}"></label>
+<header class="g-hd">
+    <div class="g-wrap">
+        <!--logo size ：150 X 40-->
+        <img src="../static/images/login/logo.jpg" th:src="@{/images/login/logo.jpg}" alt="统一用户权限系统">
+    </div>
+</header>
+<section class="g-bd">
+    <div class="g-bd-mn js-bdImg u-bd-img14">
+        <div class="g-wrap">
+            <div class="m-login js-loginpanel">
+                <div class="login-hd">
+                    <div class="item">帐号登录</div>
+                </div>
+                <div class="login-bd">
+                    <form class="login-form login-form-acc js-loginform js-loginform-acc" name="accountlogin"
+                          th:action="@{/login}" th:method="post" target="_top">
+                        <div class="m-ipt js-ipt">
+                            <span class="icon icon-account"></span>
+                            <input id="username" class="ipt js-value js-username" tabindex="1" type="text"
+                                   placeholder="请输入用户名" name="username" th:value="admin">
+                        </div>
+                        <div class="m-ipt js-ipt">
+                            <span class="icon icon-pwd"></span>
+                            <input id="password" class="ipt js-value js-pwd" tabindex="2" placeholder="请输入密码"
+                                   type="password"
+                                   name="password" th:value="654321">
+                        </div>
+                        <div class="m-ipt js-ipt" th:if="${errorRemaining != null && errorRemaining <= 0}">
+                            <input id="accverifycode" maxlength="4" class="ipt js-value js-verifycode" tabindex="2"
+                                   placeholder="请输入验证码" type="text" name="captcha">
+                            <img th:src="@{/images/captcha.svl}" height="42px" id="imgVerifycode" class="refreshVerifycode" title="点击切换" onclick="this.src=this.src">
+                        </div>
+
+                        <div class="loginconf">
+                            <div class="logincheck js-logincheck">
+                                <label class="checklabel js-autolabel">
+                                    <input title="自动登录" class="checkipt js-autologin" type="checkbox">
+                                    <span class="logincheck remember">自动登录</span>
+                                </label>
+                                <div class="securetip js-securetip">为了您的信息安全，请不要在网吧或公用电脑上使用此功能！</div>
+                            </div>
+                        </div>
+                        <div class="loginbtn">
+                            <button class="w-button w-button-account js-loginbtn" type="submit" tabindex="4">登 录
+                            </button>
+                        </div>
+                        <div class="loginact">
+                            <a href="https://mail.qiye.163.com/mailapp/qiyeurs/?from=http%3A%2F%2Fmail.qiye.163.com%2F#/resetPwd"
+                               target="_blank">忘记密码了？</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="js-speedbox">
+                    <div class="m-speed">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<footer class="g-ft">
+    <div class="g-wrap">
+    </div>
+</footer>
+<img src="../static/images/login/httpsEnable.gif" th:src="@{/images/login/httpsEnable.gif}"
+     style="position: absolute;left: -999em;top: -999em;width: 0;height: 0">
+
+<script type="text/javascript">
+    var gDocHeight = $('body').height();
+    //初始化页面垂直居中
+    resizeBody();
+
+    function resizeBody() {
+        var winHeight = $(window).height();
+        var heightGap = winHeight - gDocHeight;
+        if (heightGap > 5) {
+            $('body').css('padding-top', heightGap / 2);
+        } else {
+            $('body').css('padding-top', 0);
+        }
+        var winWidth = $(window).width();
+        $(".g-wrap").width(winWidth >= 960 ? 960 : winWidth);
+    }
+
+    $(window).resize(function () {
+        var winWidth = $(window).width();
+        if (winWidth <= 500) {
+            $(".g-bd-mn").removeClass("u-bd-img14")
+        } else {
+            $(".g-bd-mn").addClass("u-bd-img14")
+        }
+        $(".g-wrap").width(winWidth >= 960 ? 960 : winWidth);
+    });
+    $(".checklabel").hover(function () {
+        $(".js-securetip").css({"display": "block"});
+    }, function () {
+        $(".js-securetip").css({"display": "none"});
+    });
+
+    window.onload = function () {
+        if (window.parent.window != window) {
+            window.top.location.href = window.location.href;
+        }
+    }
+    //页面加载时判断cookie是否有值
+    $(function(){
+        var username = getCookie("username");
+        var password = getCookie("password");
+        $("input[name='username']").val(username);
+        $("input[name='password']").val(password);
+        /*if(username && password){
+            $("button.w-button").click();
+        }*/
+    })
+    //当复选框钩选/不勾选时，保存/删除用户信息cookie失效期设置为15天
+    $(function(){
+        $(":checkbox").click(function(){
+            var flag = $(this).is(":checked");
+            if(flag){
+                var username = $("input[name = 'username']").val();
+                var password = $("input[name = 'password']").val();
+                setCookie("username",username,15)
+                setCookie("password",password,15)
+            }else{
+                deleteCookie("username")
+                deleteCookie("password")
+            }
+        });
+    })
+    //获取cookie的值
+    function getCookie(name){
+        var reg = RegExp(name+'=([^;]+)');
+        var arr = document.cookie.match(reg);
+        if(arr){
+            return arr[1];
+        }else{
+            return '';
+        }
+    }
+    //设置cookie的值
+    function setCookie(name,value,day){
+        var date = new Date();
+        date.setDate(date.getDate() + day);
+        document.cookie = name + '=' + value + ';expires='+ date;
+    };
+    //清除cookie
+    function deleteCookie(name){
+        setCookie(name,null,-1);
+    };
+
+</script>
+
+</body>
+</html>

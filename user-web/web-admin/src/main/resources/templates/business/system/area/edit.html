@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" th:action="@{/sys/area/doUpdate}">
+    <input type="hidden" name="id" id="id" class="layui-input" th:value="${areaVM.id}">
+    <input type="hidden" name="parentId" id="parentId" class="layui-input" th:value="${areaVM.parentId}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">上级地区</label>
+        <div class="layui-input-block">
+            <input type="text" class="layui-input" th:value="${areaVM.parentName!=null?areaVM.parentName:'无'}" disabled>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>地区名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required|areaName" lay-verType="msg" class="layui-input"
+                   th:value="${areaVM.text}">
+            <div class="layui-form-mid layui-word-aux">由1-20位中文组成</div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>邮政编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="code" class="layui-input" th:value="${areaVM.code}" lay-verify="required|areaCode"
+                   lay-verType="msg">
+            <div class="layui-form-mid layui-word-aux">由6位数字组成</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>地区类型</label>
+        <div class="layui-input-block">
+            <select name="areaType" class="layui-input" lay-verType="msg" lay-verify="required">
+                <option value="NATIONALITY" th:selected="${areaVM.areaTypeName}=='国家'">国家</option>
+                <option value="PROVINCE" th:selected="${areaVM.areaTypeName}=='省/直辖市'">省/直辖市</option>
+                <option value="CITY" th:selected="${areaVM.areaTypeName}=='市'">市</option>
+                <option value="COUNTY" th:selected="${areaVM.areaTypeName}=='区/县'">区/县</option>
+            </select>
+            <div class="layui-form-mid layui-word-aux">必选项</div>
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入描述" class="layui-textarea" name="description"
+                      th:value="${areaVM.description}"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="areaEdit">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'jquery', 'layer'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+
+        //自定义验证规则
+        form.verify({
+            areaName: function (value) {
+                return verifyAera(value, '地区名称', 'name');
+            },
+            areaCode: function (value) {
+                return verifyAera(value, '邮编', 'code');
+            }
+        })
+
+        function verifyAera(value, title, type) {
+            if (type == 'name') {
+                if (!new RegExp('^[\u4e05-\u9fa5]{1,20}$').test(value)) {
+                    return '地区名称由1-20位中文组成';
+                }
+            }
+            else if (type == 'code') {
+                if (!new RegExp('^\\d{6}$').test(value)) {
+                    return '邮编只能由6位数字组成';
+                }
+            }
+            var id = $("#id").val();
+            var data = '{"' + type + '":"' + value + '","parentId":"' + $("#parentId").val() + '","id":"' + id + '"}';
+            var isExist = false;
+            $.ajax({
+                url: basePath + '/sys/area/doValidate',
+                data: JSON.parse(data),
+                dataType: "json",
+                async: false,
+                type: "post",
+                success: function (data) {
+                    if (data.retCode == '0000')
+                        isExist = true;
+                }
+            })
+            if (!isExist)
+                return title + '已存在,请重新填写！';
+        }
+
+        //监听提交
+        form.on('submit(areaEdit)', function (data) {
+            layer.confirm('是否确认修改?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                $.ajax({
+                    url: basePath + '/sys/area/doSave',
+                    data: data.field,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000') {
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.areaTreegrid.treegrid('reload');
+                            parent.layer.closeAll();
+                        }
+                        parent.layer.msg(data.retInfo);
+                    }
+                })
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

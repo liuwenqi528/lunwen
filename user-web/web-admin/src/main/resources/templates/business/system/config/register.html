@@ -1,0 +1,46 @@
+<!--  Created by   liuwenqi on 2018-03-05. -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+<div class="layui-tab-item REGISTER" th:fragment="config">
+    <div class="xy-form">
+        <form class="layui-form">
+            <input type="hidden" name="type" th:value="REGISTER">
+            <div class="layui-form-item">
+                <div class="layui-block">
+                    <label class="layui-form-label">注册标题</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="register_title" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <hr class="layui-bg-gray">
+            <div class="layui-form-item">
+                <div class="layui-block">
+                    <label class="layui-form-label">注册内容</label>
+                    <div class="layui-input-block">
+                                    <textarea placeholder="请输入内容" class="layui-textarea"
+                                              name="register_content"></textarea>
+                        <div class="layui-form-mid layui-word-aux"
+                             th:utext="${'用户名：${Username}，激活码：${ActivationCode}'}"></div>
+
+                    </div>
+                </div>
+            </div>
+            <hr class="layui-bg-gray">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="setRegisterConfig">保存</button>
+                    <button class="layui-btn layui-btn-primary changeReturn" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

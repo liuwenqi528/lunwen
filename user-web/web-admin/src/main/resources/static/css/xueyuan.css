@@ -1,0 +1,668 @@
+.xy-inline, img {
+    display: inline-block;
+    vertical-align: middle
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 400
+}
+
+.xy-edge, .xy-header, .xy-inline, .xy-main {
+    position: relative
+}
+
+.xy-btn, .xy-edge, .xy-inline, img {
+    vertical-align: middle
+}
+
+blockquote, body, button, dd, div, dl, dt, form, h1, h2, h3, h4, h5, h6, input, li, ol, p, pre, td, textarea, th, ul {
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+}
+
+a:active, a:hover {
+    outline: 0
+}
+
+img {
+    border: none
+}
+
+li {
+    list-style: none
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+h4, h5, h6 {
+    font-size: 100%
+}
+
+button, input, optgroup, option, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    outline: 0
+}
+
+pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word
+}
+
+body {
+    line-height: 24px;
+    font: 14px Helvetica Neue, Helvetica, PingFang SC, \5FAE\8F6F\96C5\9ED1, Tahoma, Arial, sans-serif
+}
+
+hr {
+    height: 1px;
+    margin: 10px 0;
+    border: 0;
+    clear: both
+}
+
+a {
+    color: #333;
+    text-decoration: none
+}
+
+a:hover {
+    color: #777
+}
+
+a cite {
+    font-style: normal;
+    *cursor: pointer
+}
+
+div {
+    display: block;
+}
+
+#center {
+    border-top: 6px solid #009688;
+    border-left: 2px solid #009688;
+}
+
+/*菜单样式设置*/
+.panel, .panel-body, .layout-panel {
+    overflow: auto;
+}
+
+.xy-show {
+    display: block !important;
+}
+
+.xy-nav-img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+/*布局顶部header*/
+.xy-header {
+    background-color: #23262E;
+    width: 100%;
+    z-index: 1000;
+    height: 60px;
+}
+
+/*布局顶部header最左侧，放系统logo文字等*/
+.xy-header .xy-header-logo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    line-height: 60px;
+    text-align: center;
+    color: #009688;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/*设置背景颜色*/
+.xy-header .xy-nav {
+    background: 0 0;
+}
+
+/*设置整个系统中所有导航标签ul的样式*/
+.xy-nav {
+    position: relative;
+    padding: 0 20px;
+    background-color: #393D49;
+    color: #fff;
+    border-radius: 2px;
+    font-size: 0;
+    box-sizing: border-box;
+}
+
+/*设置顶部header最左侧的横向导航。*/
+.xy-header-left {
+    position: absolute;
+    left: 200px;
+    top: 0;
+}
+
+/*设置顶部header最右侧的横向导航。*/
+.xy-header-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/*设置导航标签下的所有字体大小都为14px*/
+.xy-nav * {
+    font-size: 14px;
+}
+
+/*设置导航标签ul中的li*/
+.xy-nav .xy-nav-item {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 64px;
+}
+
+/*设置导航标签中显示文字的标签样式-此UI中用的是超链接a */
+.xy-nav .xy-nav-item a {
+    display: block;
+    padding: 0 20px;
+    color: #fff;
+    transition: all .3s;
+    -webkit-transition: all .3s;
+}
+
+.xy-nav .xy-nav-item a:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/*子菜单样式*/
+
+.xy-nav .xy-nav-item .xy-nav-child {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 59px;
+    min-width: calc(100% - 2px);
+    line-height: 36px;
+    padding: 5px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .12);
+    border: 1px solid #d2d2d2;
+    background-color: #fff;
+    z-index: 9999;
+    border-radius: 2px;
+    white-space: nowrap;
+}
+
+.xy-nav .xy-nav-child a {
+    color: #333
+}
+
+.xy-nav .xy-nav-child a:hover {
+    background-color: #f2f2f2;
+    color: #000
+}
+
+.xy-nav .xy-nav-child dd {
+    position: relative
+}
+
+.xy-nav .xy-nav-child dd.xy-this a, .xy-nav-child dd.xy-this {
+    background-color: #5FB878;
+    color: #fff
+}
+
+.xy-nav .xy-nav-child dd.xy-this:after {
+    display: none
+}
+
+.xy-nav .xy-nav-more {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid dashed dashed;
+    border-color: #fff transparent transparent;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all .2s;
+    -webkit-transition: all .2s;
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    margin-top: -3px;
+    border-width: 6px;
+    border-top-color: rgba(255, 255, 255, .7);
+}
+
+.xy-nav .xy-nav-mored, .xy-nav-itemed .xy-nav-more {
+    margin-top: -9px;
+    border-style: dashed dashed solid;
+    border-color: transparent transparent #fff;
+}
+
+.xy-nav .xy-this:after, .xy-nav-bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 4px;
+    background-color: #393D49;
+    transition: all .2s;
+    -webkit-transition: all .2s
+}
+
+/*导航鼠标移上后显示的元素*/
+.xy-nav-bar {
+    z-index: 1000;
+    bottom: 0;
+}
+
+.xy-nav .xy-nav-item:hover > a:after {
+    content: '';
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    /*top: 55px;*/
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #393D49;
+    transition: all .2s;
+    -webkit-transition: all .2s;
+}
+
+/*设置nav中点击后的样式*/
+.xy-nav .xy-this:after {
+    content: '';
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #393D49;
+    transition: all .2s;
+    -webkit-transition: all .2s;
+}
+
+/*手风琴内容设置*/
+.xy-nav-tree {
+    width: 100%;
+    height: 100%;
+    background-color: #23262E;
+    position: relative;
+    padding: 0;
+    border-radius: 2px;
+    font-size: 0;
+    box-sizing: border-box;
+}
+
+.xy-nav-tree .xy-nav-item {
+    width: 100%;
+    height: 40px;
+    list-style-type: none;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 60px;
+}
+
+/*手风琴下的超链接*/
+.xy-nav-tree .xy-nav-item > a {
+    font-size: 14px;
+    margin: 0 auto;
+    display: block;
+    padding: 0 20px;
+    color: #fff;
+    transition: all .3s;
+    -webkit-transition: all .3s;
+    height: 40px;
+    line-height: 40px;
+    text-decoration: none;
+}
+
+.xy-nav-tree .xy-nav-item > a:hover {
+    color: rgba(255, 255, 255, 1);
+    background-color: #4E5465;
+}
+
+.xy-nav-tree .xy-nav-item:hover a:after {
+    content: '';
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    top: 0px;
+    width: 5px;
+    height: 40px;
+    background-color: #009688;
+    transition: all 2s;
+    -webkit-transition: all 2s;
+}
+
+.xy-nav-tree .xy-this {
+    background-color: #009688;
+}
+
+.xy-tool {
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background-color: #4A5064;
+    text-align: center;
+    border-right: 2px solid #009688;
+}
+
+.xy-tool i {
+    padding: 6px;
+    color: #b6c2cb;
+}
+
+.xy-tool i:hover {
+    cursor: pointer;
+}
+
+/*菜单样式设置完成*/
+/*统一样式设置完成*/
+/*checkbox*/
+.datagrid-cell-check > label > input[type="checkbox"], .datagrid-header-check > label > input[type="checkbox"] {
+    appearance: none;
+    outline: none;
+}
+
+td > .datagrid-cell-check > label, td .datagrid-header-check > label {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 30px;
+}
+
+td > .datagrid-cell-check > label > input, td > .datagrid-header-check > label > input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 10000;
+}
+
+td > .datagrid-cell-check > label > i, td > .datagrid-header-check > label > i {
+    position: relative;
+    top: 5px;
+    left: 0px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    border: 1px solid #d2d2d2;
+    color: #fff;
+    font-size: 12px;
+    line-height: 16px;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.datagrid-cell-check > label:hover i, .datagrid-header-check > label:hover i {
+    border: 1px solid #5FB878;
+}
+
+.datagrid-cell > label > input[type="checkbox"], .datagrid-header-check > label > input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    visibility: hidden;
+}
+
+.datagrid-cell > label > input[type="checkbox"] + i, .datagrid-header-check > label > input[type="checkbox"] + i {
+    position: relative;
+    left: 0px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    border: 1px solid #d2d2d2;
+    color: #fff;
+    font-size: 12px;
+    line-height: 16px;
+    border-radius: 2px;
+    text-align: center;
+}
+
+.datagrid-cell > label > input[type="checkbox"] + i:hover, .datagrid-header-check > label > input[type="checkbox"] + i:hover {
+    border: 1px solid #5FB878;
+}
+
+.datagrid-cell .layui-form-switch {
+    margin-top: 0px;
+}
+
+/*工具栏*/
+.toolbar {
+    padding: 10px;
+    /*height: 45px;*/
+    background-color: #ffffff;
+    /*border-bottom: 1px solid #e1e1e1;*/
+    box-sizing: border-box;
+}
+
+.xy-toolbar {
+    padding: 6px;
+    background-color: #F5F5F5;
+    /*border:1px solid #e1e1e1;*/
+}
+
+.xy-toolbar select {
+    width: 154px;
+}
+
+.xy-toolbar .xy-toolbar-left, .xy-toolbar .xy-toolbar-right {
+    box-sizing: border-box;
+    display: inline-block;
+    /*top: 16px;*/
+    height: 42px;
+    line-height: 42px;
+    vertical-align: middle;
+}
+
+.xy-toolbar .xy-toolbar-left {
+    /*padding-top: 5px;*/
+}
+
+.xy-toolbar .xy-toolbar-left .xy-toolbar-title {
+    padding-left: 15px;
+    height: 38px;
+    line-height: 38px;
+}
+
+.xy-toolbar .xy-toolbar-right {
+    margin-right: 20px;
+    float: right;
+}
+
+/*工具栏设置结束*/
+.xy-button {
+    vertical-align: middle;
+    display: inline-block;
+    /* height: 26px;*/
+    /*zyc updata*/
+    height: 30px;
+    /*zyc updata*/
+    margin-left: 10px;
+    padding: 0 10px;
+    background-color: #009688;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 16px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+
+.xy-button-sm {
+    height: 26px;
+    line-height: 26px;
+    padding: 0 10px;
+    font-size: 14px !important;
+    border-radius: 2px;
+    margin-left: 0px;
+}
+
+.xy-button span {
+    font-size: 14px;
+    padding-left: 5px;
+}
+
+.xy-button-sm span {
+    padding: 0px 3px;
+}
+.xy-button-disabled, .xy-button-disabled:active, .xy-button-disabled:hover{
+    border: 1px solid #e6e6e6;
+    background-color: #FBFBFB;
+    color: #C9C9C9;
+    cursor: not-allowed;
+    opacity: 1
+}
+.xy-button-azury {
+    border: 1px solid #009688;
+    background-color: #009688;
+}
+
+.xy-button-blue {
+    border: 1px solid #1E9FFF;
+    background-color: #1E9FFF;
+}
+
+.xy-button-white {
+    background-color: #ffffff;
+    border: 1px solid #dedede;
+    color: #6c6565;
+}
+
+.xy-button-red {
+    border: 1px solid #FF5722;
+    background-color: #FF5722;
+}
+
+.xy-button-yellow {
+    border: 1px solid #ffbe60;
+    background-color: #ffbe60;
+
+}
+
+.xy-button-orange {
+    border: 1px solid #fe9901;
+    background-color: #fe9901;
+}
+
+.xy-button-wathet {
+    border: 1px solid #56dea0;
+    background-color: #56dea0;
+}
+.xy-button-light-green {
+    border: 1px solid #15bc84;
+    background-color: #15bc84;
+}
+.xy-button-light-yellow {
+    border: 1px solid #ff9f4c;
+    background-color: #ff9f4c;
+}
+
+.toolbar .layui-form-label {
+    height: 20px;
+    line-height: 20px;
+    padding: 5px 5px 0 15px;
+    width: auto;
+    font-size: 14px;
+}
+
+.toolbar .layui-input {
+    height: 30px;
+    line-height: 30px;
+}
+
+.toolbar .layui-form-item {
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 5px;
+}
+
+.toolbar .layui-form-mid {
+    padding: 5px 5px !important;
+    height: 20px;
+    line-height: 20px;
+    margin-right: 0px;
+}
+
+.toolbar .layui-input-inline {
+    height: auto;
+    margin-right: 0px;
+}
+
+.toolbar .layui-form-switch {
+    margin-top: 0px;
+}
+
+.toolbar .layui-form-item .layui-input-inline {
+    width: auto;
+}
+
+.toolbar .layui-form-select {
+    width: auto;
+}
+
+.toolbar .layui-form-select dl {
+    top: 30px;
+}
+
+.layui-nav .layui-nav-item a {
+    padding: 0 10px;
+}
+
+.layui-table-header span, .datagrid-header .datagrid-cell span {
+    font-weight: 600;
+    color: #303030;
+    font-size: 14px;
+}
+
+.topNav .layui-nav .layui-nav-item {
+    height: 60px;
+}
+
+.layui-input, .datagrid-htable, .datagrid-btable, .datagrid-ftable, .layui-table {
+    color: #000;
+}
+
+.layui-input-block {
+    margin-left: 120px;
+}
+
+.layui-form-label {
+    width: 90px;
+}
+
+.layui-info {
+    height: auto;
+    min-height: 38px;
+    /*max-height: 100px;*/
+    line-height: 38px;
+    word-wrap:break-word;
+    word-break:break-all;
+    overflow: hidden;
+    width: 90%;
+    color: #656565;
+}
+.layui-elem-quote .layui-btn-sm{
+    height:30px;
+    line-height: 30px;
+}

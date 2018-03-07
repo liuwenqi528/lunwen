@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/base::baseHead">
+</head>
+<body class="childrenBody">
+<div class="layui-elem-quote news_search changeBg">
+    <form class="layui-form" id="appSearchForm">
+        <div class="layui-inline">
+            <input type="text" name="name" placeholder="系统名称关键字" class="layui-input" autocomplete="off">
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="code" placeholder="系统编码关键字" class="layui-input" autocomplete="off">
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="timeRange" id="begin_success" placeholder="创建用户时间范围"
+                   autocomplete="off" class="layui-input">
+            <input type="hidden" name="beginTime"/>
+            <input type="hidden" name="endTime"/>
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="appSearch" id="appSearch">搜索</button>
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-sm layui-btn-primary" type="reset" id="appReset">重置</button>
+        </div>
+    </form>
+</div>
+<div class="layui-form xy-table">
+    <!--zyc add-->
+    <div class="btnsOperation">
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" data-type="appAdd">添加</a>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm layui-btn-danger" data-type="appRemove">删除</a>
+        </div>
+        <div class="layui-inline">
+            <a class="layui-btn layui-btn-sm" data-type="appFlush">刷新</a>
+        </div>
+    </div>
+    <!--zyc add-->
+    <table class="layui-hide" id="appDatagrid" lay-filter="appDatagrid"></table>
+
+</div>
+</body>
+<script src="../../../../static/js/parseDate.js" th:src="@{/js/parseDate.js}"></script>
+
+<script type="text/javascript" th:inline="none">
+    var appDataGrid, currentPage = 1, ServerRows = 1;
+    layui.use(['layer', 'laydate', 'table', 'form'], function () {
+        var layer = layui.layer, form = layui.form, laydate = layui.laydate,
+            table = layui.table, $ = layui.jquery;
+        //日期
+        var ins1 = laydate.render({
+            elem: '#begin_success'
+            , type: 'datetime'
+            , range: '至'
+        });
+
+        //监听提交
+        form.on('submit(appSearch)', function (data) {
+            parseDatetoSplit(data);
+            appDataGrid.reload({
+                where: data.field
+                , page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            })
+            return false;
+        });
+        $('#appReset').on('click', function () {
+            $('#appSearchForm')[0].reset();
+            $('#appSearch').click();
+        })
+        //渲染table.
+        appDataGrid = initTable(table,{
+            elem: '#appDatagrid'
+            , url: basePath + '/sys/appRegister/doDatagrid?orderBy=id=desc'
+            , cols: [[ //表头
+                {field: 'id', type: 'checkbox'}
+                , {field: 'name', title: '系统名称', width: '20%'}
+                , {field: 'code', title: '系统编码', width: '15%'}
+                , {field: 'url', title: '访问地址', width: '20%'}
+                , {field: 'gmtCreate', title: '创建时间', width: '20%', sort: true}
+                , {field: 'priority', title: '权重', width: '10%', sort: true}
+                , {title: '操作', align: 'center', toolbar: '#appBar'}
+            ]]
+            , done: function (res, curr, count) {
+                //如果是异步请求数据方式，res即为你接口返回的信息。
+                ServerRows = res.rows.length;
+                currentPage = curr;
+            }
+        })
+//        appDataGrid = table.render({
+//            elem: '#appDatagrid'
+//            , url: basePath + '/sys/appRegister/doDatagrid?orderBy=id=desc'
+//            , cols: [[ //表头
+//                {field: 'id', type: 'checkbox'}
+//                , {field: 'name', title: '系统名称', width: '20%'}
+//                , {field: 'code', title: '系统编码', width: '15%'}
+//                , {field: 'url', title: '访问地址', width: '20%'}
+//                , {field: 'gmtCreate', title: '创建时间', width: '20%', sort: true}
+//                , {field: 'priority', title: '权重', width: '10%', sort: true}
+//                , {title: '操作', align: 'center', toolbar: '#appBar'}
+//            ]]
+//            , request: {
+//                limitName: 'rows' //每页数据量的参数名，默认：limit
+//            },
+//            response: {
+//                statusName: 'retCode' //数据状态的字段名称，默认：code
+//                , statusCode: '0000' //成功的状态码，默认：0
+//                , msgName: 'retInfo' //状态信息的字段名称，默认：msg
+//                , countName: 'total' //数据总数的字段名称，默认：count
+//                , dataName: 'rows' //数据列表的字段名称，默认：data
+//            }
+//            , text: {
+//                none: '暂无相关数据' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+//            }
+//            , height: 'full-160'
+//            , page: true
+//            , limits: [5, 10, 15, 20]
+//            , done: function (res, curr, count) {
+//                //如果是异步请求数据方式，res即为你接口返回的信息。
+//                ServerRows = res.rows.length;
+//                currentPage = curr;
+//            }
+//        })
+        //触发事件
+        var app = {
+            appAdd: function () {
+                openLayer('添加系统', basePath + '/sys/appRegister/toAddPage');
+            },
+            appEdit: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                    openLayer('编辑系统', basePath + '/sys/appRegister/toEditPage' + param);
+                }
+            },
+            appRemove: function (id) {
+                var ids = [];
+                if (id != undefined) {
+                    ids.push(id);
+                } else {
+                    var checkStatus = table.checkStatus('appDatagrid')
+                        , data = checkStatus.data;
+                    for (var i = 0; i < data.length; i++) {
+                        ids.push(data[i].id);
+                    }
+                }
+                if (ids.length < 1) {
+                    layer.alert("至少选择一行数据进行删除", {
+                        title: '警告'
+                    });
+                } else {
+                    layer.confirm('是否确认删除?', {
+                        btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+                    }, function (index) {//点击保存执行的函数
+                        $.ajax({
+                            url: basePath + '/sys/appRegister/doRemove',
+                            data: {ids: ids.join(',')},
+                            dataType: "json",
+                            type: "post",
+                            success: function (data) {
+                                layer.msg(data.retInfo);
+                                //如果大于第一页
+                                if ((currentPage > 1) && (ServerRows == ids.length)) {
+                                    --currentPage;
+                                }
+                                appDataGrid.reload({
+                                    page: {
+                                        curr: currentPage
+                                    }
+                                });
+                                layer.close(index);
+                            }
+                        })
+
+                    });
+                }
+            },
+            appSearch: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                    openLayer('系统详情', basePath + '/sys/appRegister/toInfoPage' + param);
+                }
+            },
+            appFlush: function () {
+                appDataGrid.reload();
+            }
+        };
+        //上部按钮点击事件
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            app[type] ? app[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(appDatagrid)', function (obj) {
+            var data = obj.data;
+            app[obj.event] ? app[obj.event].call(this, data.id) : '';
+        });
+    });
+
+</script>
+<script type="text/html" id="appBar">
+    <a class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="appSearch" title="详情"></a>
+    <a class="layui-btn layui-btn-normal layui-btn-sm iconfont icon-xiugai1" lay-event="appEdit" title="编辑"></a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm iconfont icon-shanchu" lay-event="appRemove" title="删除"></a>
+</script>
+</html>
+
+
+

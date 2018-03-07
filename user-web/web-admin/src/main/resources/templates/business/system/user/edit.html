@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" th:action="@{/sys/user/doUpdate}" method="post">
+    <input type="hidden" name="id" id="uid" class="layui-input" th:value="${userVM.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="required|username" lay-verType="msg"
+                   class="layui-input" th:value="${userVM.username}" readonly="readonly">
+            <div class="layui-form-mid layui-word-aux">字母、数字、下划线组成，且长度必须为4-18位</div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" lay-verify="required|email" lay-verType="msg"
+                   th:value="${userVM.email}"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" lay-verify="required|phone" lay-verType="msg"
+                   th:value="${userVM.phone}"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">昵称</label>
+        <div class="layui-input-block">
+            <input type="text" name="nickname" lay-verify="nickname" lay-verType="msg" class="layui-input"
+                   th:value="${userVM.nickname}">
+            <div class="layui-form-mid layui-word-aux">不能包含特殊字符，且长度不能大于16位</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="realname" lay-verify="realname" lay-verType="msg" class="layui-input"
+                   th:value="${userVM.realname}">
+            <div class="layui-form-mid layui-word-aux">只能由中文组成</div>
+        </div>
+    </div>
+
+
+    <!--<div class="layui-form-item">-->
+    <!--<label class="layui-form-label">身份证号</label>-->
+    <!--<div class="layui-input-block">-->
+    <!--<input type="text" name="idcard" placeholder="请输入身份证号" autocomplete="off" th:value="${userVM.idcard}"-->
+    <!--class="layui-input">-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="layui-form-item">-->
+    <!--<label class="layui-form-label">生日</label>-->
+    <!--<div class="layui-input-block">-->
+    <!--<input type="text" name="birthday" id="birthday" autocomplete="off" th:value="${userVM.birthday}"-->
+    <!--class="layui-input">-->
+    <!--</div>-->
+    <!--</div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理员</label>
+        <div class="layui-input-block">
+            <input type="radio" name="admin" title="是" th:checked="${userVM.admin}" value="true">
+            <input type="radio" name="admin" title="否" th:checked="${userVM.admin}==false" value="false">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户状态</label>
+        <div class="layui-input-block">
+            <select name="status" class="layui-input">
+                <option value="NORMAL" th:selected="${userVM.statusName}=='NORMAL'">正常</option>
+                <option value="DISABLED" th:selected="${userVM.statusName}=='DISABLED'">禁用</option>
+                <option value="LOCKED" th:selected="${userVM.statusName}=='LOCKED'">锁定</option>
+                <option value="UNACTIVED" th:selected="${userVM.statusName}=='UNACTIVED'">未激活</option>
+                <option value="CLOSED" th:selected="${userVM.statusName}=='CLOSED'">删除</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="userUpdate">提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['form', 'jquery', 'layer', 'laydate'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+            , laydate = layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#birthday'
+            , type: 'date'
+        });
+
+        //自定义验证规则
+        form.verify({
+            username: function (value) {
+                return verifyAccount(value, "username");
+            }
+            , password: function (value) {
+                return verifyPassWord(value)
+            }
+            , email: function (value) {
+                return verifyAccount(value, "email");
+            }
+            , phone: function (value) {
+                return verifyAccount(value, "phone");
+            }
+            , nickname: function (value) {
+                return verifyNickName(value, '昵称')
+            }
+            , card: function (value) {
+                return verifyCard(value)
+            }
+            , realname: function (value) {
+                return verifyRealName(value)
+            }
+        })
+
+        //监听提交
+        form.on('submit(userUpdate)', function (data) {
+            layer.confirm('是否确认修改?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                $.ajax({
+                    url: basePath + '/sys/user/doUpdate',
+                    data: data.field,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000') {
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.userDatagrid.reload();
+                            parent.layer.closeAll();
+                        }
+                        parent.layer.msg(data.retInfo);
+                    }
+                })
+            });
+            return false;
+        });
+    });
+
+    //验证账号（用户名/邮箱/手机号）格式是否正确、异步验证账号是否存在
+    function verifyAccount(value, type) {
+        var msg = "";
+        if (type == "username") {
+            msg = "用户名";
+            if (!new RegExp('^[a-zA-Z0-9_]{4,16}$').test(value)) {
+                return '用户名必须由字母、数字、下划线组成，且长度必须为4-16位';
+            }
+        } else if (type == "email") {
+            msg = "邮箱";
+            if (!new RegExp('^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$').test(value)) {
+                return '邮箱格式不正确!';
+            }
+        } else if (type == "phone") {
+            msg = "手机号";
+            if (!new RegExp('^((13[0-9])|(14[5-9])|(15([0-9]))|(17([(01)|(3-8]))|(18[0-9])|(166)|(19[89]))\\d{8}$').test(value)) {
+                return '手机号码格式错误!';
+            }
+        }
+        var isExist = false;
+        $.ajax({
+            url: basePath + '/sys/user/doVerify',
+            data: {value: value, type: type},
+            dataType: "json",
+            async: false,
+            type: "post",
+            success: function (data) {
+                if (data == $("#uid").val()||data==0)
+                    isExist = true;
+            }
+        })
+        if (!isExist)
+            return msg + '已存在,请重新填写！';
+    }
+</script>
+<script type="text/javascript" src=${base_Path}+"/static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" th:action="@{/template/smsTpl/doUpdate}">
+    <input type="hidden" name="id" class="layui-input" th:value="${smsTplVM.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>模板名称</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="templateType" value="SMS"/>
+            <input type="text" name="tplName" lay-verify="required|tplName" lay-verType="msg"
+                   class="layui-input" th:value="${smsTplVM.tplName}"/>
+            <div class="layui-form-mid layui-word-aux">由2-20位字母、数字、中文和下划线组成，下划线不能开头结尾</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>业务类型</label>
+        <div class="layui-input-block">
+            <select name="smsType" class="layui-input">
+                <option value="REGIST" th:selected="${smsTplVM.businessType}=='REGIST'">注册发送</option>
+                <option value="CHANGEPWD" th:selected="${smsTplVM.businessType}=='CHANGEPWD'">修改密码发送</option>
+                <option value="BACKPWD" th:selected="${smsTplVM.businessType}=='BACKPWD'">找回密码发送</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>短信类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="type" value="0" title="普通短信" th:checked="${smsTplVM.type}==0">
+            <input type="radio" name="type" value="1" title="营销短信" th:checked="${smsTplVM.type}==1">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>模板内容</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入短信内容" class="layui-textarea" th:text="${smsTplVM.content}"  lay-verify="required|content" lay-verType="msg"  name="content"></textarea>
+            <div class="layui-form-mid layui-word-aux">短信内容中的变量使用${n}表示,n为大于等于0的整数内容长度不能大于50</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>短信平台</label>
+        <div class="layui-input-block">
+            <select name="platform" class="layui-input">
+                <option value="0" th:selected="${smsTplVM.platform}==0">腾讯云</option>
+                <option value="1" th:selected="${smsTplVM.platform}==1">阿里云</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入短信备注内容" th:text="${smsTplVM.remark}" class="layui-textarea" name="remark"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="smsTplEdit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
+
+<script>
+    layui.use(['form', 'jquery', 'layer'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+
+        form.verify({
+            content: function (value) {
+                if (value.length > 50) {
+                    return "短信内容长度不能超过50";
+                }
+            },
+            tplName: function (value) {
+                if (!new RegExp('^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]{2,20}$').test(value)) {
+                    return '角色名称长度为2-20位，可以是汉字、数字、字母、下划线不能以下划线开头和结尾!';
+                }
+                var id = $("input[name = 'id']").val();
+                var data = '{"tplName":"' + value + '","id":' + id + '}';
+                var isExist = false;
+                $.ajax({
+                    url: basePath + '/template/smsTpl/doValidate',
+                    data: JSON.parse(data),
+                    dataType: "json",
+                    async: false,
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000')
+                            isExist = true;
+                    }
+                })
+                if (!isExist)
+                    return '模板名称已存在,请重新填写！';
+            }
+        });
+
+        //监听提交
+        form.on('submit(smsTplEdit)', function (data) {
+            layer.confirm('是否确认修改?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                $.ajax({
+                    url: basePath + '/template/smsTpl/doUpdate',
+                    data: data.field,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000') {
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.smsTplDatagrid.reload();
+                            parent.layer.closeAll();
+                        }
+                        parent.layer.msg(data.retInfo);
+                    }
+                })
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

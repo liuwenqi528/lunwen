@@ -1,0 +1,509 @@
+@charset "UTF-8";
+body{overflow:hidden;}
+
+.video-player{background-color: transparent;display: block;position: absolute;z-index: 1;top:0;}
+.video_mask{ width:100%; height:100%; position:absolute; left:0; top:0; z-index:90; background-color:rgba(0,0,0,0.5); }
+.login{ height:260px;width:260px;padding: 20px;background-color:rgba(0,0,0,0.5);border-radius: 4px;position:absolute;left: 50%;top: 50%; margin:-150px 0 0 -150px;z-index:99;}
+.login h1{ text-align:center; color:#fff; font-size:24px; margin-bottom:20px; }
+.form_code{ position:relative; }
+.form_code .code{ position:absolute; right:0; top:1px; cursor:pointer; }
+.login_btn{ width:100%; }
+.f-fl, .m-login .login-hd .item, .m-login .logincheck, .m-speed .item {
+    float: left;
+    display: inline
+}
+
+.f-fr {
+    float: right;
+    display: inline
+}
+
+.f-cb, .m-login .login-hd, .m-login .loginconf, .m-speed .speed-bd {
+    zoom: 1
+}
+
+.f-cb:after, .m-login .login-hd:after, .m-login .loginconf:after,
+.m-speed .speed-bd:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden
+}
+
+.m-login .logincheck .icon-checkbox {
+    display: -moz-inline-stack;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: middle
+}
+
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre,
+form, fieldset, legend, button, input, textarea, th, td, figure {
+    margin: 0;
+    padding: 0
+}
+
+ul, ol {
+    list-style: none outside none
+}
+
+q {
+    quotes: none
+}
+
+q:before, q:after {
+    content: "";
+    content: none
+}
+
+legend {
+    color: #000
+}
+
+fieldset {
+    border: 0
+}
+
+button, input, select, textarea {
+    font-size: 100%
+}
+
+button, input {
+    line-height: normal
+}
+
+button::-moz-focus-inner, input::-moz-focus-inner {
+    border: 0;
+    padding: 0
+}
+
+textarea {
+    overflow: auto
+}
+
+img {
+    border: 0;
+    vertical-align: middle
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0
+}
+
+th {
+    text-align: inherit
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup,
+menu, nav, section, summary {
+    display: block
+}
+
+html {
+    *overflow: auto;
+    *overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%
+}
+
+body, button, input, select, textarea {
+    outline: 0;
+    font: 12px / 1.5 Verdana;
+    _font-family: tahoma;
+    color: #000
+}
+
+button, input, select, textarea {
+    border: 0
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: 100%
+}
+
+a, a:hover {
+    text-decoration: none
+}
+
+a {
+    color: #959595
+}
+
+a:hover {
+    color: #626262
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    a:active {
+        background-color: transparent
+    }
+}
+
+img {
+    max-width: 100%;
+    width: auto \9;
+    /*height: auto;*/
+    -ms-interpolation-mode: bicubic
+}
+
+textarea {
+    width: 100%;
+    vertical-align: middle;
+    resize: none;
+    border: 0;
+    overflow: auto
+}
+
+label {
+    vertical-align: top
+}
+
+input[type=submit], input[type=button], button {
+}
+
+input::-ms-clear {
+    display: none
+}
+
+table {
+    table-layout: fixed
+}
+
+article, aside, footer, header, hgroup, nav, section {
+    display: block
+}
+
+.f-hide {
+    display: none
+}
+
+.m-ipt, .m-ipt .icon, .m-login .logincheck .icon-checkbox,
+.w-button {
+    background: url(../images/login/sprite.png) -9999px -9999px no-repeat;
+}
+
+body {
+    text-align: center;
+    background-color: #fff
+}
+
+body.resize {
+    -webkit-transition: padding .3s ease;
+    -moz-transition: padding .3s ease;
+    -o-transition: padding .3s ease;
+    transition: padding .3s ease
+}
+
+html, body {
+    min-width: 490px
+}
+
+.g-wrap {
+    position: relative;
+    width: 960px;
+    height: 100%;
+    margin: 0 auto;
+    text-align: left
+}
+
+.g-hd, .g-ft {
+    height: 65px;
+    overflow: hidden;
+}
+
+.g-bd {
+    height: 580px
+}
+
+.g-bd-mn {
+    height: 100%;
+    background: center no-repeat
+}
+
+.u-bd-img14 {
+    background-image: url(../images/login/banner14.jpg)
+}
+
+.m-login {
+    position: absolute;
+    z-index: 2;
+    right: 66px;
+    top: 120px;
+    width: 305px;
+    height: 380px;
+    /*padding: 13px 14px 15px;*/
+    /*background: url(img/login.png);*/
+    border: 2px solid #F5F5F5;
+    box-shadow: 0 0 3px #F5F5F5;
+    border-radius: 4px;
+    background-color: #ffffff;
+    opacity: 0.95;
+}
+
+.m-login .login-hd {
+    height: 47px;
+    width: 100%;
+}
+
+.m-login .login-hd .item {
+    width: 100%;
+    line-height: 46px;
+    font-size: 15px;
+    text-align: center;
+    color: #626262;
+    padding: 5px 0;
+}
+
+.m-login .login-bd {
+    height: 303px;
+
+}
+
+.m-login .login-form {
+    /*padding: 40px 25px 0;*/
+    margin: 0 auto;
+}
+
+.m-login .login-form-admin {
+    display: none
+}
+
+.m-ipt {
+    position: relative;
+    height: 42px;
+    margin-bottom: 20px;
+    background-position: 0 -92px
+}
+
+.m-ipt .icon {
+    position: absolute;
+    left: 9px;
+    top: 13px;
+    width: 14px;
+    height: 16px
+}
+
+.m-ipt .icon-account {
+    background-position: -20px -28px
+}
+
+.m-ipt .icon-pwd {
+    background-position: -44px -28px
+}
+
+.m-ipt .ipt {
+    position: absolute;
+    top: 1px;
+    left: 28px;
+    width: 205px;
+    height: 22px;
+    line-height: 22px;
+    padding: 9px 0;
+    border: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    background: transparent
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .m-ipt .ipt {
+        line-height: normal
+    }
+}
+
+.m-ipt .placeholder {
+    /*position: absolute;*/
+    left: 30px;
+    top: 10px;
+    line-height: 22px;
+    font-size: 14px;
+    color: #c9c9c9;
+    background-color: transparent;
+    cursor: text
+}
+
+.refreshVerifycode {
+    float: right;
+    /*margin-top:2px;*/
+    margin-right: 11px;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+#accverifycode {
+    width: 85px;
+}
+
+.m-login .loginconf {
+    *height: 16px;
+    line-height: 14px;
+    margin-bottom: 0px;
+    color: #959595
+}
+
+.m-login .logincheck {
+    position: relative;
+    width: 88px
+}
+
+.m-login .logincheck .icon-checkbox {
+    width: 13px;
+    height: 13px;
+    background-position: 0 -28px;
+    cursor: pointer
+}
+
+.m-login .logincheck .icon-checkbox-checked {
+    background-position: 0 -48px
+}
+
+.m-login .logincheck .checklabel:hover {
+    color: #626262
+}
+
+.m-login .logincheck .checklabel .remember {
+    top: -10px;
+    left: 15px;
+}
+
+.m-login .logincheck .checkipt {
+    position: absolute;
+    top: 0px;
+    width: 13px;
+    height: 13px;
+    overflow: hidden
+}
+
+.m-login .logincheck .securetip {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 16px;
+    width: 180px;
+    height: 36px;
+    background-color: #fffde4;
+    border: 1px #dfb86d solid;
+    left: 0;
+    top: 16px;
+    text-align: left;
+    padding: 5px 10px;
+    line-height: 18px;
+    color: #dc9632;
+    border-radius: 4px
+}
+
+.w-button {
+    display: block;
+    width: 100%;
+    height: 38px;
+    line-height: 38px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer
+}
+
+.w-button, .w-button:hover {
+    color: #fff
+}
+
+.w-button-account {
+    background-position: 0 -145px
+}
+
+.w-button-account:hover {
+    background-position: 0 -193px
+}
+
+.m-login .loginact {
+    margin-top: 15px;
+    line-height: 24px;
+    color: #959595;
+    zoom: 1;
+}
+
+.m-login .loginact a {
+    margin-left: 5px;
+    margin-right: 0;
+}
+
+.m-speed {
+    display: none;
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 15px;
+    z-index: 10;
+    width: 295px;
+    height: 63px;
+    line-height: 16px;
+    background: url(../images/login/speedbg.png);
+    color: #959595
+}
+
+.w-nteslogo {
+    position: absolute;
+    left: 15px;
+    top: 10px
+}
+
+.w-kximg {
+    position: absolute;
+    right: 30px;
+    top: 22px
+}
+
+.m-ftnav {
+    position: absolute;
+    right: 100px;
+    top: 0;
+    line-height: 64px;
+    color: #959595
+}
+
+.m-ftnav a {
+    margin-left: 10px
+}
+
+.w-ipt, .w-ipt .value {
+    height: 32px;
+    line-height: 32px
+}
+
+.w-ipt {
+    position: relative;
+    zoom: 1;
+    overflow: hidden;
+    background-color: #fbfbfb;
+    padding-left: 10px
+}
+
+.w-ipt .value {
+    width: 100%;
+    background-color: transparent;
+    border: 0;
+    font-size: 14px;
+    color: #534a45
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .w-ipt .value {
+        line-height: normal
+    }
+}
+
+.w-ipt .placeholder {
+    position: absolute;
+    top: 1px;
+    left: 10px;
+    width: 100%;
+    line-height: 32px;
+    font-size: 14px;
+    color: #8a8583
+}
+
+

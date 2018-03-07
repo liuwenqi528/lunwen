@@ -1,0 +1,107 @@
+plugins {
+    id 'net.ltgt.apt' version '0.13'
+}
+
+apply plugin: 'maven-publish'
+
+dependencies {
+    compile(
+            // spring-context-support
+            "org.springframework:spring-context-support:${springVersion}",
+
+            // lombok
+            "org.projectlombok:lombok:${lombokVersion}",
+
+            // json
+            "com.alibaba:fastjson:${fastjsonVersion}",
+
+            // spring-boot-starter-data-jpa
+            'org.springframework.boot:spring-boot-starter-data-jpa',
+
+            // java validation
+            //"javax.validation:validation-api:${validationVersion}",
+
+            // shiro
+            "org.apache.shiro:shiro-spring:${shiroSpringVersion}",
+            "org.apache.shiro:shiro-ehcache:${shiroSpringVersion}",
+
+            // pac4j
+            "io.buji:buji-pac4j:${bujiPac4jVersion}",
+            "org.pac4j:pac4j-cas:${pac4jVersion}",
+            "org.pac4j:pac4j-oauth:${pac4jVersion}",
+            "org.pac4j:pac4j-jwt:${pac4jVersion}",
+            "org.pac4j:pac4j-http:${pac4jVersion}",
+
+            // spring-boot-starter-web
+            'org.springframework.boot:spring-boot-starter-web',
+
+            // mapstruct
+            "org.mapstruct:mapstruct-jdk8:${mapstructVersion}",
+            "org.mapstruct:mapstruct-processor:${mapstructVersion}",
+
+            // httpclient
+            "org.apache.httpcomponents:httpclient:${httpclientVersion}",
+
+            // common-lang3
+            "org.apache.commons:commons-lang3:${commonslang3Version}",
+    )
+
+    apt "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    testCompile "org.easymock:easymock:${easymockVersion}"
+}
+
+// 最新的 maven 库发布方式，参照 https://docs.gradle.org/current/userguide/publishing_maven.html
+ext{
+    groupId = "com.khcm"
+    artifactId = "khcm-common"
+    version = "1.0-SNAPSHOT"
+}
+//打包class文件
+task classJar(type:Jar){
+    version version
+    baseName artifactId
+    from sourceSets.main.output
+    destinationDir file("$buildDir/libs")
+    includes ['com/khcm/user/common/**']
+    manifest {
+        attributes 'packageName': artifactId, 'Built-By': builtBy,'Built-date': new Date().format('yyyy-MM-dd HH:mm:ss'),'Manifest-Version':version
+    }
+}
+//打包源码
+task sourceJar(type:Jar){
+    version version
+    baseName artifactId
+    classifier "sources"
+    from sourceSets.main.allSource
+    destinationDir file("$buildDir/libs")
+    includes ['com/khcm/user/common/**']
+    manifest {
+        attributes 'packageName': artifactId+'-sources', 'Built-By': builtBy,'Built-date': new Date().format('yyyy-MM-dd HH:mm:ss'),'Manifest-Version':version
+    }
+}
+
+//上传jar包
+publishing {
+    publications {
+        publishing.publications.create('userCommon', MavenPublication) {
+            groupId groupId
+            artifactId artifactId
+            version version
+            //同时上传class包和源码包
+            artifacts = [classJar,sourceJar]
+        }
+    }
+    repositories {
+        maven {
+            url  nexusURL
+            credentials {
+                username = nexusUserName
+                password = nexusPassword
+            }
+        }
+    }
+}
+
+
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<div class="layui-form">
+    <div class="layui-form-item">
+            <label class="layui-form-label">角色名称：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${roleVM.name}"></p>
+            </div>
+    </div>
+
+    <div class="layui-form-item">
+            <label class="layui-form-label">创建时间：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${#dates.format(roleVM.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}"></p>
+            </div>
+    </div>
+    <div class="layui-form-item">
+            <label class="layui-form-label">修改时间：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${#dates.format(roleVM.gmtModified, 'yyyy-MM-dd HH:mm:ss')}"></p>
+            </div>
+    </div>
+
+    <div class="layui-form-item">
+            <label class="layui-form-label">描述：</label>
+            <div class="layui-input-block">
+                <p class="layui-info" th:text="${roleVM.description}"></p>
+            </div>
+    </div>
+</div>
+</body>
+</html>

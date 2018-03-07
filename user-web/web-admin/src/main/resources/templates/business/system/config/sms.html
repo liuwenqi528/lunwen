@@ -1,0 +1,90 @@
+<!--  Created by   liuwenqi on 2018-03-05. -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+<div class="layui-tab-item SMS" th:fragment="config">
+    <div class="xy-form">
+        <form class="layui-form">
+            <input type="hidden" name="type" th:value="SMS">
+            <div class="layui-form-item">
+                <div class="layui-block">
+                    <label class="layui-form-label">注册短信发送上限</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="sms_register_count" lay-verify="count" class="layui-input">
+                        <div class="layui-form-mid layui-word-aux">注册时每个手机号一天内可发送的短信条数</div>
+                    </div>
+                </div>
+            </div>
+            <!--<hr class="layui-bg-gray">-->
+            <!--<div class="layui-form-item">-->
+                <!--<div class="layui-block">-->
+                    <!--<label class="layui-form-label">注册短信发送模板</label>-->
+                    <!--<div class="layui-input-block">-->
+                        <!--<textarea class="layui-textarea" name="sms_register_content"></textarea>-->
+                        <!--<div class="layui-form-mid layui-word-aux"-->
+                             <!--th:utext="${'用户ID：${id}，用户名：${username}，验证码：${smsCode}'}"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <hr class="layui-bg-gray">
+            <div class="layui-form-item">
+                <div class="layui-block">
+                    <label class="layui-form-label">找回密码短信发送上限</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="sms_back_password_count" lay-verify="count"
+                               class="layui-input">
+                        <div class="layui-form-mid layui-word-aux">找回密码时每个手机号一天内可发送的短信条数</div>
+                    </div>
+                </div>
+            </div>
+            <!--<hr class="layui-bg-gray">-->
+            <!--<div class="layui-form-item">-->
+                <!--<div class="layui-block">-->
+                    <!--<label class="layui-form-label">找回密码短信发送模板</label>-->
+                    <!--<div class="layui-input-block">-->
+                        <!--<textarea class="layui-textarea" name="sms_back_password_content"></textarea>-->
+                        <!--<div class="layui-form-mid layui-word-aux"-->
+                             <!--th:utext="${'用户ID：${id}，用户名：${username}，验证码：${smsCode}'}"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <hr class="layui-bg-gray">
+            <div class="layui-form-item">
+                <div class="layui-block">
+                    <label class="layui-form-label">修改密码短信发送上限</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="sms_update_password_count" lay-verify="count"
+                               class="layui-input">
+                        <div class="layui-form-mid layui-word-aux">修改密码时每个手机号一天内可发送的短信条数</div>
+                    </div>
+                </div>
+            </div>
+            <!--<hr class="layui-bg-gray">-->
+            <!--<div class="layui-form-item">-->
+            <!--<div class="layui-block">-->
+            <!--<label class="layui-form-label">修改密码短信发送模板</label>-->
+            <!--<div class="layui-input-block">-->
+            <!--<textarea class="layui-textarea" name="sms_update_password_content"></textarea>-->
+            <!--<div class="layui-form-mid layui-word-aux"-->
+            <!--th:utext="${'用户ID：${id}，用户名：${username}，验证码：${smsCode}'}"></div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <hr class="layui-bg-gray">
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="setSmsConfig">保存</button>
+                    <button class="layui-btn layui-btn-primary changeReturn" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

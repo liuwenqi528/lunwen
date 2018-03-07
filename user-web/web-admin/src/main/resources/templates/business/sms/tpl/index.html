@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/base::baseHead">
+</head>
+<body class="childrenBody">
+<div class="layui-elem-quote news_search changeBg">
+    <form class="layui-form" id="smsTplSearchForm">
+        <div class="layui-inline">
+            <input name="tplName" id="tplName" placeholder="关键字" class="layui-input">
+        </div>
+        <div class="layui-inline">
+            <select id="smsType" name="businessType" class="layui-input">
+                <option value="">--短信业务类型--</option>
+                <option value="REGIST">注册发送</option>
+                <option value="CHANGEPWD">修改密码发送</option>
+                <option value="BACKPWD">找回密码发送</option>
+            </select>
+        </div>
+        <div class="layui-inline">
+            <select id="type" name="type" class="layui-input">
+                <option value="">--短信模板类型--</option>
+                <option value="0">普通短信</option>
+                <option value="1">营销短信</option>
+            </select>
+        </div>
+        <div class="layui-inline">
+            <select id="smsTplStatus" name="smsTplStatus" class="layui-input">
+                <option value="">--短信模板状态--</option>
+                <option value="PASS">已通过</option>
+                <option value="CHECK">待审核</option>
+                <option value="REJECT">已拒绝</option>
+            </select>
+        </div>
+        <div class="layui-inline">
+            <select id="smsPlatform" name="smsPlatform" class="layui-input">
+                <option value="">--短信平台--</option>
+                <option value="0">腾讯云</option>
+                <option value="1">阿里云</option>
+            </select>
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="timeRange" id="begin_success" placeholder="创建用户时间范围"
+                   autocomplete="off" class="layui-input">
+            <input type="hidden" name="beginTime"/>
+            <input type="hidden" name="endTime"/>
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="smsTplSearch" id="smsTplSearch">搜索</button>
+        </div>
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-sm layui-btn-primary" type="reset" id="smsTplReset">重置</button>
+        </div>
+    </form>
+</div>
+<div class="layui-form xy-table">
+    <div class="layui-inline">
+        <a class="layui-btn layui-btn-sm layui-btn-normal" data-type="smsTplAdd">添加</a>
+    </div>
+    <div class="layui-inline">
+        <a class="layui-btn layui-btn-sm layui-btn-danger" data-type="smsTplRemove">删除</a>
+    </div>
+    <div class="layui-inline">
+        <a class="layui-btn layui-btn-sm" data-type="smsTplFlush">刷新</a>
+    </div>
+    <table class="layui-hide" id="smsTplDatagrid" lay-filter="smsTplDatagrid"></table>
+</div>
+</body>
+<script type="text/javascript" th:inline="none">
+    var smsTplDatagrid, currentPage = 1, ServerRows = 1;
+    layui.use(['layer', 'table', 'form', 'laydate'], function () {
+        var layer = layui.layer, form = layui.form, laydate = layui.laydate,
+            table = layui.table, $ = layui.jquery;
+        //日期
+        laydate.render({
+            elem: '#begin_success'
+            , type: 'datetime'
+            , range: '至'
+        });
+        //监听提交
+        form.on('submit(smsTplSearch)', function (data) {
+            parseDatetoSplit(data);
+            var param = data.field;
+            smsTplDatagrid.reload({
+                where: param, page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            })
+            return false;
+        });
+        $('#smsTplReset').on('click', function () {
+            $('#smsTplSearchForm')[0].reset();
+            $('#smsTplSearch').click();
+        })
+        smsTplDatagrid = initTable(table,{
+            elem: '#smsTplDatagrid'
+            , url: basePath + '/sms/smsTpl/doDatagrid?orderBy=id=desc'
+            , cols: [[ //表头
+                {field: 'id', type: 'checkbox'}
+                , {field: 'tplName', title: '模板名称', width: '10%'}
+                , {field: 'content', title: '内容', width: '20%'}
+                , {field: 'tplId', title: '模板ID', width: '8%', align: 'center'}
+                , {field: 'businessType', title: '业务类型', width: '9%', align: 'center'
+                    , templet: function (row) {
+                        var smsType = row.businessType;
+                        if (smsType == 'REGIST') {
+                            return '<span  class="layui-btn layui-btn-sm xy-button-light-green us">注册发送</span>'
+                        } else if (smsType == 'CHANGEPWD') {
+                            return '<span class="layui-btn layui-btn-orange layui-btn-sm us">修改密码发送</span>'
+                        } else if (smsType == 'BACKPWD') {
+                            return '<span class="layui-btn xy-button-blue layui-btn-sm us">找回密码发送</span>'
+                        }
+                    }
+                }
+                , {
+                    field: 'type', title: '短信类型', width: '8%', align: 'center'
+                    , templet: function (row) {
+                        var type = row.type;
+                        if (type == 0) {
+                            return '<span  class="layui-btn layui-btn-sm xy-button-light-green us">普通短信</span>'
+                        } else if (type == 1) {
+                            return '<span class="layui-btn xy-button-orange layui-btn-sm us">营销短信</span>'
+                        }
+                    }
+                }
+                , {
+                    field: 'templateStatus', title: '模板状态', width: '8%', align: 'center', templet: function (row) {
+                        var smsTplStatus = row.templateStatus;
+                        if (smsTplStatus == "PASSED") {
+                            return '<span  class="layui-btn layui-btn-sm xy-button-light-green us">已通过</span>'
+                        }  else if (smsTplStatus == "REJECTED") {
+                            return '<span class="layui-btn layui-btn-danger layui-btn-sm us">已拒绝</span>'
+                        }else {
+                            return '<span class="layui-btn xy-button-orange layui-btn-sm us">待审核</span>'
+                        }
+                    }
+                }, {
+                    field: 'platform', title: '短信平台', width: '8%', align: 'center', templet: function (row) {
+                        var smsPlatform = row.platform;
+                        if (smsPlatform== 0) {
+                            return '<span  class="layui-btn layui-btn-sm xy-button-light-green us">腾讯云</span>'
+                        } else if (smsPlatform == 1) {
+                            return '<span class="layui-btn layui-btn-sm xy-button-orange us">阿里云</span>'
+                        }  else {
+                            return '<span class="layui-btn layui-btn-sm xy-button-blue us">其它平台</span>'
+                        }
+                    }
+                }
+                , {field: 'gmtCreate', title: '创建时间', width: '12%', align: 'center'}
+                , {
+                    fixed: 'right', title: '操作', align: 'center', templet: function (row) {
+                        var btn = `<button class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="smsTplInfo" title="详情"></button>
+                                <button class="layui-btn layui-btn-normal layui-btn-sm iconfont icon-xiugai1" lay-event="smsTplEdit" title="编辑"></button>
+                                <button class="layui-btn layui-btn-danger layui-btn-sm iconfont icon-shanchu" lay-event="smsTplRemove" title="删除"></button>
+                                <button class="layui-btn xy-button-light-green layui-btn-sm iconfont icon-sousuo" lay-event="smsTplStatus" title="状态查询" ${(row.smsTplStatus != "CHECK") ? 'disabled' : ''}></button>`;
+                        return btn;
+                    }
+                }
+            ]]
+            , done: function (res, curr, count) {
+                //如果是异步请求数据方式，res即为你接口返回的信息。
+                ServerRows = res.rows.length;
+                currentPage = curr;
+            }
+        })
+        //触发事件
+        var smsTpl = {
+            smsTplAdd: function () {
+                openLayer('添加短信模板', basePath + '/sms/smsTpl/toAddPage');
+            }, smsTplEdit: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                    openLayer('编辑短信模板', basePath + '/sms/smsTpl/toEditPage' + param);
+                }
+            }, smsTplRemove: function (id) {
+                var ids = [];
+                if (id != undefined) {
+                    ids.push(id);
+                } else {
+                    var checkStatus = table.checkStatus('smsTplDatagrid')
+                        , data = checkStatus.data;
+                    for (var i = 0; i < data.length; i++) {
+                        ids.push(data[i].id);
+                    }
+                }
+                if (!ids.length) {
+                    layer.alert("至少选择一行数据进行删除", {
+                        title: '警告'
+                    });
+                } else {
+                    layer.confirm('是否确认删除?', {
+                        btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+                    }, function (index) {//点击保存执行的函数
+                        $.ajax({
+                            url: basePath + '/sms/smsTpl/doRemove',
+                            data: {ids: ids.join(",")},
+                            dataType: "json",
+                            type: "post",
+                            success: function (data) {
+                                layer.msg(data.retInfo);
+                                //如果大于第一页
+                                if ((currentPage > 1) && (ServerRows == ids.length)) {
+                                    --currentPage;
+                                }
+                                smsTplDatagrid.reload({
+                                    page: {
+                                        curr: currentPage
+                                    }
+                                });
+                                layer.close(index);
+                            }
+                        })
+                    });
+                }
+            }, smsTplFlush: function () {
+                smsTplDatagrid.reload();
+            }, smsTplInfo: function (id) {
+                openLayer('短信模板详情', basePath + '/sms/smsTpl/toInfoPage?id=' + id);
+            }, smsTplStatus: function (id) {
+                $.ajax({
+                    url: basePath + '/sms/smsTpl/searchStatus',
+                    data: {id: id},
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if(data=="pass"){
+                            smsTplDatagrid.reload();
+                        }else{
+                            //layer.msg(data);
+                            layer.alert(data);
+                        }
+                    }
+                })
+            }
+        };
+        //上部按钮点击事件
+        $('.layui-btn').on('click', function () {
+            var type = $(this).data('type');
+            smsTpl[type] ? smsTpl[type].call(this) : '';
+        });
+        //监听工具条
+        table.on('tool(smsTplDatagrid)', function (obj) {
+            var data = obj.data;
+            smsTpl[obj.event] ? smsTpl[obj.event].call(this, data.id) : '';
+        });
+
+    });
+
+</script>
+<script type="text/javascript" src="../../../../static/js/parseDate.js" th:src="@{/js/parseDate.js}"></script>
+<style>
+    .us {
+        cursor: default;
+    }
+</style>
+</html>

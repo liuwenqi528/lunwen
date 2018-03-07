@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<head th:replace="base/childHeader::childBaseHead">
+</head>
+<body>
+<form class="layui-form" action="" id="personAddForm">
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>人员名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" class="layui-input" lay-verType="msg" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>所属机构</label>
+        <div class="layui-input-block">
+            <input type="text" name="organizationId" id="organizationId" lay-verify="organization" lay-verType="msg"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>所属部门</label>
+        <div class="layui-input-block">
+            <input type="text" name="departmentId" id="departmentId" lay-verify="department" lay-verType="msg"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">关联账号</label>
+        <div class="layui-input-block">
+            <select name="userId" id="user" lay-filter="user" lay-search>
+                <option value="">请选择用户账号</option>
+                <option th:each="user:${users}" th:value="${user.id}" th:text="${user.username}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>年龄</label>
+        <div class="layui-input-block">
+            <input type="text" min="1" max="200" name="age" lay-verify="required|age" lay-verType="msg"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="sex" value="1" title="男" checked="">
+            <input type="radio" name="sex" value="0" title="女">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="personAdd">添加</button>
+            <button id="personAddReset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
+
+<script th:inline="javascript" type="text/javascript">
+
+    layui.use(['form', 'jquery', 'layer'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer;
+
+        //验证年龄是否为数字
+        form.verify({
+            age: function (value) {
+                if(!new RegExp('^[1-9]{1}[0-9]?$').test(value)){
+                    return '年龄只能输入数字，且要大于0！';
+                }
+            },
+            organization: function (value) {
+                if ("" == value) {
+                    return "所属机构必填"
+                }
+            },
+            department: function (value) {
+                if ("" == value) {
+                    return "所属部门必填"
+                }
+            }
+        });
+
+        //监听提交   -----------------------------
+        form.on('submit(personAdd)', function (data) {
+            layer.confirm('是否确认添加?', {
+                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+            }, function (index) {//点击保存执行的函数
+                $.ajax({
+                    url: basePath + '/org/person/doSave',
+                    data: data.field,
+                    dataType: "json",
+                    type: "post",
+                    success: function (data) {
+                        if (data.retCode == '0000') {
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.personDatagrid.reload();
+                            parent.layer.closeAll();
+                        }
+                        parent.layer.msg(data.retInfo);
+                    }
+                })
+            });
+            return false;
+        });
+
+
+    });
+    $(function () {
+        var departmentCombotree;
+        $("#organizationId").combotree({
+            width: '100%',
+            height: 36,
+            panelMaxHeight: 150,
+            url: basePath + '/org/organization/doTreegrid',
+            onSelect: function (node) {
+                departmentCombotree.combotree({
+                    url: basePath + '/org/department/doTreegrid',
+                    queryParams: {
+                        "organizationId": node.id
+                    }
+                })
+                departmentCombotree.combotree('enable');
+            }
+        })
+
+        departmentCombotree = $("#departmentId").combotree({
+            width: '100%',
+            height: 36,
+            panelMaxHeight: 150
+        }).combotree('disable');
+
+        $('#personAddReset').on('click', function () {
+            $("#personAddForm")[0].reset();
+            departmentCombotree.combotree('disable');
+            return false;
+        })
+    })
+</script>
+
+</body>
+</html>
