@@ -4,7 +4,8 @@ import com.khcm.user.common.constant.Constants;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Created by yangwb on 2017/11/28.
+ * 分页参数
+ * @author  lwq on 2018/1/5.
  */
 public class PageContext {
 

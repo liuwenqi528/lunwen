@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import java.util.Map;
  * @date 2017/8/24
  */
 @Slf4j
+@Configuration
 public class ShiroConfig {
 
     @Value("${shiro.cipherKey}")

@@ -13,7 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author yangwb
+ * @author lwq
  * @date 2018/1/24
  */
 @Configuration

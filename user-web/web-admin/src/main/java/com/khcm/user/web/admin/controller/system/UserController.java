@@ -54,8 +54,6 @@ public class UserController {
     private UserService userService;
     @Autowired
     private AreaService areaService;
-    @Autowired
-    private SmsService smsService;
 
     @RequiresPermissions("sys:user:view")
     @GetMapping
@@ -262,50 +260,5 @@ public class UserController {
         }
         return VMUtils.resultFailure();
     }
-    @RequiresPermissions("sys:user:edit")
-    @RequestMapping("/getSmsCode")
-    @ResponseBody
-    public Map getSmsCode(Integer userId,String phone){
-        Map<String, String> map = new HashMap();
-        UserDTO userDTO=userService.getById(userId);
-        if(Objects.isNull(userDTO.getPhone())){
-            map.put("status","error");
-            map.put("msg", "该用户未绑定手机号");
-            return map;
-        }else if(!userDTO.getPhone().equals(phone)){
-            map.put("status","error");
-            map.put("msg", "手机号和用户绑定的手机号不匹配");
-            return map;
-        }
-        int res = smsService.sendSmsCode(phone, BusinessType.CHANGE_PASSWORD);
-        if(res==0){
-            map.put("status","success");
-            map.put("msg", "OK");
-        }else{
-            map.put("status","error");
-            map.put("msg", "操作失败，请联系管理员");
-        }
-        return map;
-    }
-    @RequiresPermissions("sys:user:edit")
-    @RequestMapping("/doValidateSmsCode")
-    @ResponseBody
-    public Map doValidateSmsCode(String phone,String smsCode){
-        Map<String, String> map = new HashMap();
-        SmsCodeDTO smsCodeDTO=smsService.validateSmsCode(phone,smsCode);
-        if(Objects.isNull(smsCodeDTO)){
-            map.put("status","error");
-            map.put("msg", "验证码不存在，请检查手机号或者验证码是否输入正确");
-            return map;
-        }else{
-            if(smsCodeDTO.getExpiredTime().getTime()<System.currentTimeMillis()){
-                map.put("status","error");
-                map.put("msg", "验证码已过期");
-                return map;
-            }
-        }
-        map.put("status","success");
-        map.put("msg", "OK");
-        return map;
-    }
+
 }

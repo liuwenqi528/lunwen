@@ -3,7 +3,6 @@ package com.khcm.user.web.admin.shiro;
 import com.khcm.user.service.api.system.AuthorizationService;
 import com.khcm.user.web.admin.config.AdminConfig;
 import io.buji.pac4j.realm.Pac4jRealm;
-import io.buji.pac4j.subject.Pac4jPrincipal;
 import io.buji.pac4j.token.Pac4jToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
@@ -16,9 +15,9 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.pac4j.core.profile.CommonProfile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 @Slf4j
 public class AdminCasRealm extends Pac4jRealm {

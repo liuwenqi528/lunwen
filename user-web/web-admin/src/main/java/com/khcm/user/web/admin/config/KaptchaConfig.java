@@ -28,8 +28,6 @@ public class KaptchaConfig {
         properties.setProperty("kaptcha.textproducer.font.size", "36");
         properties.setProperty("kaptcha.session.key", "code");
         properties.setProperty("kaptcha.textproducer.char.length", "4");
-        properties.setProperty("kaptcha.background.clear.from", String.valueOf(Color.WHITE));
-        properties.setProperty("kaptcha.background.clear.to", String.valueOf(Color.LIGHT_GRAY));
         properties.setProperty("kaptcha.noise.impl","com.khcm.user.web.admin.kaptcha.AdminNoise");
         properties.setProperty("kaptcha.textproducer.font.names", "宋体,楷体,微软雅黑");
         Config config = new Config(properties);

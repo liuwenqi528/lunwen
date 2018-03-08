@@ -2,7 +2,7 @@ package com.khcm.user.common.constant;
 
 /**
  * 全局常量
- * Created by yangwb on 2017/12/5.
+ * @author  lwq on 2018/1/5.
  */
 public class Constants {
 

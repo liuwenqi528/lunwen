@@ -23,7 +23,8 @@ public interface AuthorizationRepository extends BaseRepository<Authorization, I
      * @return
      */
     @Query("select auth.resource from Authorization auth join auth.app join auth.resource join auth.role.users user where auth.app.code = ?1 and user.id = ?2")
-    List<Resource> getResourcesByUserId(String appCode, Integer userId);
+    List<Resource> getResourcesByUserIdOrderByLft(String appCode, Integer userId);
+
 
     /**
      * 根据系统编号和角色编号查询权限

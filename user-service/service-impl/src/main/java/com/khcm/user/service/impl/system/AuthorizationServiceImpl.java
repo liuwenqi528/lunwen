@@ -2,6 +2,7 @@ package com.khcm.user.service.impl.system;
 
 import com.khcm.user.common.ensure.Ensure;
 import com.khcm.user.dao.entity.business.system.Authorization;
+import com.khcm.user.dao.entity.business.system.QAuthorization;
 import com.khcm.user.dao.entity.business.system.Resource;
 import com.khcm.user.dao.entity.business.system.User;
 import com.khcm.user.dao.repository.master.system.AuthorizationRepository;
@@ -15,9 +16,12 @@ import com.khcm.user.service.mapper.system.AuthorizationMapper;
 import com.khcm.user.service.mapper.system.ModuleMapper;
 import com.khcm.user.service.mapper.system.OperationMapper;
 import com.khcm.user.service.param.business.system.AuthorizationParam;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,14 +63,21 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             return convertResourceToModule(permissions);
         }
 
+        QAuthorization qAuthorization = QAuthorization.authorization;
+
+        BooleanExpression booleanExpression = qAuthorization.app.code.eq(appCode).and(qAuthorization.role.users.contains(user));
         //查询分配权限
-        List<Resource> permissions = authorizationRepository.getResourcesByUserId(appCode, userId);
-        return convertResourceToModule(permissions);
+        Sort sort = new Sort(Sort.Direction.ASC, "resource.id");
+        List<Authorization> authorization = authorizationRepository.findList(booleanExpression, sort);
+        Optional<List<Authorization>> authorizationOptional = Optional.of(authorization);
+        List<Resource> resourceList = authorizationOptional.map(authorizations -> authorizations.stream().map(authorization1 -> authorization1.getResource()).collect(Collectors.toList())).orElse(new ArrayList<>());
+        return convertResourceToModule(resourceList);
+//        return null;
     }
 
     @Override
     public Set<String> getAppPermsByUserId(Integer userId, String appCode) {
-        List<Resource> resources = authorizationRepository.getResourcesByUserId(appCode, userId);
+        List<Resource> resources = authorizationRepository.getResourcesByUserIdOrderByLft(appCode, userId);
         return resources.stream()
                 .map(Resource::getCode)
                 .filter(StringUtils::isNotBlank)
