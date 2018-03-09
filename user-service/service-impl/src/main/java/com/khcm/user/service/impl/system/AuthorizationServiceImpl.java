@@ -72,13 +72,21 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         Optional<List<Authorization>> authorizationOptional = Optional.of(authorization);
         List<Resource> resourceList = authorizationOptional.map(authorizations -> authorizations.stream().map(authorization1 -> authorization1.getResource()).collect(Collectors.toList())).orElse(new ArrayList<>());
         return convertResourceToModule(resourceList);
-//        return null;
     }
 
     @Override
     public Set<String> getAppPermsByUserId(Integer userId, String appCode) {
-        List<Resource> resources = authorizationRepository.getResourcesByUserIdOrderByLft(appCode, userId);
-        return resources.stream()
+        User user = userRepository.findOne(userId);
+
+        QAuthorization qAuthorization = QAuthorization.authorization;
+
+        BooleanExpression booleanExpression = qAuthorization.app.code.eq(appCode).and(qAuthorization.role.users.contains(user));
+        //查询分配权限
+        Sort sort = new Sort(Sort.Direction.ASC, "resource.id");
+        List<Authorization> authorization = authorizationRepository.findList(booleanExpression, sort);
+        Optional<List<Authorization>> authorizationOptional = Optional.of(authorization);
+        Set<Resource> resourceList = authorizationOptional.map(authorizations -> authorizations.stream().map(authorization1 -> authorization1.getResource()).collect(Collectors.toSet())).orElse(null);
+        return resourceList.stream()
                 .map(Resource::getCode)
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toSet());
