@@ -46,7 +46,7 @@ public class ChannelController {
         return BASH_PATH + "index";
     }
 
-    @RequiresPermissions("sys:channel:add")
+    @RequiresPermissions("sys:channel:view")
     @RequestMapping("/doDatagrid")
     @ResponseBody
     @OperationLog(name = "查询渠道列表信息")
@@ -110,7 +110,7 @@ public class ChannelController {
      * changed by liuwenqi on 2018-02-01
      * 用于验证注册渠道是否重复
      */
-    @RequiresPermissions("sys:channel:view")
+    @RequiresPermissions({"sys:channel:add","sys:channel:edit"})
     @RequestMapping("/doValidate")
     @ResponseBody
     public ResultVM doValidate(ChannelPM channelPM) {

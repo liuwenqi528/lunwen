@@ -75,13 +75,31 @@
     $(function () {
         roleId = $('#roleId').val();//获取角色编号
 
-
+        var checkFlag = false;
 //        创建树形列表
         arTree = $("#appResourceTree").tree({
             checkbox: true,
+            cascadeCheck: false,
             onCheck: function (node, checked) {
                 //点击复选框时表示数据发生变化。将标记改为true.
                 flag = true;
+                if (checkFlag) {
+                    var isLeaf = arTree.tree('isLeaf', arTree.tree('find', node.id).target);
+                    var parent = arTree.tree('getParent', arTree.tree('find', node.id).target);
+                    if (parent != null && checked) {
+                        var targetID = parent.id;
+                        arTree.tree('check', arTree.tree('find', targetID).target);
+                    }
+                    if (!isLeaf) {
+                        var child = arTree.tree('getChildren', arTree.tree('find', node.id).target);
+                        $(child).each(function () {
+                            var childId = $(this)[0].id;
+                            if (!checked) {
+                                arTree.tree('uncheck', arTree.tree('find', childId).target);
+                            }
+                        });
+                    }
+                }
             },
             onLoadSuccess: function (node, data) {
                 //根据系统编号，获取对应的资源编号集合、
@@ -93,8 +111,10 @@
                     }
                 }
                 flag = false;
+                checkFlag = true;
             }
         })
+
         //提交按钮绑定点击事件
         $('#setAuth').on('click', function () {
             setAuth();

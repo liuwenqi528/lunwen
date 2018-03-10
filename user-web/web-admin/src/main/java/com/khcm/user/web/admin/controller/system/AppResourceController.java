@@ -85,7 +85,7 @@ public class AppResourceController {
         return VMUtils.resultSuccess();
     }
 
-    @RequiresPermissions("sys:role:edit")
+    @RequiresPermissions("sys:appResource:edit")
     @RequestMapping("/toEditPage")
     public String toEditPage(Integer id, Model model) {
         if (Objects.nonNull(id)) {
@@ -95,7 +95,7 @@ public class AppResourceController {
         return BASE_PATH + "edit";
     }
 
-    @RequiresPermissions("sys:role:info")
+    @RequiresPermissions("sys:appResource:info")
     @RequestMapping("/toInfoPage")
     public String toInfoPage(Integer id, Model model) {
         if (Objects.nonNull(id)) {
@@ -105,7 +105,7 @@ public class AppResourceController {
         return BASE_PATH + "info";
     }
 
-    @RequiresPermissions("sys:role:edit")
+    @RequiresPermissions("sys:appResource:edit")
     @RequestMapping("/doUpdate")
     @ResponseBody
     @OperationLog(name="修改系统资源信息")

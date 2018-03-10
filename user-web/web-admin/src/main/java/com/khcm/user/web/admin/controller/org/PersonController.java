@@ -53,7 +53,7 @@ public class PersonController {
         return BASE_PATH + "add";
     }
 
-    @RequiresPermissions("org:person:add")
+    @RequiresPermissions({"org:person:add","org:person:edit"})
     @RequestMapping("/doSave")
     @ResponseBody
     @OperationLog(name = "编辑人员信息")

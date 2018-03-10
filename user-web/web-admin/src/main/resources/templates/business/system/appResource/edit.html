@@ -47,7 +47,7 @@
         <div class="layui-input-block">
             <input type="text" name="code" lay-verType="msg" lay-verify="resourceCode" th:value="${resourceVM.code}"
                    class="layui-input">
-            <div class="layui-form-mid layui-word-aux">由2-16位字母、数字、下划线组成，下划线不能开头结尾</div>
+            <div class="layui-form-mid layui-word-aux">由字母和冒号:组成，冒号:不能开头结尾</div>
         </div>
     </div>
     <div class="layui-form-item" th:if="${resourceVM.parentName!=null}">
@@ -136,8 +136,8 @@
                     return title + '长度为2至16位，由字母、数字、中文和下划线组成，下划线不能开头结尾!'
                 }
             } else if (type == 'code') {
-                if (!new RegExp('^(?!_)(?!.*?_$)[a-zA-Z0-9_]{2,16}$').test(value)) {
-                    return title + '长度为2至16位，由字母、数字、中文和下划线组成，下划线不能开头结尾!'
+                if (!new RegExp('^(?!:)(?!.*?:$)[a-zA-Z:]+$').test(value)) {
+                    return title + '由字母和冒号:组成，冒号:不能开头结尾'
                 }
             }
         }

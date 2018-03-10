@@ -47,6 +47,7 @@ public class DepartmentController {
      * @param departmentPM
      * @return
      */
+    @RequiresPermissions("org:department:view")
     @RequestMapping("/doTreegrid")
     @ResponseBody
     @OperationLog(name="部门查询")
@@ -56,6 +57,7 @@ public class DepartmentController {
         return DepartmentDTOMapper.MAPPER.dtoToVM(departmentDTOS);
     }
 
+    @RequiresPermissions("org:department:add")
     @RequestMapping("/toAddPage")
     public String toAddPage(Integer id,Integer organizationId, Model model) {
         if (Objects.nonNull(id)) {
@@ -69,6 +71,7 @@ public class DepartmentController {
         return BASE_PATH + "add";
     }
 
+    @RequiresPermissions("org:department:add")
     @RequestMapping("/doSave")
     @ResponseBody
     @OperationLog(name="保存部门信息")

@@ -35,7 +35,7 @@ public class LoginSucessController {
 
     @Autowired
     private LogService logService;
-    @RequiresPermissions("sys:user:view")
+    @RequiresPermissions("sys:log:success:view")
     @RequestMapping(value = "/doDatagrid")
     @ResponseBody
     @OperationLog(name="成功日志查询")
@@ -44,13 +44,13 @@ public class LoginSucessController {
         PageDTO<LogDTO> page = logService.getPage(logParam);
         return VMUtils.pageSuccess(page.getTotalCount(), LogDTOMapper.MAPPER.dtoToVM(page.getContent()));
     }
-    @RequiresPermissions("sys:appRegister:view")
+    @RequiresPermissions("sys:log:success:view")
     @GetMapping
     public String showSuccessLog() {
         return BASE_PATH+"loginSuccess";
     }
 
-    @RequiresPermissions("sys:user:remove")
+    @RequiresPermissions("sys:log:success:remove")
     @RequestMapping("/doRemove")
     @ResponseBody
     @OperationLog(name="成功日志删除")

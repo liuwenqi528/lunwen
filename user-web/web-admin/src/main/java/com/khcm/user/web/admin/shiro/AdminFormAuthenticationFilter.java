@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.apache.shiro.web.util.SavedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletRequest;
@@ -31,6 +33,8 @@ public class AdminFormAuthenticationFilter extends FormAuthenticationFilter {
 
     public static final String CAPTCHA_SESSION_KEY = "verifyCode";
 
+    /** 自定义保存到session中的请求URI的key 用于页面跳转 */
+    public static final String CUSTOM_SAVED_REQUEST = "customSavedRequest";
     @Autowired
     private UserService userService;
 
@@ -69,6 +73,9 @@ public class AdminFormAuthenticationFilter extends FormAuthenticationFilter {
             //登录
             Subject subject = getSubject(request, response);
             subject.login(token);
+            SavedRequest savedRequest = org.apache.shiro.web.util.WebUtils.getAndClearSavedRequest(request);
+            Session session = subject.getSession();
+            session.setAttribute(CUSTOM_SAVED_REQUEST, savedRequest);
             return onLoginSuccess(token, subject, request, response);
         } catch (AuthenticationException e) {
             return onLoginFailure(token, e, request, response);

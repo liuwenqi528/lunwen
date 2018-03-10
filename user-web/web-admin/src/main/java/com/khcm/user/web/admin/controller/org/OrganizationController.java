@@ -45,6 +45,7 @@ public class OrganizationController {
         return BASE_PATH + "index";
     }
 
+    @RequiresPermissions("org:organization:view")
     @RequestMapping("/doTreegrid")
     @ResponseBody
     @OperationLog(name="查询组织机构信息")
@@ -54,6 +55,7 @@ public class OrganizationController {
         return OrganizationDTOMapper.MAPPER.dtoToVM(organizationDTOList);
     }
 
+    @RequiresPermissions("org:organization:add")
     @RequestMapping("/toAddPage")
     public String toAddPage(Integer id, Model model) {
         if (Objects.nonNull(id)) {
@@ -63,6 +65,7 @@ public class OrganizationController {
         return BASE_PATH + "add";
     }
 
+    @RequiresPermissions("org:organization:add")
     @RequestMapping("/doSave")
     @ResponseBody
     @OperationLog(name="保存组织机构信息")

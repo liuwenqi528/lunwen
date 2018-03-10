@@ -4,7 +4,6 @@ $(function ($) {
             var loginStatus = XMLHttpRequest.getResponseHeader("loginStatus");
             if (loginStatus == "0") {
                 var responseJSON = XMLHttpRequest.responseJSON;
-                layer.msg(responseJSON.loginMessage);
                 window.top.location.reload(true);
                 return false;
             }

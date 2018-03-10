@@ -109,16 +109,6 @@ public class RoleController {
         return BASE_PATH + "edit";
     }
 
-    @RequiresPermissions("sys:role:info")
-    @RequestMapping("/toInfoPage")
-    public String toInfoPage(Integer id, Model model) {
-        if (Objects.nonNull(id)) {
-            RoleDTO roleDTO = roleService.getById(id);
-            model.addAttribute("roleVM", RoleDTOMapper.MAPPER.dtoToVM(roleDTO));
-        }
-        return BASE_PATH + "info";
-    }
-
     @RequiresPermissions("sys:role:edit")
     @RequestMapping("/doUpdate")
     @ResponseBody
@@ -141,7 +131,7 @@ public class RoleController {
         return VMUtils.resultSuccess();
     }
 
-    @RequiresPermissions("sys:role:setting")
+    @RequiresPermissions("sys:role:setAuth")
     @RequestMapping("/toSetAuthPage")
     public String toSetAuthPage(Integer id, Model model) {
         if (Objects.nonNull(id)) {
@@ -161,7 +151,7 @@ public class RoleController {
         return VMUtils.resultSuccess();
     }
 
-    @RequiresPermissions("sys:role:setAuth")
+    @RequiresPermissions("sys:role:setUser")
     @RequestMapping("/toSetUserPage")
     public String toSetUserPage(Integer id, Model model) {
         if (Objects.nonNull(id)) {
@@ -220,7 +210,7 @@ public class RoleController {
      * changed by liuwenqi on 2018-02-01
      * 用于验证系统编码或系统名称是否重复
      */
-    @RequiresPermissions("sys:role:view")
+    @RequiresPermissions({"sys:role:add","sys:role:edit"})
     @RequestMapping("/doValidate")
     @ResponseBody
     public ResultVM doValidate(RolePM rolePM) {
@@ -229,5 +219,4 @@ public class RoleController {
         ResultVM resultVM = Optional.ofNullable(areaDTO).map(role->VMUtils.resultFailure()).orElse(VMUtils.resultSuccess());
         return resultVM;
     }
-
 }

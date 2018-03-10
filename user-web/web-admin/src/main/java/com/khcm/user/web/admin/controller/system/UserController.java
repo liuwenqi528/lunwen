@@ -154,7 +154,7 @@ public class UserController {
      * @param type
      * @return
      */
-    @RequiresPermissions("sys:user:setRole")
+    @RequiresPermissions("sys:user:view")
     @RequestMapping("/doVerify")
     @ResponseBody
     public Integer doVerify(String value, String type) {
@@ -202,7 +202,7 @@ public class UserController {
         return BASE_PATH + "infoDetail";
     }
 
-    @RequiresPermissions("sys:user:edit")
+    @RequiresPermissions("sys:user:editInfo")
     @RequestMapping("/editUserInfo")
     @ResponseBody
     @OperationLog(name = "编辑个人资料信息")
@@ -212,7 +212,7 @@ public class UserController {
         return VMUtils.resultSuccess();
     }
 
-    @RequiresPermissions("sys:user:view")
+    @RequiresPermissions("sys:user:updatePwd")
     @RequestMapping("/toChangePwdPage")
     public String toChangePwdPage(Integer uid, Model model) {
         UserDTO userDTO = userService.getById(uid);
@@ -227,7 +227,7 @@ public class UserController {
      * @author QimengDuan
      * @date 2018-01-26
      */
-    @RequiresPermissions("sys:user:edit")
+    @RequiresPermissions("sys:user:updatePwd")
     @RequestMapping("/doValidatePwd")
     @ResponseBody
     public ResultVM doValidatePwd(ChangePwdPM changePwdPM) {
@@ -246,11 +246,11 @@ public class UserController {
      * @author QimengDuan
      * @date 2018-01-26
      */
-    @RequiresPermissions("sys:user:edit")
+    @RequiresPermissions("sys:user:updatePwd")
     @RequestMapping("/doUpdateWord")
     @ResponseBody
     @OperationLog(name = "修改用户密码")
-    public ResultVM doUpdateWord(ChangePwdPM changePwdPM) {
+    public ResultVM doUpdatePwd(ChangePwdPM changePwdPM) {
         String newpwd = changePwdPM.getNewPwd();
         UserDTO userDTO = userService.getById(changePwdPM.getUserId());
         if (StringUtils.isNotBlank(newpwd)) {

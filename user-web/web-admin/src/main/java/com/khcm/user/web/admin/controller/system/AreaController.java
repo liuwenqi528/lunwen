@@ -129,7 +129,7 @@ public class AreaController {
      * changed by liuwenqi on 2018-02-01
      * 用于验证地区是否重复
      */
-    @RequiresPermissions("sys:area:view")
+    @RequiresPermissions({"sys:area:add","sys:area:edit"})
     @RequestMapping("/doValidate")
     @ResponseBody
     public ResultVM doValidate(AreaPM areaPM) {

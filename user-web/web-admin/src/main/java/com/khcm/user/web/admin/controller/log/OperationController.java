@@ -30,7 +30,7 @@ public class OperationController {
 
     @Autowired
     private LogService logService;
-    @RequiresPermissions("sys:user:view")
+    @RequiresPermissions("sys:log:operation:view")
     @RequestMapping(value = "/doDatagrid")
     @ResponseBody
     @OperationLog(name="操作日志查询")
@@ -39,12 +39,12 @@ public class OperationController {
         PageDTO<LogDTO> page = logService.getPage(logParam);
         return VMUtils.pageSuccess(page.getTotalCount(), LogDTOMapper.MAPPER.dtoToVM(page.getContent()));
     }
-    @RequiresPermissions("sys:appRegister:view")
+    @RequiresPermissions("sys:log:operation:view")
     @GetMapping
     public String showOperationLog() {
         return BASE_PATH+"loginOperation";
     }
-    @RequiresPermissions("sys:user:remove")
+    @RequiresPermissions("sys:log:operation:remove")
     @RequestMapping("/doRemove")
     @ResponseBody
     @OperationLog(name="操作日志删除")

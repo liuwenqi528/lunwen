@@ -31,25 +31,32 @@ public class LoginFailureController {
     @Autowired
     private LogService logService;
 
-    @RequiresPermissions("sys:user:view")
+    /**
+     * 打开错误日志页面
+     * @return
+     */
+    @RequiresPermissions("sys:log:failure:view")
+    @GetMapping
+    @OperationLog(name = "打开错误日志页面")
+    public String showFailureLog() {
+        return BASE_PATH + "loginFailure";
+    }
+
+    @RequiresPermissions("sys:log:failure:view")
     @RequestMapping(value = "/doDatagrid")
     @ResponseBody
-    @OperationLog(name="错误日志查询")
+    @OperationLog(name = "查询错误日志")
     public PageVM<LogVM> doDatagrid(LogPM logPM) {
         LogParam logParam = LogDTOMapper.MAPPER.pmToParam(logPM);
         PageDTO<LogDTO> page = logService.getPage(logParam);
         return VMUtils.pageSuccess(page.getTotalCount(), LogDTOMapper.MAPPER.dtoToVM(page.getContent()));
     }
-    @RequiresPermissions("sys:appRegister:view")
-    @GetMapping
-    @OperationLog(name="错误日志删除")
-    public String showFailureLog() {
-        return BASE_PATH+"loginFailure";
-    }
-    @RequiresPermissions("sys:user:remove")
+
+    @RequiresPermissions("sys:log:failure:remove")
     @RequestMapping("/doRemove")
     @ResponseBody
-    public ResultVM removeById(String ids){
+    @OperationLog(name = "删除错误日志")
+    public ResultVM removeById(String ids) {
         if (StringUtils.isNotBlank(ids)) {
             List<Integer> idList = Arrays.stream(ids.split(",")).map(Integer::valueOf).collect(Collectors.toList());
             logService.remove(idList);
