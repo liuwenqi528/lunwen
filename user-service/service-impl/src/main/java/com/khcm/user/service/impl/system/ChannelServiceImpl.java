@@ -1,14 +1,11 @@
 package com.khcm.user.service.impl.system;
 
-import com.khcm.user.dao.entity.business.system.Area;
 import com.khcm.user.dao.entity.business.system.Channel;
-import com.khcm.user.dao.entity.business.system.QChannel;
 import com.khcm.user.dao.entity.business.system.QChannel;
 import com.khcm.user.dao.repository.master.system.ChannelRepository;
 import com.khcm.user.service.api.system.ChannelService;
 import com.khcm.user.service.dto.base.PageDTO;
 import com.khcm.user.service.dto.business.system.ChannelDTO;
-import com.khcm.user.service.mapper.system.AreaMapper;
 import com.khcm.user.service.mapper.system.ChannelMapper;
 import com.khcm.user.service.param.business.system.ChannelParam;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -38,13 +35,12 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Override
     public ChannelDTO saveOrUpdate(ChannelParam channelParam) {
-        if (Objects.isNull(channelParam.getId())) {
-            return ChannelMapper.MAPPER.entityToDTO(channelRepository.save(ChannelMapper.MAPPER.paramToEntity(channelParam)));
-        } else {
-            Channel channel = channelRepository.getOne(channelParam.getId());
+        Optional<Integer> channelParamIdOptional = Optional.ofNullable(channelParam.getId());
+        return channelParamIdOptional.map(channelParamId -> {
+            Channel channel = channelRepository.getOne(channelParamId);
             ChannelMapper.MAPPER.paramToEntity(channelParam, channel);
             return ChannelMapper.MAPPER.entityToDTO(channelRepository.save(channel));
-        }
+        }).orElse(ChannelMapper.MAPPER.entityToDTO(channelRepository.save(ChannelMapper.MAPPER.paramToEntity(channelParam))));
     }
 
     @Override
@@ -87,14 +83,18 @@ public class ChannelServiceImpl implements ChannelService {
     public ChannelDTO getOne(ChannelParam channelParam) {
         QChannel qChannel = QChannel.channel;
         BooleanExpression predicate;
+
         if (StringUtils.isNotBlank(channelParam.getName())) {
             predicate = qChannel.name.eq(channelParam.getName());
         } else {
             predicate = qChannel.isNotNull();
         }
-        if (Objects.nonNull(channelParam.getId())) {
-            predicate = predicate.and(qChannel.id.ne(channelParam.getId()));
-        }
+
+        Optional<Integer> channelParamIdOptional = Optional.ofNullable(channelParam.getId());
+        predicate = predicate.and(channelParamIdOptional.map(channelParamId -> {
+            return qChannel.id.ne(channelParamId);
+        }).orElse(null));
+
         Channel channel = Optional.ofNullable(channelRepository.findList(predicate)).filter(channels -> channels.size() > 0).map(channels -> channels.get(0)).orElse(null);
         return ChannelMapper.MAPPER.entityToDTO(channel);
     }

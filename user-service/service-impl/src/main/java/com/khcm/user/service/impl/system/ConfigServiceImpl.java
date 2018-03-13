@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -68,13 +67,14 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigDTO saveOrUpdate(ConfigParam configParam) {
         //根据保存的对象的type,获取详细的配置信息
         Optional<ConfigParam> configParamOptional = Optional.ofNullable(configParam);
-//       将此配置清空
+        //将此配置清空
         Config config = configParamOptional.map(configParams1 -> configParams1.getType()).map(type -> configRepository.findByType(Enum.valueOf(ConfigType.class, type))).orElse(null);
 
-        if (Objects.nonNull(config)) {
+        Optional<Config> configOptional = Optional.ofNullable(config);
+        configOptional.ifPresent(config1-> {
             config.setItems(configParam.getItems());
-        }
-//        保存新的配置
+        });
+        //保存新的配置
         return ConfigMapper.MAPPER.entityToDTO(configRepository.save(config));
     }
 
@@ -92,48 +92,4 @@ public class ConfigServiceImpl implements ConfigService {
         Config config = configRepository.findByType(ConfigType.valueOf(type));
         return ConfigMapper.MAPPER.entityToDTO(config);
     }
-
-//    @Override
-//    public List<ConfigDTO> getList() {
-//        List<Config> configs = configRepository.findAll();
-//        return ConfigMapper.MAPPER.entityToDTO(configs);
-//    }
-//
-//    /**
-//     * 获取登录配置
-//     *
-//     * @return
-//     */
-//    @Override
-//    @Cacheable
-//    public ConfigLoginDTO getLoginConfig() {
-//        List<Config> configs = configRepository.findByType(ConfigType.LOGIN);
-//        return ConfigLoginDTO.of(configs.stream().collect(Collectors.toMap(Config::getName, Config::getValue)));
-//    return null;
-//    }
-//
-//
-//    /**
-//     * 保存或修改配置
-//     *
-//     * @param configParams
-//     * @return
-//     */
-//    @Override
-//    public List<ConfigDTO> saveOrUpdate(List<ConfigParam> configParams) {
-//        Optional<List<ConfigParam>> list = Optional.ofNullable(configParams);
-////       将此配置清空
-//        list.map(configParams1 -> configParams1.get(0).getType()).ifPresent(type-> configRepository.deleteByType(Enum.valueOf(ConfigType.class,type)));
-////        保存新的配置
-//        return ConfigMapper.MAPPER.entityToDTO(configRepository.save(ConfigMapper.MAPPER.paramToEntity(configParams)));
-//    }
-//
-//    @Override
-//    public List<ConfigDTO> getListByType(String type) {
-//        QConfig config =QConfig.config;
-//        BooleanExpression booleanExpression =config.isNotNull();
-//        booleanExpression.and(config.type.eq(ConfigType.valueOf(type)));
-//        List<Config> configs = configRepository.findByType(ConfigType.valueOf(type));
-//        return ConfigMapper.MAPPER.entityToDTO(configs);
-//    }
 }

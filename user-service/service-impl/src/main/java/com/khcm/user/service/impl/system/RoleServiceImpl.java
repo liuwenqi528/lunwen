@@ -1,15 +1,14 @@
 package com.khcm.user.service.impl.system;
 
-import com.khcm.user.dao.entity.business.system.*;
-import com.khcm.user.dao.entity.business.system.QChannel;
 import com.khcm.user.dao.entity.business.system.QRole;
+import com.khcm.user.dao.entity.business.system.Role;
+import com.khcm.user.dao.entity.business.system.User;
 import com.khcm.user.dao.repository.master.system.RoleRepository;
 import com.khcm.user.dao.repository.master.system.UserRepository;
 import com.khcm.user.service.api.system.RoleService;
 import com.khcm.user.service.dto.base.PageDTO;
 import com.khcm.user.service.dto.business.system.RoleDTO;
 import com.khcm.user.service.dto.business.system.RoleUserDTO;
-import com.khcm.user.service.mapper.system.ChannelMapper;
 import com.khcm.user.service.mapper.system.RoleMapper;
 import com.khcm.user.service.mapper.system.RoleUserMapper;
 import com.khcm.user.service.param.business.system.RoleParam;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -40,15 +38,15 @@ public class RoleServiceImpl implements RoleService {
     private RoleRepository roleRepository;
     @Autowired
     private UserRepository userRepository;
+
     @Override
     public RoleDTO saveOrUpdate(RoleParam roleParam) {
-        if (Objects.isNull(roleParam.getId())) {
-            return RoleMapper.MAPPER.entityToDTO(roleRepository.save( RoleMapper.MAPPER.paramToEntity(roleParam)));
-        }
-
-        Role role = roleRepository.findOne(roleParam.getId());
-        RoleMapper.MAPPER.paramToEntity(roleParam, role);
-        return RoleMapper.MAPPER.entityToDTO(roleRepository.save(role));
+        Optional<Integer> roleParamIdOptional = Optional.ofNullable(roleParam.getId());
+        return roleParamIdOptional.map(roleParamId -> {
+            Role role = roleRepository.findOne(roleParamId);
+            RoleMapper.MAPPER.paramToEntity(roleParam, role);
+            return RoleMapper.MAPPER.entityToDTO(roleRepository.save(role));
+        }).orElse(RoleMapper.MAPPER.entityToDTO(roleRepository.save(RoleMapper.MAPPER.paramToEntity(roleParam))));
     }
 
     @Override
@@ -60,6 +58,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleDTO getById(Integer id) {
         return RoleMapper.MAPPER.entityToDTO(roleRepository.findOne(id));
     }
+
     @Override
     public RoleUserDTO getRoleUserById(Integer id) {
         return RoleUserMapper.MAPPER.entityToDTO(roleRepository.findOne(id));
@@ -68,15 +67,16 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDTO getOne(RoleParam roleParam) {
         QRole qRole = QRole.role;
-        BooleanExpression predicate ;
+        BooleanExpression predicate;
         if (StringUtils.isNotBlank(roleParam.getName())) {
             predicate = qRole.name.eq(roleParam.getName());
         } else {
             predicate = qRole.isNotNull();
         }
-        if (Objects.nonNull(roleParam.getId())) {
-            predicate = predicate.and(qRole.id.ne(roleParam.getId()));
-        }
+        Optional<Integer> roleParamIdOptional = Optional.ofNullable(roleParam.getId());
+        predicate = predicate.and(roleParamIdOptional.map(roleParamId -> {
+            return qRole.id.ne(roleParamId);
+        }).orElse(null));
         Role role = Optional.ofNullable(roleRepository.findList(predicate)).filter(roles -> roles.size() > 0).map(roles -> roles.get(0)).orElse(null);
         return RoleMapper.MAPPER.entityToDTO(role);
     }
@@ -99,10 +99,10 @@ public class RoleServiceImpl implements RoleService {
         //1、构造条件
         QRole role = QRole.role;
         BooleanExpression p;
-        if (StringUtils.isNotBlank(name)){
-            p = role.name.like("%"+name+"%");
-        }else{
-            p  = role.isNotNull();
+        if (StringUtils.isNotBlank(name)) {
+            p = role.name.like("%" + name + "%");
+        } else {
+            p = role.isNotNull();
         }
         //2、查询
         Page<Role> page = roleRepository.findPage(p);
@@ -116,7 +116,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void setUser(Integer roleId, List<Integer> userIdList) {
-        Role role =roleRepository.findOne(roleId);
+        Role role = roleRepository.findOne(roleId);
         role.getUsers().clear();
         userIdList.forEach(userId -> {
             User user = userRepository.findOne(userId);
@@ -124,7 +124,6 @@ public class RoleServiceImpl implements RoleService {
         });
         roleRepository.save(role);
     }
-
 
 
 }

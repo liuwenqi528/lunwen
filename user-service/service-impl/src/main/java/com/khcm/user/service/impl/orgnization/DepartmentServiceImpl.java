@@ -54,10 +54,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         QDepartment qDepartment = QDepartment.department;
         BooleanExpression p = qDepartment.enable.eq(true);
         //如果所属机构ID不为空，则查询所属机构
-        if (Objects.nonNull(organizationId)) {
+        Optional<Integer> organizationIdOptional = Optional.ofNullable(organizationId);
+        p = p.and(organizationIdOptional.map(orgId -> {
             Organization organization = organizationRepository.getOne(organizationId);
-            p = p.and(qDepartment.organization.id.in(organizationRepository.getIdsById(organization.getLft(), organization.getRgt())));
-        }
+            return qDepartment.organization.id.in(organizationRepository.getIdsById(organization.getLft(), organization.getRgt()));
+        }).orElse(null));
         //如果部门名称不为空，则查询部门名称
         if (StringUtils.isNotBlank(deptName)) {
             p = p.and(qDepartment.fullName.like("" + deptName + "").or(qDepartment.name.like("%" + deptName + "%")));
@@ -67,29 +68,32 @@ public class DepartmentServiceImpl implements DepartmentService {
             p = p.and(qDepartment.gmtCreate.between(beginTime, endTime));
         }
         //如果父级id不为空
-        if (Objects.nonNull(parentId)) {
-            p = p.and(qDepartment.parent.id.eq(parentId));
-        }
+        Optional<Integer> parentIdOptional = Optional.ofNullable(organizationId);
+        p = p.and(parentIdOptional.map(orgId -> {
+            return qDepartment.parent.id.eq(parentId);
+        }).orElse(null));
+
         List<Department> departmentList = departmentRepository.findList(p);
         return convertDepartment(departmentList);
     }
 
     @Override
     public DepartmentDTO saveOrUpdate(DepartmentParam departmentParam) {
-        if (departmentParam.getId() == null) {
+        Optional<Integer> departmentParamId = Optional.ofNullable(departmentParam.getId());
+        return departmentParamId.map(id -> {
+            Department department = departmentRepository.findOne(departmentParam.getId());
+            DepartmentMapper.MAPPER.paramToEntity(departmentParam, department);
+            return DepartmentMapper.MAPPER.entityToDTO(departmentRepository.save(department));
+        }).orElseGet(() -> {
             Department department = DepartmentMapper.MAPPER.paramToEntity(departmentParam);
             department.setEnable(true);
             return DepartmentMapper.MAPPER.entityToDTO(departmentRepository.save(department));
-        }
-
-        Department department = departmentRepository.findOne(departmentParam.getId());
-        DepartmentMapper.MAPPER.paramToEntity(departmentParam, department);
-        return DepartmentMapper.MAPPER.entityToDTO(departmentRepository.save(department));
+        });
     }
 
     @Override
     public void remove(List<Integer> ids) {
-        ids.forEach(id -> departmentRepository.updateEnable(id,false));
+        ids.forEach(id -> departmentRepository.updateEnable(id, false));
     }
 
     @Override

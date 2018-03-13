@@ -1,12 +1,10 @@
 package com.khcm.user.service.impl.system;
 
-import com.khcm.user.dao.entity.business.system.App;
 import com.khcm.user.dao.entity.business.system.Area;
 import com.khcm.user.dao.entity.business.system.QArea;
 import com.khcm.user.dao.repository.master.system.AreaRepository;
 import com.khcm.user.service.api.system.AreaService;
 import com.khcm.user.service.dto.business.system.AreaDTO;
-import com.khcm.user.service.mapper.system.AppMapper;
 import com.khcm.user.service.mapper.system.AreaMapper;
 import com.khcm.user.service.param.business.system.AreaParam;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -85,17 +83,16 @@ public class AreaServiceImpl implements AreaService {
         BooleanExpression predicate ;
         if(StringUtils.isNotBlank(areaParam.getName())){
             predicate = qArea.name.eq(areaParam.getName());
-            if(Objects.nonNull(areaParam.getParentId())){
-                predicate = predicate.and(qArea.parent.id.eq(areaParam.getParentId()));
-            }
+            Optional<Integer> appParamId = Optional.ofNullable(areaParam.getParentId());
+            predicate = predicate.and(appParamId.map(parentId -> qArea.parent.id.eq(parentId)).orElse(null));
         }else if(StringUtils.isNotBlank(areaParam.getCode())){
             predicate = qArea.code.eq(areaParam.getCode());
         }else{
             predicate = qArea.isNotNull();
         }
-        if (Objects.nonNull(areaParam.getId())) {
-            predicate = predicate.and(qArea.id.ne(areaParam.getId()));
-        }
+        Optional<Integer> appParamId = Optional.ofNullable(areaParam.getId());
+        predicate = predicate.and(appParamId.map(id -> qArea.parent.id.eq(id)).orElse(null));
+
         Area area = Optional.ofNullable(areaRepository.findList(predicate)).filter(areas -> areas.size() > 0).map(areas -> areas.get(0)).orElse(null);
         return AreaMapper.MAPPER.entityToDTO(area);
     }

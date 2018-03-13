@@ -1,12 +1,9 @@
 package com.khcm.user.service.impl.orgnization;
 
-
 import com.khcm.user.common.enums.UserStatus;
+import com.khcm.user.dao.entity.business.orgnization.Department;
 import com.khcm.user.dao.entity.business.orgnization.Organization;
 import com.khcm.user.dao.entity.business.orgnization.Person;
-
-import com.khcm.user.dao.entity.business.orgnization.Department;
-
 import com.khcm.user.dao.entity.business.orgnization.QPerson;
 import com.khcm.user.dao.entity.business.system.Role;
 import com.khcm.user.dao.entity.business.system.User;
@@ -24,8 +21,6 @@ import com.khcm.user.service.mapper.organization.PersonMapper;
 import com.khcm.user.service.mapper.system.UserMapper;
 import com.khcm.user.service.mapper.system.UserRoleMapper;
 import com.khcm.user.service.param.business.organization.PersonParam;
-import com.querydsl.core.types.Predicate;
-
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +29,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -64,10 +62,14 @@ public class PersonServiceImpl implements PersonService {
     public List<UserDTO> getList(PersonParam personParam) {
         QPerson qPerson = QPerson.person;
         BooleanExpression predicate = qPerson.enable.eq(true);
-        if (Objects.nonNull(personParam.getDepartmentId())) {
-            Department department = departmentRepository.findOne(personParam.getDepartmentId());
-            predicate = predicate.and(qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt())));
-        }
+        Optional<Integer> departmentIdOptional = Optional.ofNullable(personParam.getDepartmentId());
+        predicate = predicate.and(
+                departmentIdOptional.map(departmentId -> {
+                    Department department = departmentRepository.findOne(personParam.getDepartmentId());
+                    return qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt()));
+                }).orElse(null)
+        );
+
         List<User> userList = new ArrayList<>();
         personRepository.findList(predicate).forEach(person -> {
             userList.add(person.getUser());
@@ -78,43 +80,53 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public PersonDTO saveOrUpdate(PersonParam personParam) {
-        if (Objects.isNull(personParam.getId())) {
+        Optional<Integer> personParamId = Optional.ofNullable(personParam.getId());
+        return personParamId.map(id -> {
+            Person person = personRepository.getOne(personParam.getId());
+            return PersonMapper.MAPPER.entityToDTO(personRepository.save(PersonMapper.MAPPER.paramToEntity(personParam, person)));
+        }).orElseGet(() -> {
             Person person = PersonMapper.MAPPER.paramToEntity(personParam);
             person.setEnable(true);
             return PersonMapper.MAPPER.entityToDTO(personRepository.save(person));
-        }
-        Person person = personRepository.getOne(personParam.getId());
-        return PersonMapper.MAPPER.entityToDTO(personRepository.save(PersonMapper.MAPPER.paramToEntity(personParam, person)));
+        });
     }
 
     @Override
     public void remove(List<Integer> ids) {
-        ids.stream().forEach(id -> personRepository.updateEnable(id,false));
+        ids.stream().forEach(id -> personRepository.updateEnable(id, false));
     }
 
-    /**@update by Qimeng Duan
-     * @date 2018-01-25
+    /**
      * @param personParam
      * @return
+     * @update by Qimeng Duan
+     * @date 2018-01-25
      */
     @Override
     public PageDTO<PersonDTO> getPage(PersonParam personParam) {
         Integer organizationId = personParam.getOrganizationId();
         QPerson qPerson = QPerson.person;
-        BooleanExpression predicate = qPerson.isNotNull().and(qPerson.enable.eq(true));
+        BooleanExpression predicate = qPerson.enable.eq(true);
         //如果所属机构ID不为空，则查询所属机构
-        if (Objects.nonNull(organizationId)) {
-            Organization organization = organizationRepository.getOne(organizationId);
-            predicate = qPerson.organization.id.in(organizationRepository.getIdsById(organization.getLft(), organization.getRgt()));
-        }
+        Optional<Integer> organizationIdOptional = Optional.ofNullable(organizationId);
+        predicate = predicate.and(organizationIdOptional.map(orgId -> {
+            Organization organization = organizationRepository.getOne(orgId);
+            return qPerson.organization.id.in(organizationRepository.getIdsById(organization.getLft(), organization.getRgt()));
+        }).orElse(null));
+
+
         //使用StringUtils.isNotBlank替代Objects.nonNull方法
         if (StringUtils.isNotBlank(personParam.getName())) {
             //此处模糊查询需要加%号
-            predicate = predicate.and(qPerson.name.like("%"+personParam.getName()+"%"));
+            predicate = predicate.and(qPerson.name.like("%" + personParam.getName() + "%"));
         }
-        if (Objects.nonNull(personParam.getDepartmentId())) {
-            predicate = predicate.and(qPerson.department.id.eq(personParam.getDepartmentId()));
-        }
+
+        Optional<Integer> departmentIdOptional = Optional.ofNullable(personParam.getDepartmentId());
+        predicate = predicate.and(
+                departmentIdOptional.map(departmentId -> {
+                    return qPerson.department.id.eq(personParam.getDepartmentId());
+                }).orElse(null)
+        );
         Page<Person> page = personRepository.findPage(predicate);
         List<PersonDTO> personDTOS = PersonMapper.MAPPER.entityToDTO(page.getContent());
 
@@ -137,11 +149,14 @@ public class PersonServiceImpl implements PersonService {
     public PageDTO<UserDTO> getUserPage(PersonParam personParam) {
         //1、构造条件
         QPerson qPerson = QPerson.person;
-        BooleanExpression predicate = qPerson.enable.eq(true);;
-        if (Objects.nonNull(personParam.getDepartmentId())) {
-            Department department = departmentRepository.findOne(personParam.getDepartmentId());
-            predicate = predicate.and(qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt())));
-        }
+        BooleanExpression predicate = qPerson.enable.eq(true);
+        Optional<Integer> departmentIdOptional = Optional.ofNullable(personParam.getDepartmentId());
+        predicate = predicate.and(
+                departmentIdOptional.map(departmentId -> {
+                    Department department = departmentRepository.findOne(personParam.getDepartmentId());
+                    return qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt()));
+                }).orElse(null)
+        );
 
         //2、查询
         Page<Person> page = personRepository.findPage(predicate);
@@ -161,7 +176,7 @@ public class PersonServiceImpl implements PersonService {
             Department department = departmentRepository.findOne(departmentId);
             Role role = roleRepository.findOne(roleId);
             //查询条件是当前部门的已关联用户并是该角色的人员；
-           predicate = predicate.and(qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt())))
+            predicate = predicate.and(qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt())))
                     .and(qPerson.user.id.isNotNull())
                     .and(qPerson.user.roles.contains(role));
         }
@@ -181,7 +196,7 @@ public class PersonServiceImpl implements PersonService {
             Department department = departmentRepository.findOne(departmentId);
             Role role = roleRepository.findOne(roleId);
             //查询条件是当前部门的已关联用户并且不是该角色的人员；
-            predicate =predicate.and(qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt())))
+            predicate = predicate.and(qPerson.department.id.in(departmentRepository.getIdsById(department.getLft(), department.getRgt())))
                     .and(qPerson.user.id.isNotNull())
                     .and(qPerson.user.admin.isFalse())
                     .and(qPerson.user.roles.contains(role).not());

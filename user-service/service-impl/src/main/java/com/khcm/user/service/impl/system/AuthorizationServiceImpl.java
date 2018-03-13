@@ -16,7 +16,6 @@ import com.khcm.user.service.mapper.system.AuthorizationMapper;
 import com.khcm.user.service.mapper.system.ModuleMapper;
 import com.khcm.user.service.mapper.system.OperationMapper;
 import com.khcm.user.service.param.business.system.AuthorizationParam;
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -63,6 +62,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             return convertResourceToModule(permissions);
         }
 
+
         QAuthorization qAuthorization = QAuthorization.authorization;
 
         BooleanExpression booleanExpression = qAuthorization.app.code.eq(appCode).and(qAuthorization.role.users.contains(user));
@@ -94,20 +94,22 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public void saveOrUpdate(AuthorizationParam authorizationParam) {
-        List<AuthorizationParam> list = new ArrayList<>();
-        authorizationParam.getResourceIds().forEach(resourceId -> {
+
+        List<AuthorizationParam> list = authorizationParam.getResourceIds().stream().map(resourceId -> {
             AuthorizationParam authParam = new AuthorizationParam();
             authParam.setAppId(authorizationParam.getAppId());
             authParam.setRoleId(authorizationParam.getRoleId());
             authParam.setResourceId(resourceId);
-            list.add(authParam);
-        });
+            return authParam;
+        }).collect(Collectors.toList());
 
         authorizationRepository.deleteByAppIdAndByRoleId(authorizationParam.getAppId(), authorizationParam.getRoleId());
-        if (Objects.nonNull(list)) {
-            Set<Authorization> authorizations = AuthorizationMapper.MAPPER.paramToSetEntity(list);
+
+        Optional<List<AuthorizationParam>> authorizationParamOptional = Optional.ofNullable(list);
+        authorizationParamOptional.ifPresent(authorizationParams -> {
+            Set<Authorization> authorizations = AuthorizationMapper.MAPPER.paramToSetEntity(authorizationParams);
             authorizations.forEach(authorization -> authorizationRepository.save(authorization));
-        }
+        });
     }
 
     private List<ModuleDTO> convertResourceToModule(List<Resource> resources) {

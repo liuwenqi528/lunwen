@@ -1,18 +1,13 @@
 package com.khcm.user.service.impl.system;
 
 import com.khcm.user.common.ensure.Ensure;
-import com.khcm.user.dao.entity.business.system.App;
-import com.khcm.user.dao.entity.business.system.QApp;
 import com.khcm.user.dao.entity.business.system.QResource;
 import com.khcm.user.dao.entity.business.system.Resource;
 import com.khcm.user.dao.repository.master.system.AuthorizationRepository;
 import com.khcm.user.dao.repository.master.system.ResourceRepository;
 import com.khcm.user.service.api.system.ResourceService;
-import com.khcm.user.service.dto.business.system.AppDTO;
 import com.khcm.user.service.dto.business.system.ResourceDTO;
-import com.khcm.user.service.mapper.system.AppMapper;
 import com.khcm.user.service.mapper.system.ResourceMapper;
-import com.khcm.user.service.param.business.system.AppParam;
 import com.khcm.user.service.param.business.system.ResourceParam;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 /**
@@ -40,15 +36,15 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ResourceDTO saveOrUpdate(ResourceParam resourceParam) {
-        if (resourceParam.getId() == null) {
-            Resource resource = ResourceMapper.MAPPER.paramToEntity(resourceParam);
+        Optional<Integer> resourceParamId = Optional.ofNullable(resourceParam.getId());
+        return resourceParamId.map(id -> {
+            Resource resource = resourceRepository.findOne(resourceParam.getId());
+            ResourceMapper.MAPPER.paramToEntity(resourceParam, resource);
+            //todo 处理 parentId
             return ResourceMapper.MAPPER.entityToDTO(resourceRepository.save(resource));
-        }
-
-        Resource resource = resourceRepository.findOne(resourceParam.getId());
-        ResourceMapper.MAPPER.paramToEntity(resourceParam, resource);
-        //todo 处理 parentId
-        return ResourceMapper.MAPPER.entityToDTO(resourceRepository.save(resource));
+        }).orElse(
+                ResourceMapper.MAPPER.entityToDTO(resourceRepository.save(ResourceMapper.MAPPER.paramToEntity(resourceParam)))
+        );
     }
 
     @Override
@@ -74,22 +70,19 @@ public class ResourceServiceImpl implements ResourceService {
     public ResourceDTO getOne(ResourceParam resourceParam) {
         //1、构造条件
         QResource qResource = QResource.resource;
-        BooleanExpression p =qResource.app.id.eq(resourceParam.getAppId());
+        BooleanExpression p = qResource.app.id.eq(resourceParam.getAppId());
 
         //2、条件
-        if(Objects.nonNull(resourceParam.getParentId())){
-            p = p.and(qResource.parent.id.eq(resourceParam.getParentId()));
-        }else{
-            p = p.and(qResource.parent.id.isNull());
-        }
+        Optional<Integer> parentIdOptional = Optional.ofNullable(resourceParam.getParentId());
+        p = p.and(parentIdOptional.map(pId -> qResource.parent.id.eq(pId)).orElse(p.and(qResource.parent.id.isNull())));
+
         if (StringUtils.isNotBlank(resourceParam.getName())) {
             p = p.and(qResource.name.eq(resourceParam.getName()));
         } else if (StringUtils.isNotBlank(resourceParam.getCode())) {
-            p =  p.and(qResource.code.eq(resourceParam.getCode()));
+            p = p.and(qResource.code.eq(resourceParam.getCode()));
         }
-        if (Objects.nonNull(resourceParam.getId())) {
-            p = p.and(qResource.id.ne(resourceParam.getId()));
-        }
+        Optional<Integer> idOptional = Optional.ofNullable(resourceParam.getId());
+        p = p.and(idOptional.map(id -> qResource.id.ne(id)).orElse(null));
         Resource resource = Optional.ofNullable(resourceRepository.findList(p)).filter(resources -> resources.size() > 0).map(resources -> resources.get(0)).orElse(null);
         return ResourceMapper.MAPPER.entityToDTO(resource);
     }

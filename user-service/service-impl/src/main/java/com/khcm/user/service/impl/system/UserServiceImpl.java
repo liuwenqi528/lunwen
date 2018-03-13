@@ -1,8 +1,10 @@
 package com.khcm.user.service.impl.system;
 
 import com.khcm.user.common.enums.UserStatus;
-import com.khcm.user.dao.entity.business.system.*;
+import com.khcm.user.dao.entity.business.system.Area;
 import com.khcm.user.dao.entity.business.system.QUser;
+import com.khcm.user.dao.entity.business.system.Role;
+import com.khcm.user.dao.entity.business.system.User;
 import com.khcm.user.dao.repository.master.system.AreaRepository;
 import com.khcm.user.dao.repository.master.system.RoleRepository;
 import com.khcm.user.dao.repository.master.system.UserRepository;
@@ -50,22 +52,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO saveOrUpdate(UserParam userParam) {
-        if (Objects.isNull(userParam.getId())) {
+        //封装UserParam对象中的id属性。
+        Optional<Integer> userParamId = Optional.ofNullable(userParam.getId());
+        //返回保存后返回的对象。
+        // 如果userParamId中的值不为null,则执行此代码块。
+        UserDTO userDTO = userParamId.map(id -> {
+            //因为参数对象中的id存在，说明是修改。 所以先从数据库中查询到原来的数据
+            User user = userRepository.findOne(userParam.getId());
+            //封装userParam对象中password属性
+            Optional<String> userParamPassword = Optional.ofNullable(userParam.getPassword());
+            //如果password属性为null,需要把数据库中的password赋值给UserParam.
+            userParam.setPassword(userParamPassword.map(pwd -> pwd).orElse(user.getPassword()));
+            //将参数UserParam中的非null数据赋值给user
+            UserMapper.MAPPER.paramToEntity(userParam, user);
+            return UserMapper.MAPPER.entityToDTO(userRepository.save(user));
+        }).orElseGet(() -> {
+            //id为null,说明是保存。
+            //给新的用户赋一个初始状态。
             userParam.setStatus(UserStatus.NORMAL);
             return UserMapper.MAPPER.entityToDTO(userRepository.save(UserMapper.MAPPER.paramToEntity(userParam)));
-        }
-        User user = userRepository.findOne(userParam.getId());
-        if (Objects.isNull(userParam.getPassword())) {
-            userParam.setPassword(user.getPassword());
-        }
-        UserMapper.MAPPER.paramToEntity(userParam, user);
-        return UserMapper.MAPPER.entityToDTO(userRepository.save(user));
+        });
+
+        return userDTO;
     }
 
     @Override
     public void remove(List<Integer> ids) {
         //删除用户，将状态改成关闭；
-        ids.forEach(id -> userRepository.updateUserStatus(id,UserStatus.CLOSED));
+        ids.forEach(id -> userRepository.updateUserStatus(id, UserStatus.CLOSED));
     }
 
     @Override
@@ -94,12 +108,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Set<UserRoleDTO> getRoleSetUserList(Integer roleId, List<Integer> ids) {
-        List<User> users =null;
-        if(Objects.nonNull(ids)&& !ids.isEmpty()){
-            users = userRepository.findByStatusEqualsAndAdminIsFalseAndIdNotIn(UserStatus.NORMAL, ids);
-        }else{
-            users = userRepository.findByStatusEqualsAndAdminIsFalse(UserStatus.NORMAL);
-        }
+        //封装ids，用于判断是否为null.
+        Optional<List<Integer>> idsOptional = Optional.ofNullable(ids);
+        //过滤--判断集合是否长度大于0.
+        Optional<List<Integer>> idListOptional = idsOptional.filter(idList -> idList.size() > 0);
+
+        List<User> users = idListOptional.map(idList ->
+                userRepository.findByStatusEqualsAndAdminIsFalseAndIdNotIn(UserStatus.NORMAL, ids)
+        ).orElse(
+                userRepository.findByStatusEqualsAndAdminIsFalse(UserStatus.NORMAL)
+        );
 
         List<UserRoleDTO> listUserDTo = UserRoleMapper.MAPPER.entityToDTO(users);
         return new HashSet<>(listUserDTo);
@@ -115,9 +133,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO editUserInfo(UserInfoParam userInfoParam) {
         User user = userRepository.findOne(userInfoParam.getId());
-        if (Objects.nonNull(userInfoParam.getAreaId())) {
-            user.getExt().setArea(areaRepository.findOne(userInfoParam.getAreaId()));
-        }
+        Optional<Integer> areaIdOptional = Optional.ofNullable(userInfoParam.getAreaId());
+        areaIdOptional.ifPresent(areaId -> {
+            user.getExt().setArea(areaRepository.findOne(areaId));
+        });
         UserInfoMapper.MAPPER.paramToEntity(userInfoParam, user);
         return UserMapper.MAPPER.entityToDTO(userRepository.save(user));
     }
@@ -126,21 +145,22 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserAndArea(Integer uid) {
         User user = userRepository.findOne(uid);
         UserDTO userDTO = UserMapper.MAPPER.entityToDTO(user);
-        if (Objects.nonNull(user.getExt().getArea())) {
-            Integer areaPid = user.getExt().getArea().getId();
+        Optional<Area> areaOptional = Optional.ofNullable(user.getExt().getArea());
+        areaOptional.ifPresent(area -> {
             List<AreaDTO> list = new ArrayList<>();
-            list = arrangement(areaPid, list);
+            list = arrangement(area.getId(), list);
             userDTO.setAreaDTOList(list);
-        }
+        });
         return userDTO;
     }
 
     public List<AreaDTO> arrangement(Integer id, List<AreaDTO> list) {
         Area area = areaRepository.findOne(id);
         list.add(AreaMapper.MAPPER.entityToDTO(area));
-        if (Objects.nonNull(area.getParent())) {
-            arrangement(area.getParent().getId(), list);
-        }
+        Optional<Area> parentAreaOptional = Optional.ofNullable(area.getParent());
+        parentAreaOptional.ifPresent(parentArea -> {
+            arrangement(parentArea.getId(), list);
+        });
         return list;
     }
 
@@ -156,20 +176,20 @@ public class UserServiceImpl implements UserService {
         //1、构造条件
         QUser qUser = QUser.user;
         BooleanExpression predicate = qUser.isNotNull();
-        if(StringUtils.isNotBlank(userParam.getUsername())){
-            predicate = predicate.and(qUser.username.like("%"+userParam.getUsername()+"%"));
+        if (StringUtils.isNotBlank(userParam.getUsername())) {
+            predicate = predicate.and(qUser.username.like("%" + userParam.getUsername() + "%"));
         }
-        if(StringUtils.isNotBlank(userParam.getPhone())){
-            predicate = predicate.and(qUser.phone.like("%"+userParam.getPhone()+"%"));
+        if (StringUtils.isNotBlank(userParam.getPhone())) {
+            predicate = predicate.and(qUser.phone.like("%" + userParam.getPhone() + "%"));
         }
-        if(StringUtils.isNotBlank(userParam.getEmail())){
-            predicate = predicate.and(qUser.email.like("%"+userParam.getEmail()+"%"));
+        if (StringUtils.isNotBlank(userParam.getEmail())) {
+            predicate = predicate.and(qUser.email.like("%" + userParam.getEmail() + "%"));
         }
-        if(StringUtils.isNotBlank(userParam.getRealname())){
-            predicate = predicate.and(qUser.ext.realname.like("%"+userParam.getRealname()+"%"));
+        if (StringUtils.isNotBlank(userParam.getRealname())) {
+            predicate = predicate.and(qUser.ext.realname.like("%" + userParam.getRealname() + "%"));
         }
-        if(StringUtils.isNotBlank(userParam.getChannelName())){
-            predicate = predicate.and(qUser.ext.channel.name.like("%"+userParam.getChannelName()+"%"));
+        if (StringUtils.isNotBlank(userParam.getChannelName())) {
+            predicate = predicate.and(qUser.ext.channel.name.like("%" + userParam.getChannelName() + "%"));
         }
         Optional<Date> optionalBeginDate = Optional.ofNullable(userParam.getBeginTime());
         predicate = predicate.and(optionalBeginDate.map(beginDate -> qUser.gmtCreate.goe(beginDate)).orElse(null));

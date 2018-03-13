@@ -1,5 +1,6 @@
 package com.khcm.user.service.impl.system;
 
+
 import com.khcm.user.dao.entity.business.system.App;
 import com.khcm.user.dao.entity.business.system.QApp;
 import com.khcm.user.dao.repository.master.system.AppRepository;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -38,17 +38,17 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public AppDTO saveOrUpdate(AppParam appParam) {
-        if (Objects.isNull(appParam.getId())) {
-            return AppMapper.MAPPER.entityToDTO(appRepository.save(AppMapper.MAPPER.paramToEntity(appParam)));
-        }
-
-        App app = appRepository.findOne(appParam.getId());
-        AppMapper.MAPPER.paramToEntity(appParam, app);
-        return AppMapper.MAPPER.entityToDTO(appRepository.save(app));
+        Optional<Integer> appParamId = Optional.ofNullable(appParam.getId());
+        return appParamId.map(id -> {
+            App app = appRepository.findOne(appParam.getId());
+            AppMapper.MAPPER.paramToEntity(appParam, app);
+            return AppMapper.MAPPER.entityToDTO(appRepository.save(app));
+        }).orElse(AppMapper.MAPPER.entityToDTO(appRepository.save(AppMapper.MAPPER.paramToEntity(appParam))));
     }
 
     /**
      * 删除系统-->同时删除系统关联系统资源、权限等数据
+     *
      * @param ids 要删除的id集合
      */
     @Override
@@ -98,9 +98,8 @@ public class AppServiceImpl implements AppService {
         } else {
             p = qApp.isNotNull();
         }
-        if (Objects.nonNull(appParam.getId())) {
-            p = p.and(qApp.id.ne(appParam.getId()));
-        }
+        Optional<Integer> appParamId = Optional.ofNullable(appParam.getId());
+        p = p.and(appParamId.map(id -> qApp.id.ne(id)).orElse(null));
         App app = Optional.ofNullable(appRepository.findList(p)).filter(apps -> apps.size() > 0).map(apps -> apps.get(0)).orElse(null);
         return AppMapper.MAPPER.entityToDTO(app);
     }

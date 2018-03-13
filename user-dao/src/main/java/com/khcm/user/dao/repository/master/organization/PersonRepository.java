@@ -2,7 +2,6 @@ package com.khcm.user.dao.repository.master.organization;
 
 import com.khcm.user.dao.entity.business.orgnization.Person;
 import com.khcm.user.dao.repository.BaseRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
