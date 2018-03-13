@@ -25,13 +25,6 @@ dependencies {
             "org.apache.shiro:shiro-spring:${shiroSpringVersion}",
             "org.apache.shiro:shiro-ehcache:${shiroSpringVersion}",
 
-            // pac4j
-            "io.buji:buji-pac4j:${bujiPac4jVersion}",
-            "org.pac4j:pac4j-cas:${pac4jVersion}",
-            "org.pac4j:pac4j-oauth:${pac4jVersion}",
-            "org.pac4j:pac4j-jwt:${pac4jVersion}",
-            "org.pac4j:pac4j-http:${pac4jVersion}",
-
             // spring-boot-starter-web
             'org.springframework.boot:spring-boot-starter-web',
 

@@ -6,8 +6,6 @@ buildscript {
         validationVersion = '2.0.0.Final'
         mapstructVersion = '1.2.0.Final'
         shiroSpringVersion = '1.4.0'
-        bujiPac4jVersion = '3.0.0'
-        pac4jVersion = '2.2.1'
         mysqlConnectorVersion = '5.1.44'
         druidVersion = '1.1.2'
         thymeleafVersion = '3.0.6.RELEASE'
