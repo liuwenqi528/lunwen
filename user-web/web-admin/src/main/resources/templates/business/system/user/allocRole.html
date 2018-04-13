@@ -7,16 +7,12 @@
     <fieldset class="layui-elem-field">
         <legend th:text="${userVM.username}">用户名称:</legend>
         <input type="hidden" name="userId" id="userId" class="layui-input" th:value="${userVM.id}">
-        <div style="width: 100%;height:320px">
+        <div style="width: 100%;height:100%">
             <table lay-filter="userSetRoleDatagrid" id="userSetRoleDatagrid"></table>
         </div>
     </fieldset>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="settingRole">提交</button>
-            <button class="layui-btn layui-btn-primary" id="reset">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="settingRole" id="settingRole">立即提交</button>
+    <button class="hidden-btn" id="settingRoleReset">重置</button>
 </form>
 <script th:inline="javascript">
     var roleIds = [[${userVM}]].roleIds;
@@ -25,7 +21,7 @@
 
     layui.use(['form', 'layer', 'table'], function () {
         var form = layui.form, table = layui.table;
-        table.render({
+        initTable(table, {
             elem: '#userSetRoleDatagrid'
             , url: basePath + '/sys/role/doDatagrid'
             , cols: [[ //表头
@@ -33,17 +29,8 @@
                 , {field: 'name', title: '用户姓名', width: 260}
                 , {field: 'description', title: '角色描述', width: 260}
             ]]
-            , request: {
-                limitName: 'rows' //每页数据量的参数名，默认：limit
-            },
-            response: {
-                statusName: 'retCode' //数据状态的字段名称，默认：code
-                , statusCode: '0000' //成功的状态码，默认：0
-                , msgName: 'retInfo' //状态信息的字段名称，默认：msg
-                , countName: 'total' //数据总数的字段名称，默认：count
-                , dataName: 'rows' //数据列表的字段名称，默认：data
-            }
-            , height: 300
+            , height: 'full-100'
+            , page: false
             , done: function (data) {
                 checkBox(data);
             }
@@ -81,7 +68,7 @@
             });
             return false;
         });
-        $('#reset').on('click', function () {
+        $('#settingRoleReset').on('click', function () {
             table.reload('userSetRoleDatagrid', {
                 done: function (data) {
                     checkBox(data)
@@ -90,7 +77,15 @@
             return false;
         })
     });
+    //保存
+    function saveForm() {
+        $('#settingRole').click();
+    }
 
+    //重置
+    function resetForm() {
+        $('#settingRoleReset').click();
+    }
     //默认选中已有角色
     function checkBox(data) {
         var roleData = data.rows;

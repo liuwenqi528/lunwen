@@ -162,10 +162,6 @@
                 type: "post",
                 success: function (data) {
                     layer.msg(data.retInfo);
-                    if (data.retCode == '0000') {
-                        parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.personDatagrid.reload();
-                        parent.layer.closeAll();
-                    }
                 }
             })
             return false;

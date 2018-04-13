@@ -4,8 +4,10 @@
 </head>
 <body>
 <form class="layui-form" th:action="@{/sys/appResource/doSave}">
-    <input type="hidden" name="appId" id="appId" class="layui-input" th:value="${resourceVM!=null?resourceVM.appId:appVM.id}">
-    <input type="hidden" name="parentId" id="parentId" class="layui-input" th:value="${resourceVM!=null?resourceVM.id:null}">
+    <input type="hidden" name="appId" id="appId" class="layui-input"
+           th:value="${resourceVM!=null?resourceVM.appId:appVM.id}">
+    <input type="hidden" name="parentId" id="parentId" class="layui-input"
+           th:value="${resourceVM!=null?resourceVM.id:null}">
     <div class="layui-form-item">
         <label class="layui-form-label">上级资源</label>
         <div class="layui-input-block">
@@ -15,7 +17,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>资源名称</label>
         <div class="layui-input-block">
-            <input type="text" name="name" lay-verType="msg" lay-verify="required|resourceName"  class="layui-input">
+            <input type="text" name="name" lay-verType="msg" lay-verify="required|resourceName" class="layui-input">
             <div class="layui-form-mid layui-word-aux">由2-16位字母、数字、中文和下划线组成，下划线不能开头结尾</div>
         </div>
     </div>
@@ -52,15 +54,11 @@
     <div class="layui-form-item layui-form-text">
         <label class="layui-form-label">描述</label>
         <div class="layui-input-block">
-            <textarea placeholder="请输入描述" class="layui-textarea" name="description" ></textarea>
+            <textarea placeholder="请输入描述" class="layui-textarea" name="description"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="resourceAdd">添加</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="resourceAdd" id="resourceAdd">添加</button>
+    <button type="reset" class="hidden-btn" id="resourceReset">重置</button>
 </form>
 <script th:inline="javascript">
     var iconUrl = [[#{icon.url}]];
@@ -68,17 +66,17 @@
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
 <script>
     layui.config({
-        base:basePath+ '/js/' //假设这是你存放拓展模块的根目录
+        base: basePath + '/js/' //这是你存放拓展模块的根目录
     }).extend({ //设定模块别名
         myIcon: 'myIcon'
-    }).use(['form', 'jquery', 'layer','myIcon'], function () {
+    }).use(['form', 'jquery', 'layer', 'myIcon'], function () {
         var form = layui.form
             , $ = layui.$ //重点处
             , layer = layui.layer,
             //zyc add
-              myIcon=layui.myIcon;
-              myIcon(iconUrl);
-           //zyc add
+            myIcon = layui.myIcon;
+        myIcon(iconUrl);
+        //zyc add
 
         //监听提交
         form.on('submit(resourceAdd)', function (data) {
@@ -117,20 +115,21 @@
         });
 
     });
+
     function verifyResource(value, title, type) {
 
-            if (type == 'name') {
-                if (!new RegExp('^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]{2,16}$').test(value)) {
-                    return title + '长度为2至16位，由字母、数字、中文和下划线组成，下划线不能开头结尾'
-                }
-            } else if (type == 'code') {
-                if (!new RegExp('^(?!:)(?!.*?:$)[a-zA-Z:]+$').test(value)) {
-                    return title + '由字母和冒号:组成，冒号:不能开头结尾'
-                }
+        if (type == 'name') {
+            if (!new RegExp('^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]{2,16}$').test(value)) {
+                return title + '长度为2至16位，由字母、数字、中文和下划线组成，下划线不能开头结尾'
             }
+        } else if (type == 'code') {
+            if (!new RegExp('^(?!:)(?!.*?:$)[a-zA-Z:]+$').test(value)) {
+                return title + '由字母和冒号:组成，冒号:不能开头结尾'
+            }
+        }
 
 
-        var data = '{"' + type + '":"' + value + '","appId":"'+$("#appId").val()+'","parentId":"'+$("#parentId").val()+'"}';
+        var data = '{"' + type + '":"' + value + '","appId":"' + $("#appId").val() + '","parentId":"' + $("#parentId").val() + '"}';
         var isExist = false;
         $.ajax({
             url: basePath + '/sys/appResource/doValidate',
@@ -145,6 +144,16 @@
         })
         if (!isExist)
             return title + '已存在,请重新填写！';
+    }
+
+    //保存
+    function saveForm() {
+        $('#resourceAdd').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#resourceReset').click();
     }
 </script>
 </body>

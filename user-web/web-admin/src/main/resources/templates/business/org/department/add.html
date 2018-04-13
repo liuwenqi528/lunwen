@@ -10,7 +10,8 @@
         <label class="layui-form-label">上级部门</label>
         <div class="layui-input-block">
             <input type="text" class="layui-input" th:if="${departmentVM==null}" th:value="${'无'}" disabled>
-            <input type="text" class="layui-input" th:if="${departmentVM!=null}" th:value="${departmentVM.text!=null?departmentVM.text:'无'}" disabled>
+            <input type="text" class="layui-input" th:if="${departmentVM!=null}"
+                   th:value="${departmentVM.text!=null?departmentVM.text:'无'}" disabled>
         </div>
     </div>
     <div class="layui-form-item">
@@ -32,7 +33,7 @@
             <input type="text" name="organizationId" id="organizationId" class="layui-input"
                    lay-verify="required"
                    th:attr="disabled=${departmentVM!=null}"
-                   th:value="${departmentVM!=null?departmentVM.organizationId:''}">
+                   th:value="${departmentVM!=null?departmentVM.organizationName:''}">
         </div>
     </div>
     <div class="layui-form-item layui-form-text">
@@ -41,25 +42,33 @@
             <textarea placeholder="请输入内容" class="layui-textarea" name="description"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="deptAdd">添加</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="deptAdd" id="deptAdd">立即提交</button>
+    <button type="reset" class="hidden-btn" id="deptReset">重置</button>
 </form>
 
 <script th:inline="javascript" type="text/javascript">
-    layui.use(['form', 'jquery', 'layer'], function () {
+    var departmentVM = [[${departmentVM}]]
+    layui.use(['form', 'jquery', 'layer', 'treeselect'], function () {
         var form = layui.form
             , $ = layui.$ //重点处
-            , layer = layui.layer;
+            , layer = layui.layer, treeselect = layui.treeselect;
+        //初始化组织机构下拉列表
+        if (departmentVM == null) {
+            treeselect.render({
+                elem: "#organizationId",
+                data: basePath + '/org/organization/doTreegrid'
+            });
+        }
 
         //监听提交
         form.on('submit(deptAdd)', function (data) {
             layer.confirm('是否确认添加?', {
                 btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
             }, function (index) {//点击保存执行的函数
+                if (departmentVM != null) {
+                    data.field.organizationId = departmentVM.organizationId;
+                }
+
                 $.ajax({
                     url: basePath + '/org/department/doSave',
                     data: data.field,
@@ -67,7 +76,7 @@
                     type: "post",
                     success: function (data) {
                         if (data.retCode == '0000') {
-                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.deptTreegrid.treegrid('reload');
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.departmentTreegrid();
                             parent.layer.closeAll();
                         }
                         parent.layer.msg(data.retInfo);
@@ -78,13 +87,23 @@
         });
     });
     $(function () {
-        $("#organizationId").combotree({
-            width: '100%',
-            height: 38,
-            panelMaxHeight: 150,
-            url: basePath + '/org/organization/doTreegrid'
-        });
+//        $("#organizationId").combotree({
+//            width: '100%',
+//            height: 38,
+//            panelMaxHeight: 150,
+//            url: basePath + '/org/organization/doTreegrid'
+//        });
     })
+
+    //保存
+    function saveForm() {
+        $('#deptAdd').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#deptReset').click();
+    }
 </script>
 
 </body>

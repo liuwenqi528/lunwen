@@ -24,6 +24,7 @@
         form: "modules/form",
         upload: "modules/upload",
         tree: "modules/tree",
+        treeselect: "modules/treeselect",
         table: "modules/table",
         element: "modules/element",
         util: "modules/util",

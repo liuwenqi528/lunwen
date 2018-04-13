@@ -1,5 +1,4 @@
 dependencies {
-    compile project(':user-service:service-manager')
     compile project(':user-service:service-api')
     compile project(':user-dao')
 }

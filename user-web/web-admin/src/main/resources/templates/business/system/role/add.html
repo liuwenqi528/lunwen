@@ -26,12 +26,9 @@
             <textarea placeholder="请输入描述" class="layui-textarea" name="description"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="roleAdd">立即提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="roleAdd" id="roleAdd">立即提交</button>
+    <button type="reset" class="hidden-btn" id="roleReset">重置</button>
+
 </form>
 <script src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
 
@@ -42,13 +39,13 @@
             , layer = layui.layer
 
         form.verify({
-            priority:function(value){
-                if(value!=""){
-                    if(!new RegExp('^[0-9]+$').test(value)){
+            priority: function (value) {
+                if (value != "") {
+                    if (!new RegExp('^[0-9]+$').test(value)) {
                         return '只能输入数字！';
                     }
                 }
-            },roleName:function (value) {
+            }, roleName: function (value) {
                 if (!new RegExp('^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]{2,20}$').test(value)) {
                     return '角色名称长度为2-20位，可以是汉字、数字、字母、下划线不能以下划线开头和结尾!';
                 }
@@ -94,6 +91,14 @@
             return false;
         });
     });
+    //保存
+    function saveForm(){
+        $('#roleAdd').click();
+    }
+    //重置
+    function resetForm() {
+        $('#roleReset').click();
+    }
 </script>
 </body>
 </html>

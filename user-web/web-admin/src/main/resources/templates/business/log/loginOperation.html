@@ -7,7 +7,7 @@
     <form class="layui-form" id="appSearchForm">
         <div class="layui-form-item">
             <div class="layui-input-inline">
-                <input type="text" class="layui-input" name="username" placeholder="用户名关键字">
+                <input type="text" class="layui-input" name="criteria.username" placeholder="用户名关键字">
             </div>
             <!--点击按钮选择今日日期-->
             <div class="layui-form-mid">&nbsp;</div>
@@ -28,11 +28,11 @@
             </div>
             <div class="layui-form-mid">&nbsp;</div>
             <div class="layui-input-inline">
-                <input type="text" name="timeRange" id="begin_operation" placeholder="选择日期范围"
+                <input type="text" name="criteria.timeRange" id="begin_operation" placeholder="选择日期范围"
                        autocomplete="off" class="layui-input">
-                <input type="hidden" name="date">
-                <input type="hidden" name="beginTime"/>
-                <input type="hidden" name="endTime"/>
+                <input type="hidden" name="criteria.date">
+                <input type="hidden" name="criteria.beginTime"/>
+                <input type="hidden" name="criteria.endTime"/>
             </div>
             <div class="layui-form-mid">&nbsp;</div>
             <div class="layui-input-inline">
@@ -48,10 +48,10 @@
     <!--zyc add-->
     <div class="btnsOperation">
         <div class="layui-inline">
-            <a class="layui-btn layui-btn-sm layui-btn-danger" data-type="operationRemove">删除</a>
+            <a class="iconfont icon-shanchu layui-btn layui-btn-sm layui-btn-danger" data-type="operationRemove">删除</a>
         </div>
         <div class="layui-inline">
-            <a class="layui-btn layui-btn-sm" data-type="operationFlush">刷新</a>
+            <a class="iconfont icon-shuaxin layui-btn layui-btn-sm" data-type="operationFlush">刷新</a>
         </div>
     </div>
     <!--zyc add-->
@@ -131,11 +131,12 @@
             , cols: [[ //表头
                 {type: 'checkbox'}
                 , {field: 'id', title: '编号', width: '10%'}
-                , {field: 'gmtCreate', title: '登陆日期', width: '15%'}
-                , {field: 'ip', title: '用户IP', width: '17.7%'}
-                , {field: 'title', title: '日志类型', width: '17%'}
-                , {field: 'content', title: '日志内容', width: '20%'}
                 , {field: 'username', title: '登录用户', width: '17%'}
+                , {field: 'appName', title: '日志系统', width: '17%'}
+                , {field: 'ip', title: '用户IP', width: '17.7%'}
+                , {field: 'gmtCreate', title: '创建日期', width: '15%'}
+                , {field: 'title', title: '日志标题', width: '17%'}
+                , {field: 'content', title: '日志内容', width: '20%'}
             ]]
             , limits: [10, 20, 50, 100]
             ,  done: function(res, curr, count){

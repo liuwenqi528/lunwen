@@ -16,7 +16,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>角色权重</label>
         <div class="layui-input-block">
-            <input type="text" name="priority" lay-verify="required|priority" lay-verType="msg" th:value="${roleVM.priority}"
+            <input type="text" name="priority" lay-verify="required|priority" lay-verType="msg"
+                   th:value="${roleVM.priority}"
                    class="layui-input">
             <div class="layui-form-mid layui-word-aux">用于标识角色的重要性，为大于0的整数</div>
         </div>
@@ -28,12 +29,8 @@
                       th:text="${roleVM.description}"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="roleUpdate">立即提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="roleUpdate" id="roleUpdate">立即提交</button>
+    <button type="reset" class="hidden-btn" id="roleReset">重置</button>
 </form>
 <script src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
 
@@ -45,17 +42,17 @@
             , layer = layui.layer
 
         form.verify({
-            priority:function(value){
-                if(value!=""){
-                    if(!new RegExp('^[0-9]+$').test(value)){
+            priority: function (value) {
+                if (value != "") {
+                    if (!new RegExp('^[0-9]+$').test(value)) {
                         return '只能输入数字！';
                     }
                 }
-            },roleName:function (value) {
+            }, roleName: function (value) {
                 if (!new RegExp('^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]{2,20}$').test(value)) {
                     return '角色名称长度为2-20位，可以是汉字、数字、字母、下划线不能以下划线开头和结尾!';
                 }
-                var data = '{"name":"' + value + '","id":"'+$("#id").val()+'"}';
+                var data = '{"name":"' + value + '","id":"' + $("#id").val() + '"}';
                 var isExist = false;
                 $.ajax({
                     url: basePath + '/sys/role/doValidate',
@@ -74,7 +71,6 @@
                 }
             }
         });
-
 
 
         //监听提交
@@ -99,6 +95,16 @@
             return false;
         });
     });
+
+    //保存
+    function saveForm() {
+        $('#roleUpdate').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#roleReset').click();
+    }
 </script>
 </body>
 </html>

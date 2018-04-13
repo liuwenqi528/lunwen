@@ -9,10 +9,11 @@
             <input type="text" class="layui-input" name="name" id="personName" placeholder="人员名称">
         </div>
         <div class="layui-inline">
-            <input id="organization" name="organizationId">
+            <input type="text" id="organization" name="organizationId" placeholder="组织机构"  class="layui-input">
         </div>
         <div class="layui-inline">
-            <input id="department" name="departmentId">
+            <input type="text" id="department" name="departmentId" placeholder="部门"
+                   class="layui-input">
         </div>
         <div class="layui-inline">
             <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="personSearch" id="personSearch">搜索</button>
@@ -42,9 +43,31 @@
 <script type="text/javascript" th:inline="none">
     //currentPage记录当前页码   ServerRows记录当前服务器返回的记录数
     var personDatagrid,currentPage=1,ServerRows=1;
-    layui.use(['layer', 'table', 'form'], function () {
-        var layer = layui.layer, form = layui.form,laydate = layui.laydate,
-            table = layui.table, $ = layui.jquery;
+
+    layui.use(['layer', 'table', 'form', 'treeselect'], function () {
+        var layer = layui.layer, form = layui.form,
+            table = layui.table, treeselect = layui.treeselect;
+
+        //初始化组织机构下拉列表
+        treeselect.render({
+            elem: "#organization",
+            data: basePath + '/org/organization/doTreegrid',
+            selectcall: function (row) {
+                treeselect.render({
+                    elem: "#department",
+                    queryParams: {"organizationId": row.id},
+                    data: basePath + '/org/department/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+                });
+            }
+        });
+
+        //初始化部门下拉列表
+        treeselect.render({
+            elem: "#department",
+            data: basePath + '/org/department/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+        });
+
+
 
         //监听提交
         form.on('submit(personSearch)', function (data) {
@@ -143,7 +166,7 @@
             }, personFlush: function () {
                 personDatagrid.reload();
             }, personInfo: function (id) {
-                openLayer('人员详情', basePath + '/org/person/toInfoPage?id=' + id);
+                openLayer('人员详情', basePath + '/org/person/toInfoPage?id=' + id,[]);
             }
         };
         //上部按钮点击事件
@@ -156,29 +179,8 @@
             var data = obj.data;
             person[obj.event] ? person[obj.event].call(this, data.id) : '';
         });
-
     });
-    $(function () {
-        $("#organization").combotree({
-            url: basePath + '/org/organization/doTreegrid',
-            width:200,
-            prompt: '请选择组织机构',
-            onSelect: function (node) {
-                $("#department").combotree({
-                    url: basePath + '/org/department/doTreegrid',
-                    queryParams: {
-                        "organizationId": node.id
-                    }
-                })
-            }
-        });
-        $("#department").combotree({
-            url: basePath + '/org/department/doTreegrid',
-            width:200,
-            prompt: '请选择部门'
-        });
 
-    });
 </script>
 <script type="text/html" id="personBar">
     <a class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="personInfo" title="详情"></a>

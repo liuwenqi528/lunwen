@@ -3,6 +3,9 @@
 <head th:replace="base/base::baseHead">
 </head>
 <body class="childrenBody">
+<style>
+
+</style>
 <div class="layui-elem-quote news_search xy-toolbar changeBg">
     <form class="layui-form" id="resourceSearchForm">
         <!--<div class="layui-form">-->
@@ -41,41 +44,104 @@
             <a class="layui-btn layui-btn-sm" data-type="resourceFlush">刷新</a>
         </div>
     </div>
-    <div class="td">
-        <table id="appResourceTreegrid">
-            <thead>
-            <tr>
-                <th data-options="field:'text',title:'资源名称',width:100"></th>
-                <th data-options="field:'url',title:'访问地址',width:100"></th>
-                <th data-options="field:'icon',title:'资源图标',align:'center',width:50,formatter:function(value,row,index){return getIcon(row)}"></th>
-                <th data-options="field:'resourceType',title:'资源类别',align:'center',width:50,formatter:function(value,row,index){return getResourceType(row)}"></th>
-                <th data-options="field:'gmtCreate',title:'创建时间',align:'center',width:100"></th>
-                <th data-options="field:'code',title:'资源代码',align:'center',width:100"></th>
-                <th data-options="field:'level',title:'层级',align:'center',width:50"></th>
-                <th data-options="field:'abc',title:'操作',align:'center',width:80,formatter:function(value,row,index){return resourceOperator(row,index)}"></th>
-            </tr>
-            </thead>
-        </table>
+    <div class="td" id="appResourceTreegrid">
     </div>
 </div>
 </body>
 <script type="text/javascript" th:inline="javascript">
-    var appResourceTreegrid;
     $(function () {
-        //调用treegrid方法，带拖动的
-        appResourceTreegrid = createTreegrid($('#appResourceTreegrid'), "");
-        appResourceTreegrid.treegrid({
-            onDblClickRow: function (row) {
-                resourceFunction('resourceEdit',row.id);
-            }
-        });
         $(window).on('resize', function () {
-            $('.td').css({width: '100%', height: $(window).height() - 160, border: '1px solid #F6F6F6'})
+            $('.td').css({width: '100%', height: $(window).height() - 140, border: '1px solid #F6F6F6'})
         }).resize();
     });
-    layui.use(['layer', 'table', 'form', 'element', 'laydate'], function () {
+    layui.use(['tree', 'layer', 'table', 'form', 'element', 'laydate'], function () {
         var layer = layui.layer, form = layui.form, element = layui.element, laydate = layui.laydate,
             table = layui.table, $ = layui.jquery;
+
+        //资源treegrid 创建
+        function resourceTreeGird(data) {
+            $.ajax({
+                url: basePath + "/sys/appResource/doTreegrid",
+                dataType: "json",
+                data: data || {},
+                type: "post",
+                success: function (data) {
+                    $("#appResourceTreegrid").html('');
+                    layui.treeGird({
+                        elem: '#appResourceTreegrid', //传入元素选择器
+                        nodes: data,
+                        layout: [
+                            {
+                                field: 'text',
+                                name: '资源名称',
+                                treeNodes: true,
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 20%'
+                            },
+                            {
+                                field: 'url',
+                                name: '访问地址',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 15%'
+                            },
+                            {
+                                field: 'icon',
+                                name: '资源图标',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 8%',
+                                render: function (row) {
+                                    return getIcon(row);
+                                }
+                            },
+                            {
+                                field: 'resourceType',
+                                name: '资源类别',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 8%',
+                                render: function (row) {
+                                    return getResourceType(row);
+                                }
+                            },
+                            {
+                                field: 'gmtCreate',
+                                name: '创建时间',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 15%'
+                            },
+                            {
+                                field: 'code',
+                                name: '资源代码',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 15%'
+                            },
+                            {
+                                field: 'level',
+                                name: '层级',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 5%'
+                            },
+                            {
+                                name: '操作',
+                                headerClass: 'value_col',
+                                colClass: 'value_col',
+                                style: 'width: 15%',
+                                render: function (row) {
+                                    return resourceOperator(row);
+                                }
+                            },
+                        ]
+                    });
+                }
+            })
+        }
+
         //日期
         laydate.render({
             elem: '#appResource_date'
@@ -85,10 +151,7 @@
         //监听提交
         form.on('submit(resourceSearch)', function (data) {
             parseDatetoSplit(data);
-            appResourceTreegrid.treegrid({
-                url: basePath + "/sys/appResource/doTreegrid",
-                queryParams: data.field
-            });
+            resourceTreeGird(data.field);
             return false;
         });
         $.ajax({
@@ -111,6 +174,7 @@
             $('#resourceSearch').click();
         })
     })
+
     //触发事件
     var resource = {
         resourceAdd: function (id) {
@@ -149,9 +213,9 @@
                 })
             });
         }, resourceFlush: function () {
-            appResourceTreegrid.treegrid("reload");
+            $('#resourceSearch').click();
         }, resourceSearch: function (id) {
-            openLayer('系统资源详情', basePath + '/sys/appResource/toInfoPage?id=' + id);
+            openLayer('系统资源详情', basePath + '/sys/appResource/toInfoPage?id=' + id, []);
         }
     };
     //上部按钮点击事件
@@ -171,21 +235,20 @@
 
     function getResourceType(row) {
         if (row.resourceType == 'MODULE') {
-            return `<span class="xy-button xy-button-sm xy-button-light-green"><span>模块</span></span>`;
+            return `<span class="layui-btn layui-btn-sm xy-button-light-green"><span>模块</span></span>`;
         } else if (row.resourceType == 'OPERATION') {
-            return `<span class="xy-button xy-button-sm xy-button-orange"><span>操作</span></span>`;
+            return `<span class="layui-btn layui-btn-sm xy-button-orange"><span>操作</span></span>`;
         } else {
             return "";
         }
     }
 
-    function resourceOperator(row, index) {
+    function resourceOperator(row) {
         var btn = `<button class="iconfont icon-chakan xy-button-sm xy-button xy-button-azury" onclick="resourceFunction('resourceSearch',${row.id})" title="详情"></button>
 <button class="iconfont icon-xiugai1 xy-button xy-button-sm xy-button-blue" onclick="resourceFunction('resourceEdit',${row.id})" title="编辑"></button>
 <button class="iconfont icon-shanchu xy-button xy-button-sm xy-button-red" onclick="resourceFunction('resourceRemove',${row.id})" title="删除"></button>
 <button class="iconfont icon-zengjia xy-button xy-button-sm ${row.resourceType == 'MODULE' ? 'xy-button-light-green' : 'xy-button-disabled'}" onclick="resourceFunction('resourceAdd',${row.id})" ${row.resourceType == 'MODULE' ? '' : 'disabled'} title="添加子资源"></button>`;
         return btn;
     }
-
 </script>
 </html>

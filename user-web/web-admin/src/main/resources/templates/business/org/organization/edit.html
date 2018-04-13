@@ -10,7 +10,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">上级组织</label>
         <div class="layui-input-block">
-            <input type="text" class="layui-input" th:value="${organizationVM.parentName}" disabled>
+            <input type="text" class="layui-input" th:value="${organizationVM.parentName!=null?organizationVM.parentName:'无'}" disabled>
         </div>
     </div>
     <div class="layui-form-item">
@@ -40,6 +40,8 @@
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="orgEdit" id="orgEdit">立即提交</button>
+    <button type="reset" class="hidden-btn" id="orgReset">重置</button>
 </form>
 
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
@@ -71,6 +73,15 @@
             return false;
         });
     });
+    //保存
+    function saveForm() {
+        $('#orgEdit').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#orgReset').click();
+    }
 </script>
 </body>
 </html>

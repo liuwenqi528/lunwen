@@ -37,25 +37,25 @@
 </div>
 </body>
 <script type="text/javascript" th:inline="none">
-    var roleDatagrid,currentPage=1,ServerRows=1;
+    var roleDatagrid, currentPage = 1, ServerRows = 1;
     layui.use(['layer', 'table', 'form'], function () {
         var layer = layui.layer, form = layui.form,
             table = layui.table, $ = layui.jquery;
-        roleDatagrid = initTable(table,{
+        roleDatagrid = initTable(table, {
             elem: '#roleDatagrid'
             , url: basePath + '/sys/role/doDatagrid?orderBy=id=desc'
             , cols: [[ //表头
                 {field: 'id', type: 'checkbox'}
-                , {field: 'name', title: '角色名称', width: '25%',minWidth:200}
-                , {field: 'gmtCreate', title: '创建时间', width: '25%',minWidth:200}
-                , {field: 'gmtModified', title: '修改时间', width: '22%',minWidth:200}
-                , {title: '操作',  align: 'center', toolbar: '#roleBar',minWidth:150}
+                , {field: 'name', title: '角色名称', width: '25%', minWidth: 200}
+                , {field: 'gmtCreate', title: '创建时间', width: '25%', minWidth: 200}
+                , {field: 'gmtModified', title: '修改时间', width: '22%', minWidth: 200}
+                , {title: '操作', align: 'center', width:'28%', minWidth: 150, templet:function(row){return roleBar();}}
             ]]
-            ,  done: function(res, curr, count){
+            , done: function (res, curr, count) {
                 //如果是异步请求数据方式，res即为你接口返回的信息。
                 //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-                ServerRows=res.rows.length;
-                currentPage=curr;
+                ServerRows = res.rows.length;
+                currentPage = curr;
             }
         })
         var role = {
@@ -87,8 +87,8 @@
                     });
                 } else {
                     var msg = "<p style='text-align:center'>是否确认删除?</p>";
-                    if(data.userIds!=null && data.userIds.length>0){
-                        msg="<p style='text-align:center'>是否确认删除?<br/>此角色有分配的用户，删除需谨慎！</p>";
+                    if (data.userIds != null && data.userIds.length > 0) {
+                        msg = "<p style='text-align:center'>是否确认删除?<br/>此角色有分配的用户，删除需谨慎！</p>";
                     }
                     layer.confirm(msg, {
                         btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
@@ -101,12 +101,12 @@
                             success: function (data) {
                                 layer.msg(data.retInfo);
                                 //如果大于第一页
-                                if((currentPage>1) && (ServerRows==ids.length)){
+                                if ((currentPage > 1) && (ServerRows == ids.length)) {
                                     --currentPage;
                                 }
                                 roleDatagrid.reload({
-                                    page:{
-                                        curr:currentPage
+                                    page: {
+                                        curr: currentPage
                                     }
                                 });
                                 layer.close(index);
@@ -119,13 +119,13 @@
                 var id = data.id;
                 if (id != undefined) {
                     var param = "?id=" + id;
-                    openLayer('角色详情', basePath + '/sys/role/toInfoPage' + param);
+                    openLayer('角色详情', basePath + '/sys/role/toInfoPage' + param,[]);
                 }
             }, setUser: function (data) {
                 var id = data.id;
                 if (id != undefined) {
                     var param = "?id=" + id;
-                    openLayer2('分配用户', basePath + '/sys/role/toSetUserPage' + param);
+                    openLayer('分配用户', basePath + '/sys/role/toSetUserPage' + param, ['保存', '重置']);
                 }
             },
             roleFlush: function () {
@@ -137,7 +137,7 @@
                 var param = "";
                 if (id != undefined) {
                     param = "?id=" + id;
-                    openLayer('设置权限', basePath + '/sys/role/toSetAuthPage' + param);
+                    openLayer('设置权限', basePath + '/sys/role/toSetAuthPage' + param, ['保存', '重置']);
                 }
             }
         };
@@ -157,7 +157,7 @@
             var param = data.field;
             roleDatagrid.reload({
                 where: param
-                ,page: {
+                , page: {
                     curr: 1 //重新从第 1 页开始
                 }
             })
@@ -168,12 +168,14 @@
             $('#roleSearch').click();
         })
     });
-
-
-</script>
-<script type="text/html" id="roleBar">
-    <a class="layui-btn layui-btn-normal layui-btn-sm iconfont icon-xiugai1" lay-event="roleEdit" title="编辑"></a>
+    function roleBar(){
+        var btn=`<a class="layui-btn layui-btn-normal layui-btn-sm iconfont icon-xiugai1" lay-event="roleEdit" title="编辑"></a>
     <a class="layui-btn layui-btn-danger layui-btn-sm iconfont icon-shanchu" lay-event="roleRemove" title="删除"></a>
-    <a class="layui-btn xy-button-light-green layui-btn-sm iconfont icon-jiaosefenpeiyonghu1" lay-event="setUser" title="分配用户"></a>
-    <a class="layui-btn xy-button-light-yellow layui-btn-sm iconfont icon-shezhiquanxian" lay-event="setAuthority" title="设置权限"></a>
+    <a class="layui-btn xy-button-light-green layui-btn-sm iconfont icon-jiaosefenpeiyonghu1" lay-event="setUser"
+       title="分配用户"></a>
+    <a class="layui-btn xy-button-light-yellow layui-btn-sm iconfont icon-shezhiquanxian" lay-event="setAuthority"
+       title="设置权限"></a>`;
+        return btn;
+    }
 </script>
+</html>

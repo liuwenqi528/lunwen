@@ -7,36 +7,32 @@
     <legend th:text="${roleVM.name}">角色名称:</legend>
     <form class="layui-form">
         <div class="layui-inline">
-            <input id="organizationId" name="organizationId">
+            <input type="text" id="organizationId" name="organizationId" placeholder="组织机构"  class="layui-input">
+
         </div>
         <div class="layui-inline">
-            <input id="departmentId" name="departmentId">
+            <input type="text" id="departmentId" name="departmentId" placeholder="部门"  class="layui-input">
+
         </div>
     </form>
     <form class="layui-form">
         <input type="hidden" name="roleId" id="roleId" class="layui-input" th:value="${roleVM.id}">
         <div class="layui-form-item">
             <div class="layui-fluid">
-                <div class="layui-row layui-col-space20" style="height: 500px">
-                    <div class="layui-col-md6">
+                <div class="layui-row layui-col-space20" style="height: 100%">
+                    <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
                         <fieldset class="layui-elem-field layui-field-title">
                             <legend>已选列表</legend>
                         </fieldset>
                         <table lay-filter="roleSetUserDatagrid" id='roleSetUserDatagrid'></table>
                     </div>
-                    <div class="layui-col-md6">
+                    <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
                         <fieldset class="layui-elem-field layui-field-title">
                             <legend>未选列表</legend>
                         </fieldset>
                         <table lay-filter="roleNotSetUserDatagrid" id='roleNotSetUserDatagrid'></table>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" id="setUser">保存</button>
-                <button class="layui-btn layui-btn-primary" id="roleSetUserReset">重置</button>
             </div>
         </div>
     </form>
@@ -49,104 +45,92 @@
 <script th:inline="none" type="text/javascript">
     var roleId;//记录当前角色编号。
     var tableDatagrid;
-    var departmentCombotree, organizationCombotree;
     var checkedFlag = false;
     var selConditionNode;
-    $(function () {
-        roleId = $('#roleId').val();//获取角色编号
-        organizationCombotree = $("#organizationId").combotree({
-            width: 200,
-            height: 30,
-            panelWidth: 200,
-            panelMaxHeight: 250,
-            url: basePath + '/org/organization/doTreegrid',
-            prompt: '请选择组织机构',
-            onSelect: function (node) {
-                departmentCombotree.combotree({
-                    url: basePath + '/org/department/doTreegrid',
-                    queryParams: {
-                        "organizationId": node.id
-                    }
-                })
-            }
-        })
-        departmentCombotree = $("#departmentId").combotree({
-            width: 200,
-            height: 30,
-            panelWidth: 200,
-            panelMaxHeight: 250,
-            prompt: '请选择部门'
-            , onSelect: function (node) {
-                //判断列表是否发生变化，如果为true表示发生编号
-                if (checkedFlag) {
-                    //打开一个询问框。点击保存执行第一个function。跳过执行第二个function
-                    layer.confirm('是否保存分配的用户?', {
-                        btn: ['保存', '跳过'] //设置询问框上的按钮显示的文字
-                    }, function (index) {//点击保存执行的函数
-                        saveSetUser(roleId, userIds);//执行保存函数
-                        layer.close(index);//关闭询问框
-                        reloadUserDatagrid(node);
-                        reloadSetUserDatagrid(node);
-                    }, function () {//执行跳过函数
-                        reloadUserDatagrid(node);//获取对应系统下的资源数据
-                        reloadSetUserDatagrid(node);
-                    });
-                } else {
-                    reloadUserDatagrid(node);//获取对应系统下的资源数据
-                    reloadSetUserDatagrid(node);
-                }
-                checkedFlag = false;
-            }
-        })
-        //提交按钮绑定点击事件
-        $('#setUser').on('click', function () {
-            layer.confirm('确认保存分配的用户?', {
-                btn: ['保存', '取消'] //设置询问框上的按钮显示的文字
-            }, function (index) {//点击保存执行的函数
-                saveSetUser(roleId, userIds);
-                checkedFlag = false;
-                layer.close(index);//关闭询问框
-            });
 
-            return false;
-        });
-    });
 
-    function reloadUserDatagrid(node) {
-        tableDatagrid.reload('roleSetUserDatagrid', {
-            url: basePath + '/sys/role/doUserDatagrid'
-            , where: {
-                roleId: roleId,
-                departmentId: node.id
-            }, done: function (data) {
-                done(data);
-            }
-        });
-    }
 
-    function reloadSetUserDatagrid(node) {
-        tableDatagrid.reload('roleNotSetUserDatagrid', {
-            url: basePath + '/sys/role/doNotSetUserDatagrid'
-            , where: {
-                roleId: roleId,
-                departmentId: node.id
-            }, done: function (data) {
-                done(data);
-            }
-        });
-    }
-
-    layui.use(['layer', 'table', 'form'], function () {
-        var layer = layui.layer, form = layui.form;
+    layui.use(['layer', 'table', 'form', 'treeselect'], function () {
+        var layer = layui.layer, form = layui.form, treeselect = layui.treeselect;
         tableDatagrid = layui.table;
+        roleId = $('#roleId').val();//获取角色编号
+//初始化组织机构下拉列表
+        treeselect.render({
+            elem: "#organizationId",
+            data: basePath + '/org/organization/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+            selectcall: function (row) {
+                treeselect.render({
+                    elem: "#departmentId",
+                    queryParams: {"organizationId": row.id},
+                    data: basePath + '/org/department/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+                    selectcall:function(row){
+                        console.info(checkedFlag);
+                        //判断列表是否发生变化，如果为true表示发生编号
+                        if (checkedFlag) {
+                            //打开一个询问框。点击保存执行第一个function。跳过执行第二个function
+                            layer.confirm('是否保存分配的用户?', {
+                                btn: ['保存', '跳过'] //设置询问框上的按钮显示的文字
+                            }, function (index) {//点击保存执行的函数
+                                saveSetUser(roleId, userIds);//执行保存函数
+                                layer.close(index);//关闭询问框
+                                reloadUserDatagrid(row);
+                                reloadSetUserDatagrid(row);
+                            }, function () {//执行跳过函数
+                                reloadUserDatagrid(row);//获取对应系统下的资源数据
+                                reloadSetUserDatagrid(row);
+                            });
+                        } else {
+                            reloadUserDatagrid(row);//获取对应系统下的资源数据
+                            reloadSetUserDatagrid(row);
+                        }
+                        checkedFlag = false;
+                    }
+                });
+            }
+        });
+
+        //初始化部门下拉列表
+        treeselect.render({
+            elem: "#departmentId",
+             data: [],//可以是treedata，也可以是 获取treedata的URL地址
+        });
+
+        function reloadUserDatagrid(node) {
+            tableDatagrid.reload('roleSetUserDatagrid', {
+                url: basePath + '/sys/role/doUserDatagrid'
+                , where: {
+                    roleId: roleId,
+                    departmentId: node.id
+                }, done: function (data) {
+                    done(data);
+                }
+            });
+        }
+
+        function reloadSetUserDatagrid(node) {
+            tableDatagrid.reload('roleNotSetUserDatagrid', {
+                url: basePath + '/sys/role/doNotSetUserDatagrid'
+                , where: {
+                    roleId: roleId,
+                    departmentId: node.id
+                }, done: function (data) {
+                    done(data);
+                }
+            });
+        }
+
+
+
+
+
         initTable(tableDatagrid, {
             elem: '#roleSetUserDatagrid'
             , data: userDataList
             , cols: [[ //表头
-                {field: 'id', type: 'checkbox'}
-                , {field: 'username', title: '用户名', width: '80%'}
+                {type: 'checkbox'}
+                , {field: 'username', title: '用户名', width: '70%'}
             ]]
-            , height: 420
+            , height: 'full-150'
             , page: false
             , done: function (data) {
                 done(data);
@@ -157,21 +141,14 @@
             elem: '#roleNotSetUserDatagrid'
             , data: noSetRoleUsersData
             , cols: [[ //表头
-                {field: 'id', type: 'checkbox'}
-                , {field: 'username', title: '用户名', width: '80%'}
+                {type: 'checkbox'}
+                , {field: 'username', title: '用户名', width: '70%'}
             ]]
-            , height: 420
+            , height: 'full-150'
             , page: false
             , done: function (data) {
                 done(data);
             }
-        })
-
-        $('#roleSetUserReset').on('click', function () {
-            window.location.reload();
-            $("#organizationId").combotree("clear")
-            $("#departmentId").combotree("clear")
-            return false;
         })
 
         //监听复选框
@@ -254,6 +231,22 @@
                 }
             }
         })
+    }
+    //保存
+    function saveForm(){
+        layer.confirm('确认保存分配的用户?', {
+            btn: ['保存', '取消'] //设置询问框上的按钮显示的文字
+        }, function (index) {//点击保存执行的函数
+            saveSetUser(roleId, userIds);
+            checkedFlag = false;
+            layer.close(index);//关闭询问框
+        });
+        return false;
+    }
+    //重置
+    function resetForm() {
+        window.location.reload();
+        return false;
     }
 </script>
 <style>

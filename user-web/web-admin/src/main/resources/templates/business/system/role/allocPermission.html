@@ -21,13 +21,6 @@
             </div>
         </div>
     </fieldset>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" id="setAuth">保存</button>
-            <button class="layui-btn layui-btn-primary" id="roleSetAuth">重置</button>
-
-        </div>
-    </div>
 </div>
 <script th:inline="javascript">
     var roleAuth = [[${roleVM}]].authorizations;
@@ -79,7 +72,6 @@
 //        创建树形列表
         arTree = $("#appResourceTree").tree({
             checkbox: true,
-            cascadeCheck: false,
             onCheck: function (node, checked) {
                 //点击复选框时表示数据发生变化。将标记改为true.
                 flag = true;
@@ -111,19 +103,17 @@
                     }
                 }
                 flag = false;
-                checkFlag = true;
             }
         })
-
-        //提交按钮绑定点击事件
-        $('#setAuth').on('click', function () {
-            setAuth();
-        });
-        $('#roleSetAuth').on('click', function () {
-            arTree.tree('reload');
-        })
     });
-
+    //保存
+    function saveForm(){
+        setAuth();
+    }
+    //重置
+    function resetForm() {
+        arTree.tree('reload');
+    }
     //获取树形列表数据
     function reloadTree(code) {
         var record = JSON.parse(window.sessionStorage.getItem(code));

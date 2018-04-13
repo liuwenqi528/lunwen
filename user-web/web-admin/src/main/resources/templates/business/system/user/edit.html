@@ -46,22 +46,6 @@
             <div class="layui-form-mid layui-word-aux">只能由中文组成</div>
         </div>
     </div>
-
-
-    <!--<div class="layui-form-item">-->
-    <!--<label class="layui-form-label">身份证号</label>-->
-    <!--<div class="layui-input-block">-->
-    <!--<input type="text" name="idcard" placeholder="请输入身份证号" autocomplete="off" th:value="${userVM.idcard}"-->
-    <!--class="layui-input">-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--<div class="layui-form-item">-->
-    <!--<label class="layui-form-label">生日</label>-->
-    <!--<div class="layui-input-block">-->
-    <!--<input type="text" name="birthday" id="birthday" autocomplete="off" th:value="${userVM.birthday}"-->
-    <!--class="layui-input">-->
-    <!--</div>-->
-    <!--</div>-->
     <div class="layui-form-item">
         <label class="layui-form-label">管理员</label>
         <div class="layui-input-block">
@@ -84,8 +68,8 @@
 
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="userUpdate">提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            <button class="hidden-btn" lay-submit="" lay-filter="userUpdate" id="userUpdate">提交</button>
+            <button type="reset" class="hidden-btn" id="userReset">重置</button>
         </div>
     </div>
 </form>
@@ -184,6 +168,15 @@
         })
         if (!isExist)
             return msg + '已存在,请重新填写！';
+    }
+    //保存
+    function saveForm() {
+        $('#userUpdate').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#userReset').click();
     }
 </script>
 <script type="text/javascript" src=${base_Path}+"/static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>

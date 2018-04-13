@@ -12,8 +12,8 @@
             <a class="iconfont icon-shuaxin layui-btn layui-btn-sm" data-type="orgFlush">刷新</a>
         </div>
     </div>
-    <div class="td">
-        <table id="organizationTreegrid">
+    <div class="td" id="organizationTreegrid">
+        <table >
             <thead>
             <tr>
                 <!--<th data-options="field:'ck',checkbox:'true'"></th>-->
@@ -28,72 +28,90 @@
 </div>
 </body>
 <script type="text/javascript" th:inline="javascript">
-    var orgTreegrid;
+    var org
     $(function () {
-        //调用treegrid方法，带拖动的
-        orgTreegrid = createTreegrid($('#organizationTreegrid'), basePath + '/org/organization/doTreegrid');
-        orgTreegrid.treegrid({
-            onDblClickRow: function (row) {
-                orgFunction('orgEdit',row.id);
-            }
-        });
         $(window).on('resize', function () {
-//            带有表单查询时使用这个css.
-//            $('.td').css({width:'100%',height:$(window).height()-160,border:'1px solid #F6F6F6'})
-//            不带表单查询时使用下边这个css
-            $('.td').css({width: '100%', height: $(window).height() - 95, border: '1px solid #F6F6F6'})
+            $('.td').css({width: '100%', height: $(window).height() - 75, border: '1px solid #F6F6F6'})
         }).resize();
     });
-    layui.use(['layer'], function () {
-        var layer = layui.layer
-    });
-    //触发事件
-    var org = {
-        orgAdd: function (id) {
-            var param = "";
-            if (id != undefined) {
-                param = "?id=" + id;
-            } else {
-                var row = orgTreegrid.treegrid("getSelected");
-                if (row != null) {
-                    param = "?id=" + row.id;
+    layui.use(['tree', 'jquery', 'layer'], function () {
+        var $ = layui.$ //重点处
+            , layer = layui.layer;
+        function organizationTreegrid(data) {
+            $.ajax({
+                url: basePath + '/org/organization/doTreegrid',
+                dataType: "json",
+                data: data || {},
+                type: "post",
+                success: function (data) {
+                    $("#organizationTreegrid").html('');
+                    layui.treeGird({
+                        elem: '#organizationTreegrid', //传入元素选择器
+                        nodes: data,
+                        layout: [
+                            {field: 'text', name: '组织机构名称', treeNodes: true, style: 'width: 25%'},
+                            {field: 'fullName', name: '组织机构全称', style: 'width: 25%'},
+                            {field: 'gmtCreate', name: '创建时间', style: 'width: 25%'},
+                            {
+                                name: '操作', style: 'width: 25%', render: function (row) {
+                                return organizationOperator(row);
+                            }
+                            },
+                        ]
+                    });
                 }
-            }
-            openLayer('添加组织机构', basePath + '/org/organization/toAddPage' + param);
-        },
-        orgEdit: function (id) {
-            var param = "";
-            if (id != undefined) {
-                param = "?id=" + id;
-            } else {
-                var row = orgTreegrid.treegrid("getSelected");
-                var param = "";
-                if (row != null) {
-                    param = "?id=" + row.id;
-                }
-            }
-            openLayer('编辑组织机构', basePath + '/org/organization/toEditPage' + param);
-        },
-        orgRemove: function (id) {
-            layer.confirm('是否确认删除?', {
-                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
-            }, function (index) {//点击保存执行的函数
-                $.ajax({
-                    url: basePath + '/org/organization/doRemove',
-                    data: {ids: id},
-                    dataType: "json",
-                    type: "post",
-                    success: function (data) {
-                        reloadTree("#organizationTreegrid", data);
-                    }
-                })
-            });
-        }, orgFlush: function () {
-            $("#organizationTreegrid").treegrid("reload");
-        }, orgSearch: function (id) {
-            openLayer('机构详情', basePath + '/org/organization/toInfoPage?id=' + id);
+            })
         }
-    };
+        organizationTreegrid();
+        //触发事件
+        org = {
+            orgAdd: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                } else {
+                    var row = orgTreegrid.treegrid("getSelected");
+                    if (row != null) {
+                        param = "?id=" + row.id;
+                    }
+                }
+                openLayer('添加组织机构', basePath + '/org/organization/toAddPage' + param);
+            },
+            orgEdit: function (id) {
+                var param = "";
+                if (id != undefined) {
+                    param = "?id=" + id;
+                } else {
+                    var row = orgTreegrid.treegrid("getSelected");
+                    var param = "";
+                    if (row != null) {
+                        param = "?id=" + row.id;
+                    }
+                }
+                openLayer('编辑组织机构', basePath + '/org/organization/toEditPage' + param);
+            },
+            orgRemove: function (id) {
+                layer.confirm('是否确认删除?', {
+                    btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+                }, function (index) {//点击保存执行的函数
+                    $.ajax({
+                        url: basePath + '/org/organization/doRemove',
+                        data: {ids: id},
+                        dataType: "json",
+                        type: "post",
+                        success: function (data) {
+                            reloadTree("#organizationTreegrid", data);
+                        }
+                    })
+                });
+            }, orgFlush: function () {
+                organizationTreegrid();
+            }, orgSearch: function (id) {
+                openLayer('机构详情', basePath + '/org/organization/toInfoPage?id=' + id,[]);
+            }
+        };
+    });
+
     //上部按钮点击事件
     $('.layui-btn').on('click', function () {
         var type = $(this).data('type');

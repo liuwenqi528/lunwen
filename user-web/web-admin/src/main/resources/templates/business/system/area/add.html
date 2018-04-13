@@ -48,12 +48,8 @@
             <textarea placeholder="请输入描述" class="layui-textarea" name="description"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="areaAdd">提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+            <button class="hidden-btn" lay-submit="" lay-filter="areaAdd" id="areaAdd">提交</button>
+            <button type="reset" class="hidden-btn" id="areaReset">重置</button>
 </form>
 
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
@@ -127,6 +123,15 @@
             return false;
         });
     });
+    //保存
+    function saveForm() {
+        $('#areaAdd').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#areaReset').click();
+    }
 </script>
 </body>
 </html>

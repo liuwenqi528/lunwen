@@ -32,12 +32,8 @@
             <textarea placeholder="请输入内容" class="layui-textarea" name="description"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="orgAdd">添加</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="orgAdd" id="orgAdd">立即提交</button>
+    <button type="reset" class="hidden-btn" id="orgReset">重置</button>
 </form>
 
 <script>
@@ -68,6 +64,15 @@
             return false;
         });
     });
+    //保存
+    function saveForm() {
+        $('#orgAdd').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#orgReset').click();
+    }
 </script>
 </body>
 </html>

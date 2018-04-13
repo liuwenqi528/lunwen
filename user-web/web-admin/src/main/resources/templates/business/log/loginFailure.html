@@ -7,7 +7,7 @@
     <form class="layui-form" id="appSearchForm">
         <div class="layui-form-item">
             <div class="layui-input-inline">
-                <input type="text" class="layui-input" name="username" placeholder="用户名关键字">
+                <input type="text" class="layui-input" name="criteria.username" placeholder="用户名关键字">
             </div>
             <div class="layui-form-mid">&nbsp;</div>
             <!--点击按钮选择今日日期-->
@@ -28,16 +28,20 @@
             </div>
             <div class="layui-form-mid">&nbsp;</div>
             <div class="layui-input-inline">
-                <input type="text" name="timeRange" id="begin_failure" placeholder="选择日期范围"
+                <input type="text" name="criteria.timeRange" id="begin_failure" placeholder="选择日期范围"
                        autocomplete="off" class="layui-input">
-                <input type ="hidden" name = "date">
-                <input type="hidden" name="beginTime"/>
-                <input type="hidden" name="endTime"/>
+                <input type="hidden" name="criteria.date">
+                <input type="hidden" name="criteria.beginTime"/>
+                <input type="hidden" name="criteria.endTime"/>
             </div>
             <div class="layui-form-mid">&nbsp;</div>
             <div class="layui-input-inline">
-                <button class="iconfont icon-soushuo layui-btn layui-btn-sm" id="failureSearch" lay-submit lay-filter="failureSearch">搜索</button>
-                <button class="iconfont icon-reset layui-btn layui-btn-sm layui-btn-primary" type="reset" id="appReset">重置</button>
+                <button class="iconfont icon-soushuo layui-btn layui-btn-sm" id="failureSearch" lay-submit
+                        lay-filter="failureSearch">搜索
+                </button>
+                <button class="iconfont icon-reset layui-btn layui-btn-sm layui-btn-primary" type="reset" id="appReset">
+                    重置
+                </button>
             </div>
         </div>
     </form>
@@ -47,10 +51,10 @@
     <!--zyc add-->
     <div class="btnsOperation">
         <div class="layui-inline">
-            <a class="layui-btn layui-btn-sm layui-btn-danger" data-type="logFailureRemove">删除</a>
+            <a class="iconfont icon-shanchu layui-btn layui-btn-sm layui-btn-danger" data-type="logFailureRemove">删除</a>
         </div>
         <div class="layui-inline">
-            <a class="layui-btn layui-btn-sm" data-type="logFailureFlush">刷新</a>
+            <a class="iconfont icon-shuaxin layui-btn layui-btn-sm" data-type="logFailureFlush">刷新</a>
         </div>
     </div>
     <!--zyc add-->
@@ -59,20 +63,20 @@
 </div>
 </body>
 <script type="text/javascript" th:inline="none">
-    $('#appReset').on('click',function () {
+    $('#appReset').on('click', function () {
         $('#appSearchForm')[0].reset();
         $('#failureSearch').click();
     })
-    var logFailureDatagrid,deletePage=1;
-    layui.use(['layer', 'table', 'form','laydate'], function () {
-        var layer = layui.layer, form = layui.form,laydate = layui.laydate,
+    var logFailureDatagrid, deletePage = 1;
+    layui.use(['layer', 'table', 'form', 'laydate'], function () {
+        var layer = layui.layer, form = layui.form, laydate = layui.laydate,
             table = layui.table, $ = layui.jquery;
         //日期
         laydate.render({
             elem: '#begin_failure'
             , type: 'datetime'
             , range: '至'
-            ,done:function(){
+            , done: function () {
                 $(".layui-btn").removeClass("changeBtn");
             }
         });
@@ -118,33 +122,33 @@
 //            执行模糊搜索
             parseDatetoSplit(data);
             logFailureDatagrid.reload({
-                where:data.field
-                ,page: {
+                where: data.field
+                , page: {
                     curr: 1 //重新从第 1 页开始
                 }
             })
             return false;
         });
-        logFailureDatagrid = initTable(table,{
+        logFailureDatagrid = initTable(table, {
             elem: '#logFailureDatagrid'
             , url: basePath + '/log/loginFailure/doDatagrid?logType=LOGIN_FAILURE&orderBy=id=desc'
             , cols: [[ //表头
                 {type: 'checkbox'}
                 , {field: 'id', title: '编号', width: '10%'}
-                , {field: 'gmtCreate', title: '登陆日期', width: '15%'}
-                , {field: 'ip', title: '用户IP', width: '17.7%'}
-                , {field: 'title', title: '日志类型', width: '17%'}
-                , {field: 'content', title: '日志内容', width: '20%'}
                 , {field: 'username', title: '登录用户', width: '17%'}
+                , {field: 'ip', title: '用户IP', width: '17.7%'}
+                , {field: 'gmtCreate', title: '创建日期', width: '15%'}
+                , {field: 'title', title: '日志标题', width: '17%'}
+                , {field: 'content', title: '日志内容', width: '20%'}
             ]]
             , limits: [10, 20, 50, 100]
-            ,  done: function(res, curr, count){
+            , done: function (res, curr, count) {
                 //如果是异步请求数据方式，res即为你接口返回的信息。
                 //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
-                if((res.rows.length==1) && (curr>1)){
-                    deletePage=curr-1;
-                }else{
-                    deletePage=curr;
+                if ((res.rows.length == 1) && (curr > 1)) {
+                    deletePage = curr - 1;
+                } else {
+                    deletePage = curr;
                 }
             }
         })
@@ -173,10 +177,12 @@
                             dataType: "json",
                             type: "post",
                             success: function (data) {
-                                setTimeout(function(){layer.msg("刪除成功！")});
+                                setTimeout(function () {
+                                    layer.msg("刪除成功！")
+                                });
                                 logFailureDatagrid.reload({
-                                    page:{
-                                        curr:deletePage
+                                    page: {
+                                        curr: deletePage
                                     }
                                 });
                                 layer.closeAll()
@@ -200,7 +206,7 @@
         });
     });
     //点击重置按钮，使相应的值清空
-    $("button[type='reset']").on('click',function(){
+    $("button[type='reset']").on('click', function () {
         $("input[name='date']").val('');
         $("a").removeClass("changeBtn");
     });
@@ -210,7 +216,7 @@
             class="iconfont icon-shanchu"></i>删除</a>
 </script>
 <style rel="stylesheet">
-    .changeBtn{
+    .changeBtn {
         background: #099688;
         color: #fff;
     }

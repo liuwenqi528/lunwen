@@ -55,17 +55,12 @@
     <div class="layui-form-item">
         <label class="layui-form-label">管理员</label>
         <div class="layui-input-block">
-            <input type="radio" name="admin" value="true" title="是" >
+            <input type="radio" name="admin" value="true" title="是">
             <input type="radio" name="admin" value="false" title="否" checked="">
         </div>
     </div>
-
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="userAdd">提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="userAdd" id="userAdd">立即提交</button>
+    <button type="reset" class="hidden-btn" id="userReset">重置</button>
 </form>
 
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
@@ -155,6 +150,16 @@
         })
         if (!isExist)
             return msg + '已存在,请重新填写！';
+    }
+
+    //保存
+    function saveForm() {
+        $('#userAdd').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#userReset').click();
     }
 </script>
 <script type="text/javascript" src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>

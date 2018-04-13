@@ -1,3 +1,9 @@
+.layui-layer{
+    max-width: 700px;
+}
+.hidden-btn{
+    display: none;
+}
 .xy-inline, img {
     display: inline-block;
     vertical-align: middle
@@ -665,4 +671,25 @@ td > .datagrid-cell-check > label > i, td > .datagrid-header-check > label > i {
 .layui-elem-quote .layui-btn-sm{
     height:30px;
     line-height: 30px;
+}
+
+
+.td{
+    overflow: auto;
+}
+table thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+.layui-table-view .layui-table-cell{
+    width:100%;
+}
+.layui-table, .layui-table-view{
+    margin: 0px;
+    /*border-width:0 1px 0 1px;*/
+}
+ul.layui-tree  li a,ul.layui-tree  li i{
+    height:38px;
+    line-height: 38px;
 }

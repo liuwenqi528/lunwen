@@ -31,8 +31,9 @@
     <div class="layui-form-item">
         <label class="layui-form-label"><span class="must iconfont icon-xinghao"></span>所属机构</label>
         <div class="layui-input-block">
-            <input type="text" name="organizationId" id="organizationId" lay-verify="required" lay-verType="msg"
-                   th:value="${departmentVM!=null?departmentVM.organizationId:''}">
+            <input type="hidden" name="organizationId" th:value="${departmentVM!=null?departmentVM.organizationId:''}">
+            <input type="text" id="organizationId" lay-verify="required" lay-verType="msg"
+                   th:value="${departmentVM!=null?departmentVM.organizationName:''}" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item layui-form-text">
@@ -42,21 +43,24 @@
                       th:text="${departmentVM.description}"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="deptEdit">修改</button>
-            <button type="button" class="layui-btn layui-btn-primary"  id="resetForm">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="deptEdit" id="deptEdit">立即提交</button>
+    <button type="reset" class="hidden-btn" id="deptReset">重置</button>
 </form>
 
 <script th:inline="javascript" type="text/javascript">
 
-    layui.use(['form', 'jquery', 'layer'], function () {
+    layui.use(['form', 'jquery', 'layer', 'treeselect'], function () {
         var form = layui.form
             , $ = layui.$ //重点处
-            , layer = layui.layer;
-
+            , layer = layui.layer, treeselect = layui.treeselect;
+            //初始化组织机构下拉列表
+            treeselect.render({
+                elem: "#organizationId",
+                data: basePath + '/org/organization/doTreegrid',
+                selectcall:function(obj){
+                    $("input[name=organizationId]").val(obj.id);
+                }
+            });
         //监听提交
         form.on('submit(deptEdit)', function (data) {
             layer.confirm('是否确认修改?', {
@@ -69,7 +73,7 @@
                     type: "post",
                     success: function (data) {
                         if (data.retCode == '0000') {
-                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.deptTreegrid.treegrid('reload');
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.departmentTreegrid();
                             parent.layer.closeAll();
                         }
                         parent.layer.msg(data.retInfo);
@@ -80,16 +84,25 @@
         });
     });
     $(function () {
-        var orgComboTree=$("#organizationId").combotree({
-            width: '100%',
-            height: 38,
-            panelMaxHeight: 150,
-            url: basePath + '/org/organization/doTreegrid',
-        });
+//        var orgComboTree=$("#organizationId").combotree({
+//            width: '100%',
+//            height: 38,
+//            panelMaxHeight: 150,
+//            url: basePath + '/org/organization/doTreegrid',
+//        });
         $("#resetForm").click(function(){
             orgComboTree.combotree("clear");
         })
     })
+    //保存
+    function saveForm() {
+        $('#deptEdit').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#deptReset').click();
+    }
 </script>
 <style>
     .layui-form .textbox {

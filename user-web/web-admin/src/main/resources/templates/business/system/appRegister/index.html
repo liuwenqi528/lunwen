@@ -78,12 +78,12 @@
             , url: basePath + '/sys/appRegister/doDatagrid?orderBy=id=desc'
             , cols: [[ //表头
                 {field: 'id', type: 'checkbox'}
-                , {field: 'name', title: '系统名称', width: '20%'}
+                , {field: 'name', title: '系统名称', width: '20%',style:'width:20%'}
                 , {field: 'code', title: '系统编码', width: '15%'}
                 , {field: 'url', title: '访问地址', width: '20%'}
                 , {field: 'gmtCreate', title: '创建时间', width: '20%', sort: true}
                 , {field: 'priority', title: '权重', width: '10%', sort: true}
-                , {title: '操作', align: 'center', toolbar: '#appBar'}
+                , {title: '操作', align: 'center',width: '15%', templet:function(row){return appBar();}}
             ]]
             , done: function (res, curr, count) {
                 //如果是异步请求数据方式，res即为你接口返回的信息。
@@ -91,40 +91,6 @@
                 currentPage = curr;
             }
         })
-//        appDataGrid = table.render({
-//            elem: '#appDatagrid'
-//            , url: basePath + '/sys/appRegister/doDatagrid?orderBy=id=desc'
-//            , cols: [[ //表头
-//                {field: 'id', type: 'checkbox'}
-//                , {field: 'name', title: '系统名称', width: '20%'}
-//                , {field: 'code', title: '系统编码', width: '15%'}
-//                , {field: 'url', title: '访问地址', width: '20%'}
-//                , {field: 'gmtCreate', title: '创建时间', width: '20%', sort: true}
-//                , {field: 'priority', title: '权重', width: '10%', sort: true}
-//                , {title: '操作', align: 'center', toolbar: '#appBar'}
-//            ]]
-//            , request: {
-//                limitName: 'rows' //每页数据量的参数名，默认：limit
-//            },
-//            response: {
-//                statusName: 'retCode' //数据状态的字段名称，默认：code
-//                , statusCode: '0000' //成功的状态码，默认：0
-//                , msgName: 'retInfo' //状态信息的字段名称，默认：msg
-//                , countName: 'total' //数据总数的字段名称，默认：count
-//                , dataName: 'rows' //数据列表的字段名称，默认：data
-//            }
-//            , text: {
-//                none: '暂无相关数据' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
-//            }
-//            , height: 'full-160'
-//            , page: true
-//            , limits: [5, 10, 15, 20]
-//            , done: function (res, curr, count) {
-//                //如果是异步请求数据方式，res即为你接口返回的信息。
-//                ServerRows = res.rows.length;
-//                currentPage = curr;
-//            }
-//        })
         //触发事件
         var app = {
             appAdd: function () {
@@ -183,7 +149,7 @@
                 var param = "";
                 if (id != undefined) {
                     param = "?id=" + id;
-                    openLayer('系统详情', basePath + '/sys/appRegister/toInfoPage' + param);
+                    openLayer('系统详情', basePath + '/sys/appRegister/toInfoPage' + param,[]);
                 }
             },
             appFlush: function () {
@@ -201,12 +167,12 @@
             app[obj.event] ? app[obj.event].call(this, data.id) : '';
         });
     });
-
-</script>
-<script type="text/html" id="appBar">
-    <a class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="appSearch" title="详情"></a>
+    function appBar(){
+        var btn =` <a class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="appSearch" title="详情"></a>
     <a class="layui-btn layui-btn-normal layui-btn-sm iconfont icon-xiugai1" lay-event="appEdit" title="编辑"></a>
-    <a class="layui-btn layui-btn-danger layui-btn-sm iconfont icon-shanchu" lay-event="appRemove" title="删除"></a>
+    <a class="layui-btn layui-btn-danger layui-btn-sm iconfont icon-shanchu" lay-event="appRemove" title="删除"></a>`;
+        return btn;
+    }
 </script>
 </html>
 

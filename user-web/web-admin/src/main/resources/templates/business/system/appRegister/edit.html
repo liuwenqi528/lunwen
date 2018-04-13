@@ -44,12 +44,8 @@
                       th:text="${appVM.description}"></textarea>
         </div>
     </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button class="layui-btn" lay-submit="" lay-filter="appEdit">修改</button>
-            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-        </div>
-    </div>
+    <button class="hidden-btn" lay-submit="" lay-filter="appUpdate" id="appUpdate">修改</button>
+    <button type="reset" class="hidden-btn" id="appReset">重置</button>
 </form>
 
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
@@ -60,7 +56,7 @@
             , layer = layui.layer
 
         //监听提交
-        form.on('submit(appEdit)', function (data) {
+        form.on('submit(appUpdate)', function (data) {
             layer.confirm('是否确认修改?', {
                 btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
             }, function (index) {//点击保存执行的函数
@@ -130,6 +126,15 @@
             return title + '已存在,请重新填写！';
     }
 
+    //保存
+    function saveForm() {
+        $('#appUpdate').click();
+    }
+
+    //重置
+    function resetForm() {
+        $('#appReset').click();
+    }
 </script>
 <script type="text/javascript" src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
 </body>

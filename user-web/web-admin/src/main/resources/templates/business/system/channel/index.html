@@ -126,7 +126,7 @@
                 var param = "";
                 if (id != undefined) {
                     param = "?id=" + id;
-                    openLayer('渠道详情', basePath + '/sys/channel/toInfoPage?id=' + id);
+                    openLayer('渠道详情', basePath + '/sys/channel/toInfoPage?id=' + id,[]);
                 }
             }, channelFlush: function () {
                 channelDatagrid.reload();

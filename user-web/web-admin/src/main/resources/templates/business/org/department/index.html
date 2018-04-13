@@ -18,10 +18,11 @@
                         <input type="hidden" name="endTime"/>
                     </div>
                     <div class="layui-inline">
-                        <input id="parentOrg" name="organizationId">
+                        <input type="text" id="parentOrg" name="organizationId" placeholder="组织机构"  class="layui-input">
                     </div>
                     <div class="layui-inline">
-                        <input id="parentDept" name="parentId">
+                        <input type="text" id="parentDept" name="parentId" placeholder="部门"
+                               class="layui-input">
                     </div>
                     <div class="layui-inline">
                         <button class="layui-btn layui-btn-sm" lay-submit="" lay-filter="departmentSearch"
@@ -29,7 +30,8 @@
                         </button>
                     </div>
                     <div class="layui-inline">
-                        <button class="layui-btn layui-btn-sm layui-btn-primary" id="departmentReset" type="reset">重置</button>
+                        <button class="layui-btn layui-btn-sm layui-btn-primary" id="departmentReset" type="reset">重置
+                        </button>
                     </div>
                 </form>
             </div>
@@ -59,17 +61,7 @@
                         <a class="iconfont icon-shuaxin layui-btn layui-btn-sm" data-type="deptFlush">刷新</a>
                     </div>
                 </div>
-                <div class="td">
-                    <table id="departmentTreegrid">
-                        <thead>
-                        <tr>
-                            <th data-options="field:'text',width:150,title:'部门名称'"></th>
-                            <th data-options="field:'fullName',width:100,title:'部门全称'"></th>
-                            <th data-options="field:'gmtCreate',width:150,title:'创建时间'"></th>
-                            <th data-options="field:'abc',width:100,title:'操作',align:'center',formatter:function(value,row,index){return departmentOperator(row)}"></th>
-                        </tr>
-                        </thead>
-                    </table>
+                <div class="td" id="departmentTreegrid">
                 </div>
             </div>
         </div>
@@ -82,74 +74,11 @@
     }
 </style>
 <script type="text/javascript" th:inline="javascript">
-    var departmentCombotree, organizationCombotree;
+    var organizationClickId;
+    var departmentTreegrid;
     $(function () {
-        organizationCombotree = $("#parentOrg").combotree({
-            width: 200,
-            height: 30,
-            panelMaxHeight: 250,
-            url: basePath + '/org/organization/doTreegrid',
-            prompt: '请选择组织机构',
-            onSelect: function (node) {
-                departmentCombotree.combotree({
-                    url: basePath + '/org/department/doTreegrid',
-                    queryParams: {
-                        "organizationId": node.id
-                    }
-                })
-            }
-        })
-        departmentCombotree = $("#parentDept").combotree({
-            width: 200,
-            height: 30,
-            panelMaxHeight: 250,
-            prompt: '请选择部门',
-            url: basePath + '/org/department/doTreegrid'
-        })
-    });
-    layui.use(['form', 'jquery', 'layer', 'laydate'], function () {
-        var form = layui.form
-            , $ = layui.$ //重点处
-            , layer = layui.layer
-            , laydate = layui.laydate;
-        //日期
-        laydate.render({
-            elem: '#department_date'
-            , type: 'datetime'
-            , range: '至'
-            ,format: 'yyyy-M-d HH:mm:ss'
-        });
-        //监听提交
-        form.on('submit(departmentSearch)', function (data) {
-//            执行模糊搜索
-            parseDatetoSplit(data);
-            deptTreegrid.treegrid({
-                url: basePath + '/org/department/doTreegrid',
-                queryParams: data.field
-            });
-            return false;
-        });
-    });
-    var deptTreegrid,organizationClickId;
-    $(function () {
-        //调用treegrid方法，带拖动的
-        deptTreegrid = createTreegrid($('#departmentTreegrid'), basePath + '/org/department/doTreegrid');
-        deptTreegrid.treegrid({
-            onDblClickRow: function (row) {
-                deptFunction('deptEdit',row.id);
-            }
-        });
-        $("#orgTree").tree({
-            url: basePath + '/org/organization/doTreegrid',
-            onClick: function (node) {
-                organizationClickId=node.id;
-                deptTreegrid.treegrid('load', {
-                    organizationId: node.id
-                });
-            }
-        })
         $(window).on('resize', function () {
-            $('.td').css({width: '100%', height: $(window).height() - 180, border: '1px solid #F6F6F6'})
+            $('.td').css({width: '100%', height: $(window).height() - 166, border: '1px solid #F6F6F6'})
             $('.left').css({
                 marginTop: '10px',
                 width: '100%',
@@ -161,10 +90,91 @@
 
         $('#departmentReset').on('click', function () {
             $('#departmentSearchForm')[0].reset();
-            $("#parentOrg").combotree("clear")
-            $("#parentDept").combotree("clear")
             $('#departmentSearch').click();
         })
+    });
+    layui.use(['form', 'tree', 'jquery', 'layer', 'laydate', 'treeselect'], function () {
+        var form = layui.form
+            , $ = layui.$ //重点处
+            , layer = layui.layer
+            , laydate = layui.laydate, treeselect = layui.treeselect;
+        //日期
+        laydate.render({
+            elem: '#department_date'
+            , type: 'datetime'
+            , range: '至'
+            , format: 'yyyy-M-d HH:mm:ss'
+        });
+        //监听提交
+        form.on('submit(departmentSearch)', function (data) {
+//            执行模糊搜索
+            parseDatetoSplit(data);
+            departmentTreegrid(data.field);
+            return false;
+        });
+        //初始化组织机构下拉列表
+        treeselect.render({
+            elem: "#parentOrg",
+            data: basePath + '/org/organization/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+            selectcall: function (row) {
+                treeselect.render({
+                    elem: "#parentDept",
+                    queryParams: {"organizationId": row.id},
+                    data: basePath + '/org/department/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+                });
+            }
+        });
+
+        //初始化部门下拉列表
+        treeselect.render({
+            elem: "#parentDept",
+            data: basePath + '/org/department/doTreegrid',//可以是treedata，也可以是 获取treedata的URL地址
+        });
+
+//        treeselect.render();
+        //初始化左侧tree
+        $.ajax({
+            url: basePath + '/org/organization/doTreegrid',
+            dataType: "json",
+            type: "post",
+            success: function (data) {
+                layui.tree({
+                    elem: '#orgTree' //传入元素选择器
+                    , nodes: data
+                    , click: function (node) {
+                        organizationClickId = node.id;
+                        departmentTreegrid({organizationId: node.id});
+                    }
+                });
+            }
+        })
+
+        departmentTreegrid = function (data) {
+            $.ajax({
+                url: basePath + '/org/department/doTreegrid',
+                dataType: "json",
+                data: data || {},
+                type: "post",
+                success: function (data) {
+                    $("#departmentTreegrid").html('');
+                    layui.treeGird({
+                        elem: '#departmentTreegrid', //传入元素选择器
+                        nodes: data,
+                        layout: [
+                            {field: 'text', name: '部门名称', treeNodes: true, style: 'width: 25%'},
+                            {field: 'fullName', name: '部门全称', style: 'width: 25%'},
+                            {field: 'gmtCreate', name: '创建时间', style: 'width: 25%'},
+                            {
+                                name: '操作', style: 'width: 25%', render: function (row) {
+                                return departmentOperator(row);
+                            }
+                            },
+                        ]
+                    });
+                }
+            })
+        }
+        departmentTreegrid();
     });
     //触发事件
     var dept = {
@@ -174,48 +184,43 @@
                 param = "?id=" + id;
             }
             //当前机构下添加部门还需要选择机构
-            else if(organizationClickId!=undefined){
+            else if (organizationClickId != undefined) {
                 param = "?organizationId=" + organizationClickId;
-            } else {
-                var row = deptTreegrid.treegrid("getSelected");
-                if (row != null) {
-                    param = "?id=" + row.id;
-                }
             }
 
             openLayer('添加部门', basePath + '/org/department/toAddPage' + param);
         },
         deptEdit: function (id) {
-            var param = "";
             if (id != undefined) {
-                param = "?id=" + id;
+                var param = "?id=" + id;
+                openLayer('编辑部门', basePath + '/org/department/toEditPage' + param);
             } else {
-                var row = deptTreegrid.treegrid('getSelected');
-                var param = "";
-                if (row != null) {
-                    param = "?id=" + row.id;
-                }
+                layer.msg('请选择一条数据进行修改！');
             }
-            openLayer('编辑部门', basePath + '/org/department/toEditPage' + param);
         },
         deptRemove: function (id) {
-            layer.confirm('是否确认删除?', {
-                btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
-            }, function (index) {//点击保存执行的函数
-                $.ajax({
-                    url: basePath + '/org/department/doRemove',
-                    data: {ids: id},
-                    dataType: "json",
-                    type: "post",
-                    success: function (data) {
-                        reloadTree("#departmentTreegrid", data);
-                    }
-                })
-            });
+            if (id != undefined) {
+                layer.confirm('是否确认删除?', {
+                    btn: ['确认', '取消'] //设置询问框上的按钮显示的文字
+                }, function (index) {//点击保存执行的函数
+                    $.ajax({
+                        url: basePath + '/org/department/doRemove',
+                        data: {ids: id},
+                        dataType: "json",
+                        type: "post",
+                        success: function (data) {
+                            reloadTree("#departmentTreegrid", data);
+                        }
+                    })
+                });
+            } else {
+                layer.msg('请选择一条数据进行删除！');
+            }
+
         }, deptFlush: function () {
-            deptTreegrid.treegrid("reload");
+            $('#departmentSearch').click();
         }, deptSearch: function (id) {
-            openLayer('部门详情', basePath + '/org/department/toInfoPage?id=' + id);
+            openLayer('部门详情', basePath + '/org/department/toInfoPage?id=' + id, []);
         }
     };
     //上部按钮点击事件
