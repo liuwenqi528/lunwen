@@ -134,12 +134,12 @@
             , url: basePath + '/log/loginFailure/doDatagrid?logType=LOGIN_FAILURE&orderBy=id=desc'
             , cols: [[ //表头
                 {type: 'checkbox'}
-                , {field: 'id', title: '编号', width: '10%'}
-                , {field: 'username', title: '登录用户', width: '17%'}
-                , {field: 'ip', title: '用户IP', width: '17.7%'}
-                , {field: 'gmtCreate', title: '创建日期', width: '15%'}
-                , {field: 'title', title: '日志标题', width: '17%'}
-                , {field: 'content', title: '日志内容', width: '20%'}
+                , {field: 'id', title: '编号', width: '10%',unresize:true}
+                , {field: 'username', title: '登录用户', width: '17%',unresize:true}
+                , {field: 'ip', title: '用户IP', width: '17.7%',unresize:true}
+                , {field: 'gmtCreate', title: '创建日期', width: '15%',unresize:true}
+                , {field: 'title', title: '日志标题', width: '17%',unresize:true}
+                , {field: 'content', title: '日志内容', width: '20%',unresize:true}
             ]]
             , limits: [10, 20, 50, 100]
             , done: function (res, curr, count) {
