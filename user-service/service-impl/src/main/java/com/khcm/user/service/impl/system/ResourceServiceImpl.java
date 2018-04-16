@@ -90,7 +90,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public List<ResourceDTO> getList(ResourceParam resourceParam) {
         Ensure.that(resourceParam).isNotNull().orThrowArgumentException("resource.required");
-        Ensure.that(resourceParam.getAppCode()).isNotNullOrEmpty().orThrowArgumentException("resource.appcode.required");
+//        Ensure.that(resourceParam.getAppCode()).isNotNullOrEmpty().orThrowArgumentException("resource.appcode.required");
         QResource resource = QResource.resource;
         BooleanExpression predicate = resource.app.code.eq(resourceParam.getAppCode());
         if (StringUtils.isNotBlank(resourceParam.getResourceType())) {

@@ -54,12 +54,13 @@
             $('.td').css({width: '100%', height: $(window).height() - 140, border: '1px solid #F6F6F6'})
         }).resize();
     });
+    var resourceTreeGird;
     layui.use(['tree', 'layer', 'table', 'form', 'element', 'laydate'], function () {
         var layer = layui.layer, form = layui.form, element = layui.element, laydate = layui.laydate,
             table = layui.table, $ = layui.jquery;
 
         //资源treegrid 创建
-        function resourceTreeGird(data) {
+        resourceTreeGird =function (data) {
             $.ajax({
                 url: basePath + "/sys/appResource/doTreegrid",
                 dataType: "json",
@@ -208,7 +209,8 @@
                     dataType: "json",
                     type: "post",
                     success: function (data) {
-                        reloadTree("#appResourceTreegrid", data);
+                        layer.msg(data.retInfo);
+                        $('#resourceSearch').click();
                     }
                 })
             });

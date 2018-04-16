@@ -90,7 +90,7 @@
                     type: "post",
                     success: function (data) {
                         if (data.retCode == '0000') {
-                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.appResourceTreegrid.treegrid('reload');
+                            parent.$(".clildFrame").find(".layui-show").find("iframe")[0].contentWindow.resourceTreeGird();
                             parent.layer.closeAll();
                         }
                         parent.layer.msg(data.retInfo);
