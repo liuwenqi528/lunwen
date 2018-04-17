@@ -29,8 +29,7 @@
         appId,//记录选择的系统ID
         flag = false;//记录树形列表是否点击过。如果点击过则切换系统时会提示是否保存。未点击直接进行切换
     var roleId;//记录当前角色编号。
-
-    layui.use(['layer', 'form', 'element', 'jquery', 'tree'], function () {
+    layui.use(['layer', 'form', 'element', 'jquery', 'treeBox'], function () {
         var layer = layui.layer, form = layui.form, element = layui.element,
             $ = layui.jquery;
         $.ajax({
@@ -63,7 +62,7 @@
             }
 
         });
-        var arTree;
+
         roleId = $('#roleId').val();//获取角色编号
 
         var checkFlag = false;
@@ -75,21 +74,17 @@
                 url: basePath + "/sys/appResource/doTreegrid?appCode=" + record.code,
                 dataType: "json",
                 type: "post",
-
                 success: function (data) {
-
                     //根据系统编号，获取对应的资源编号集合、
                     var resourceIds = getResourceIds();
-                    console.info(resourceIds)
-                    console.info(data)
                     checkData(data, resourceIds);
                     //遍历资源编号。将已有的权限进行选中
-
-                    arTree = layui.tree({
+                    $('#appResourceTree').html('');
+                    arTree = layui.treeBox({
                         elem: '#appResourceTree' //传入元素选择器
                         , nodes: data
                         , check: 'checkbox'
-                        , click: function (node) {
+                        , clickCheckbox: function (node) {
 //点击复选框时表示数据发生变化。将标记改为true.
                             flag = true;
                         }
@@ -103,9 +98,8 @@
 
     function checkData(data, resourceIds) {
         for (var i = 0; i < data.length; i++) {
-            if ($.inArray(data[i].id, resourceIds)>0) {
+            if ($.inArray(data[i].id, resourceIds) != -1) {
                 data[i].checked = true;
-                console.info("LLLLLL")
             }
             if (data[i].children != null && data[i].children.length > 0) {
                 checkData(data[i].children, resourceIds);
@@ -120,6 +114,7 @@
 
     //重置
     function resetForm() {
+        $('#appCombobox').next().find('.layui-this').click();
     }
 
 
@@ -163,7 +158,7 @@
 
     //获取选中的树形列表数据编号。
     function getCheckedTree() {
-        var checkedTree = arTree.tree('getChecked');
+        var checkedTree = arTree.getChecked();
         if (checkedTree == null) {
             return null;
         }
@@ -186,16 +181,4 @@
     }
 </script>
 </body>
-<style>
-    .layui-tree li i{
-        padding:0px;
-    }
-    .layui-tree li .layui-tree-check{
-        font-size:18px;
-    }
-    .layui-tree li .layui-tree-checked{
-        border-color: #5FB878;
-        color: #fff;
-    }
-</style>
 </html>

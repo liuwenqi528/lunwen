@@ -25,6 +25,7 @@
         upload: "modules/upload",
         tree: "modules/tree",
         treeselect: "modules/treeselect",
+        treeBox: "modules/treeBox",
         table: "modules/table",
         element: "modules/element",
         util: "modules/util",
