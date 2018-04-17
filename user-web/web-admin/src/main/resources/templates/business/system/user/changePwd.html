@@ -22,21 +22,6 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">手机号</label>
-                <div class="layui-input-block">
-                    <input lay-verify="phone" id="phone" name="phone" placeholder="请输入手机号" autocomplete="off"
-                           class="layui-input" style="width: 260px;display:inline;margin-right: 26px;">
-                    <button class="layui-btn" id="getSmsCode">获取验证码</button>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">短信验证码</label>
-                <div class="layui-input-block">
-                    <input lay-verify="smsCode" name="smsCode" placeholder="请输入短信验证码" autocomplete="off"
-                           class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
                 <label class="layui-form-label">新密码</label>
                 <div class="layui-input-block">
                     <input type="password" lay-verify="newPwd" name="newPwd" id="newPwd" autocomplete="off"
@@ -207,6 +192,6 @@
         }
     }
 </script>
-<script type="text/javascript" src="../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
+<script type="text/javascript" src="../../../../static/js/formValidate.js" th:src="@{/js/formValidate.js}"></script>
 </body>
 </html>

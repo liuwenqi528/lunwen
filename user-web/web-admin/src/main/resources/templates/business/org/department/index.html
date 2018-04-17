@@ -140,6 +140,7 @@
             success: function (data) {
                 layui.tree({
                     elem: '#orgTree' //传入元素选择器
+
                     , nodes: data
                     , click: function (node) {
                         organizationClickId = node.id;

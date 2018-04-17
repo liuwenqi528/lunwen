@@ -26,7 +26,4 @@ public class UserParam {
     private UserStatus status;
     private String registerIp;
 
-    private String channelName;
-
-
 }

@@ -1,26 +1,19 @@
 package com.khcm.user.web.admin.controller.system;
 
 import com.khcm.user.common.constant.Constants;
-import com.khcm.user.common.enums.BusinessType;
-import com.khcm.user.service.api.sms.SmsService;
-import com.khcm.user.service.api.system.AreaService;
 import com.khcm.user.service.api.system.UserService;
 import com.khcm.user.service.dto.base.PageDTO;
-import com.khcm.user.service.dto.business.sms.SmsCodeDTO;
-import com.khcm.user.service.dto.business.system.AreaDTO;
 import com.khcm.user.service.dto.business.system.LoginDTO;
 import com.khcm.user.service.dto.business.system.UserDTO;
 import com.khcm.user.service.param.business.system.UserInfoParam;
 import com.khcm.user.service.param.business.system.UserParam;
 import com.khcm.user.web.admin.annotation.OperationLog;
-import com.khcm.user.web.admin.model.mapper.system.AreaDTOMapper;
 import com.khcm.user.web.admin.model.mapper.system.UserDTOMapper;
 import com.khcm.user.web.admin.model.mapper.system.UserInfoDTOMapper;
 import com.khcm.user.web.admin.model.parammodel.business.system.ChangePwdPM;
 import com.khcm.user.web.admin.model.parammodel.business.system.UserPM;
 import com.khcm.user.web.admin.model.viewmodel.base.PageVM;
 import com.khcm.user.web.admin.model.viewmodel.base.ResultVM;
-import com.khcm.user.web.admin.model.viewmodel.business.system.AreaVM;
 import com.khcm.user.web.admin.model.viewmodel.business.system.UserVM;
 import com.khcm.user.web.admin.utils.VMUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +26,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -52,8 +47,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private AreaService areaService;
 
     @RequiresPermissions("sys:user:view")
     @GetMapping
@@ -180,24 +173,8 @@ public class UserController {
     @RequiresPermissions("sys:user:view")
     @RequestMapping("/toInfoDetailPage")
     public String toInfoDetailPage(Integer uid, Model model) {
-        UserDTO userDTO = userService.getUserAndArea(uid);
+        UserDTO userDTO = userService.getById(uid);
         UserVM userVM = UserDTOMapper.MAPPER.dtoToVM(userDTO);
-        //获取初级地域列表
-        List<AreaDTO> areaDTOAllList = areaService.findAllByParentId(null);
-        if (Objects.nonNull(userDTO.getAreaDTOList())) {
-            List<AreaDTO> exitAreas = userDTO.getAreaDTOList();
-            List<AreaDTO> temp = new ArrayList<>();
-            areaDTOAllList.stream().forEach(areaDTO -> {
-                if (!exitAreas.contains(areaDTO)) {
-                    temp.add(areaDTO);
-                }
-            });
-            areaDTOAllList.removeAll(temp);
-            List<AreaVM> areaVMS = AreaDTOMapper.MAPPER.dtoToVM(exitAreas);
-            Collections.reverse(areaVMS);
-            userVM.setAreas(areaVMS);
-        }
-        model.addAttribute("areas", AreaDTOMapper.MAPPER.dtoToVM(areaDTOAllList));
         model.addAttribute("user", userVM);
         return BASE_PATH + "infoDetail";
     }

@@ -55,7 +55,9 @@ public class UserVM {
     private String nickname;
 
     private String realname;
+
     private Integer age;
+
     private String sex;
 
     @JSONField(format = DateUtils.STANDARD_DATE)
@@ -65,8 +67,5 @@ public class UserVM {
 
     private List<Integer> roleIds;
 
-    private List<AreaVM> areas;
-
-    private String channelName;
     private String statusName;
 }

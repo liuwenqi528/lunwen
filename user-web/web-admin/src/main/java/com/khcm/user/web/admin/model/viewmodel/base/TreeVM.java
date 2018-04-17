@@ -17,14 +17,21 @@ import java.util.List;
 public class TreeVM<VM extends TreeVM> {
 
     private Integer id;
+
     @JSONField(format = DateUtils.STANDARD_DATETIME)
     private Date gmtCreate;
+
     @JSONField(format = DateUtils.STANDARD_DATETIME)
     private Date gmtModified;
     private Integer level;
+
     private String text;
+
     private List<VM> children;
+
     private Integer parentId;
+
     private String parentName;
 
+    private Boolean checked=false;
 }

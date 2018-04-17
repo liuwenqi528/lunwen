@@ -54,8 +54,6 @@ public class UserDTO implements Serializable {
 
     private Integer errorCount;
 
-    private String registerIp;
-
     private String nickname;
 
     private String realname;
@@ -67,9 +65,5 @@ public class UserDTO implements Serializable {
     private String idcard;
 
     private List<Integer> roleIds;
-
-    private String channelName;
-    private List<AreaDTO> areaDTOList;
-
 
 }

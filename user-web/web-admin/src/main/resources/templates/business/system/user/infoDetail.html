@@ -61,34 +61,6 @@
                            class="layui-input" th:value="${user.age}">
                 </div>
             </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">选择地区</label>
-                <div class="layui-input-inline" style="width: 177px;">
-                    <select name="province" lay-filter="province">
-                        <option value="">请选择省</option>
-                        <option th:if="${not #lists.isEmpty(user.areas)}" th:value="${user.areas[0].id}"
-                                selected="selected"
-                                th:text="${user.areas[0].text}"></option>
-                        <option th:each="area:${areas}" th:value="${area.id}" th:text="${area.text}"></option>
-                    </select>
-                </div>
-                <div class="layui-input-inline" style="width: 177px;">
-                    <select name="city" id="city" lay-filter="city">
-                        <option value="">请选择市</option>
-                        <option th:if="${not #lists.isEmpty(user.areas)}" th:value="${user.areas[1].id}"
-                                selected="selected"
-                                th:text="${user.areas[1].text}"></option>
-                    </select>
-                </div>
-                <div class="layui-input-inline" style="width: 177px;">
-                    <select name="areaId" id="area" lay-filter="area">
-                        <option value="">请选择县/区</option>
-                        <option th:if="${not #lists.isEmpty(user.areas)}" th:value="${user.areas[2].id}"
-                                selected="selected"
-                                th:text="${user.areas[2].text}"></option>
-                    </select>
-                </div>
-            </div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label">生日</label>

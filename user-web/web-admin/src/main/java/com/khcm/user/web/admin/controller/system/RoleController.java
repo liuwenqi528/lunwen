@@ -5,16 +5,13 @@ import com.khcm.user.service.api.system.AuthorizationService;
 import com.khcm.user.service.api.system.RoleService;
 import com.khcm.user.service.api.system.UserService;
 import com.khcm.user.service.dto.base.PageDTO;
-import com.khcm.user.service.dto.business.system.AreaDTO;
 import com.khcm.user.service.dto.business.system.RoleDTO;
 import com.khcm.user.service.dto.business.system.RoleUserDTO;
 import com.khcm.user.service.dto.business.system.UserRoleDTO;
-import com.khcm.user.service.param.business.system.AreaParam;
 import com.khcm.user.service.param.business.system.AuthorizationParam;
 import com.khcm.user.service.param.business.system.RoleParam;
 import com.khcm.user.web.admin.annotation.OperationLog;
 import com.khcm.user.web.admin.model.mapper.system.*;
-import com.khcm.user.web.admin.model.parammodel.business.system.AreaPM;
 import com.khcm.user.web.admin.model.parammodel.business.system.AuthorizationPM;
 import com.khcm.user.web.admin.model.parammodel.business.system.RolePM;
 import com.khcm.user.web.admin.model.viewmodel.base.PageVM;
@@ -38,7 +35,7 @@ import java.util.stream.Collectors;
 
 /**
  * 角色管理
- * Created by 刘文琪 on 2017/11/28.
+ * Created by LiuWenqi on 2017/11/28.
  */
 @Controller
 @RequestMapping("/sys/role")

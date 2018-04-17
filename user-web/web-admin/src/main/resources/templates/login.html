@@ -22,7 +22,7 @@
     </style>
 </head>
 <body class="resize" style="padding-top: 101.5px;">
-<label th:text="${errorInfo}"></label>
+
 <header class="g-hd">
     <div class="g-wrap">
         <!--logo size ：150 X 40-->
@@ -36,6 +36,7 @@
                 <div class="login-hd">
                     <div class="item">帐号登录</div>
                 </div>
+                <label th:text="${errorInfo}"></label>
                 <div class="login-bd">
                     <form class="login-form login-form-acc js-loginform js-loginform-acc" name="accountlogin"
                           th:action="@{/login}" th:method="post" target="_top">
@@ -59,8 +60,8 @@
                         <div class="loginconf">
                             <div class="logincheck js-logincheck">
                                 <label class="checklabel js-autolabel">
-                                    <input title="自动登录" class="checkipt js-autologin" type="checkbox">
-                                    <span class="logincheck remember">自动登录</span>
+                                    <input title="记住密码" class="checkipt js-autologin" name="rememberMe" type="checkbox">
+                                    <span class="logincheck remember">记住密码</span>
                                 </label>
                                 <div class="securetip js-securetip">为了您的信息安全，请不要在网吧或公用电脑上使用此功能！</div>
                             </div>

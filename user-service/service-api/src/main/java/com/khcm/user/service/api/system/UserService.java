@@ -38,8 +38,6 @@ public interface UserService {
 
     UserDTO editUserInfo(UserInfoParam userInfoParam);
 
-    UserDTO getUserAndArea(Integer uid);
-
     LoginDTO getByEmail(String email);
     LoginDTO getByPhone(String phone);
 }

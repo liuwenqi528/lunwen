@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 登录 Controller
  *
- * @author wangtao
- * @date 2017/8/23
  */
 @Controller
 public class LoginController{

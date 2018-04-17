@@ -9,7 +9,7 @@ layui.define("jquery", function (e) {
         },
         t = {
             arrow: ["&#xe623;", "&#xe625;"],
-            checkbox: ["&#xe626;", "&#xe627;"],
+            checkbox: ["&#xe618;", "&#xe605;"],
             radio: ["&#xe62b;", "&#xe62a;"],
             branch: ["&#xe622;", "&#xe624;"],
             leaf: "&#xe621;"
@@ -90,226 +90,229 @@ layui.define("jquery", function (e) {
             o.on(e);
         index = 1;
         return e;
-    }, i.prototype.tree = function (e, a) {
-        var r = this,
-            i = r.options,
-            n = a || i.nodes;
-        layui.each(n, function (a, n) {
-            if (n.children) {
-                layui.each(n.children, function (index, item) {
-                    item.pid = n.id;
-                });
-            }
-            var l = n.children && n.children.length > 0,
-                c = o('<ul class="' + (n.spread ? "layui-show" : "") + '"></ul>'),
-                s = o(["<li " + (n.spread ? 'data-spread="' + n.spread + '"' : "") + ">", function () {
-                    return l ? '<i class="layui-icon layui-tree-spread">' + (n.spread ? t.arrow[1] : t.arrow[0]) + '</i>' : '<span style="display: inline-block;width: 20px;"></span>';
-                }(), function () {
-                    return i.check && i.check == "checkbox" ? '<input type="checkbox" name="' + i.checkboxName + '" ' + ((n.checked && n.checked == true) ? 'checked="checked"' : "") + (n.checkboxValue ? ('value="' + n.checkboxValue + '"') : "") + 'data-parent-id="' + n.pid + '"' + 'id="' + n.id + '"' + (i.checkboxStyle ? ('style="' + i.checkboxStyle + '"') : "") + ' />' : "";
-                }(), function () {
-                    return '<a href="' + (n.href || "javascript:;") + '" ' + (i.target && n.href ? 'target="' + i.target + '"' : "") + ">" + ('<i class="layui-icon layui-tree-' + (l ? "branch" : "leaf") + '">' + (l ? n.spread ? t.branch[1] : t.branch[0] : t.leaf) + "</i>") + ("<cite>" + (n.text || "未命名") + "</cite></a>")
-                }(), "</li>"].join(""));
-            l && (s.append(c), r.tree(c, n.children)), e.append(s), "function" == typeof i.click && r.click(s, n), r.spread(s, n), i.drag && r.drag(s, n)
-            r.changed(s, n)
-        })
-    }, i.prototype.treeGird = function (e, a) {
-        var r = this,
-            i = r.options,
-            n = a || i.nodes,
-            sxa = i.spreadable == true ? true : false;
-        layui.each(n, function (a, n) {
-            if (n.children) {
-                layui.each(n.children, function (index, item) {
-                    item.pid = n.id;
-                });
-            }
-            var treeNode = tt.mapping[n.id];
-            var indent = '';
-            if (treeNode.level > 1) {
-                for (var ind = 1; ind < treeNode.level; ind++) {
-                    indent += '<span style="display: inline-block;width: 20px;"></span>';
+    },
+        i.prototype.tree = function (e, a) {
+            var i = this, r = i.options, n = a || r.nodes;
+            layui.each(n, function (a, n) {
+                var l = n.children && n.children.length > 0,
+                    c = o('<ul class="' + (n.spread ? "layui-show" : "") + '"></ul>'),
+                    s = o(["<li " + (n.spread ? 'data-spread="' + n.spread + '"' : "") + ">", function () {
+                        return l ? '<i class="layui-icon layui-tree-spread">' + (n.spread ? t.arrow[1] : t.arrow[0]) + "</i>" : ""
+                    }(), function () {
+                        return r.check && r.check == "checkbox" ? '<input type="checkbox" name="layTreeCheckbox" lay-skin="primary" '+(n.checked?'checked="checked"':'')+'><div class="layui-unselect layui-form-checkbox '+(n.checked?"layui-form-checked":"")+'"lay-skin="primary"><i class="layui-icon">'+(n.checked?t.checkbox[1]:"")+'</i></div>' : ""
+                    }(), function () {
+                        return '<a href="' + (n.href || "javascript:;") + '" ' + (r.target && n.href ? 'target="' + r.target + '"' : "") + ">" + ('<i class="layui-icon layui-tree-' + (l ? "branch" : "leaf") + '">' + (l ? n.spread ? t.branch[1] : t.branch[0] : t.leaf) + "</i>") + ("<cite>" + (n.text || "未命名") + "</cite></a>")
+                    }(), "</li>"].join(""));
+                l && (s.append(c), i.tree(c, n.children)), e.append(s), "function" == typeof r.click && i.click(s, n), i.spread(s, n),
+                    i.checkParentAndChild(s, n), r.drag && i.drag(s, n)
+            })
+        },
+        i.prototype.treeGird = function (e, a) {
+            var r = this,
+                i = r.options,
+                n = a || i.nodes,
+                sxa = i.spreadable == true ? true : false;
+            layui.each(n, function (a, n) {
+                if (n.children) {
+                    layui.each(n.children, function (index, item) {
+                        item.pid = n.id;
+                    });
                 }
-            }
-            var p;
-            if (sxa) {
-                n.spread = true, p = false, treeNode.isOpened = true;
+                var treeNode = tt.mapping[n.id];
+                var indent = '';
+                if (treeNode.level > 1) {
+                    for (var ind = 1; ind < treeNode.level; ind++) {
+                        indent += '<span style="display: inline-block;width: 20px;"></span>';
+                    }
+                }
+                var p;
+                if (sxa) {
+                    n.spread = true, p = false, treeNode.isOpened = true;
+                } else {
+                    p = treeNode.parentId == 'root' ? null : treeNode.parentId;
+                }
+                var l = n.children && n.children.length > 0,
+                    str = o(['<tr class="' + (p ? "layui-hide" : "") + '" id="' + n.id + '">', function () {
+                        return '<td style="width:40px"><div class="layui-table-cell">' + index + '</div></td>';
+                    }(), function () {
+                        var ret = ""
+                        for (var ind = 0; ind < i.layout.length; ind++) {
+                            var colClass = i.layout[ind].colClass ? ' class="' + i.layout[ind].colClass + '"' : '';
+                            var style = i.layout[ind].style ? 'style ="' + i.layout[ind].style + '"' : '';
+                            if (i.layout[ind].treeNodes) {
+                                ret += '<td ' + colClass + ' ' + style + '"><div class="layui-table-cell"><li ' + (n.spread ? 'data-spread="' + n.spread + '"' : "") + '>' + (indent + (l ? '<i class="layui-icon layui-tree-spread">' + (n.spread ? t.arrow[1] : t.arrow[0]) + "</i>" : "<span style=\"display: inline-block;width: 20px;\"></span>")) + '<a href="' + (n.href || "javascript:;") + '" ' + (i.target && n.href ? 'target="' + i.target + '"' : "") + ">" + ('<i class="layui-icon layui-tree-' + (l ? "branch" : "leaf") + '">' + (l ? n.spread ? t.branch[1] : t.branch[0] : t.leaf) + "</i>") + ("<cite>" + (n[i.layout[ind].field] || "未命名") + "</cite></a></li></div></td>");
+                            } else if (i.layout[ind].render) {
+                                ret += '<td ' + colClass + ' ' + style + '"><div class="layui-table-cell">' + i.layout[ind].render(n) + '</div></td>'
+                            } else {
+                                ret += '<td ' + colClass + ' ' + style + '"><div class="layui-table-cell">' + n[i.layout[ind].field] + '</div></td>';
+                            }
+                        }
+                        return ret;
+                    }(), "</tr>"].join(""));
+                e.append(str), index++, l && (r.treeGird(e, n.children)), r.spreadGird(str, n), i.drag && r.drag(str, n)
+                r.changed(str, n)
+            })
+        },
+        i.prototype.changed = function (e, o) {
+            var r = this;
+            if (o.pid == undefined || o.pid == null) {
+                e.children("input").on("change", function () {
+                    var childUl = e.children("ul"),
+                        checked = this.checked;
+                    childUl.find("input").prop("checked", checked);
+                })
             } else {
-                p = treeNode.parentId == 'root' ? null : treeNode.parentId;
-            }
-            var l = n.children && n.children.length > 0,
-                str = o(['<tr class="' + (p ? "layui-hide" : "") + '" id="' + n.id + '">', function () {
-                    return '<td style="width:40px"><div class="layui-table-cell">' + index + '</div></td>';
-                }(), function () {
-                    var ret = ""
-                    for (var ind = 0; ind < i.layout.length; ind++) {
-                        var colClass = i.layout[ind].colClass ? ' class="' + i.layout[ind].colClass + '"' : '';
-                        var style = i.layout[ind].style ? 'style ="' + i.layout[ind].style + '"' : '';
-                        if (i.layout[ind].treeNodes) {
-                            ret += '<td ' + colClass + ' ' + style + '"><div class="layui-table-cell"><li ' + (n.spread ? 'data-spread="' + n.spread + '"' : "") + '>' + (indent + (l ? '<i class="layui-icon layui-tree-spread">' + (n.spread ? t.arrow[1] : t.arrow[0]) + "</i>" : "<span style=\"display: inline-block;width: 20px;\"></span>")) + '<a href="' + (n.href || "javascript:;") + '" ' + (i.target && n.href ? 'target="' + i.target + '"' : "") + ">" + ('<i class="layui-icon layui-tree-' + (l ? "branch" : "leaf") + '">' + (l ? n.spread ? t.branch[1] : t.branch[0] : t.leaf) + "</i>") + ("<cite>" + (n[i.layout[ind].field] || "未命名") + "</cite></a></li></div></td>");
-                        } else if (i.layout[ind].render) {
-                            ret += '<td ' + colClass + ' ' + style + '"><div class="layui-table-cell">' + i.layout[ind].render(n) + '</div></td>'
-                        } else {
-                            ret += '<td ' + colClass + ' ' + style + '"><div class="layui-table-cell">' + n[i.layout[ind].field] + '</div></td>';
+                e.children("input").on("change", function () {
+                    var that = this;
+                    if (!this.checked) {
+                        if (o.children && o.children.length > 0) {
+                            var childUl = e.children("ul"),
+                                checked = this.checked;
+                            childUl.find("input").prop("checked", checked);
+                        }
+                        r.cancelParentsCheckboxCheck(that);
+                    } else {
+                        r.parentsChecked(this, this.checked);
+                        if (o.children && o.children.length > 0) {
+                            var childUl = e.children("ul"),
+                                checked = this.checked;
+                            childUl.find("input").prop("checked", checked);
                         }
                     }
-                    return ret;
-                }(), "</tr>"].join(""));
-            e.append(str), index++, l && (r.treeGird(e, n.children)), r.spreadGird(str, n), i.drag && r.drag(str, n)
-            r.changed(str, n)
-        })
-    }, i.prototype.changed = function (e, o) {
-        var r = this;
-        if (o.pid == undefined || o.pid == null) {
-            e.children("input").on("change", function () {
-                var childUl = e.children("ul"),
-                    checked = this.checked;
-                childUl.find("input").prop("checked", checked);
-            })
-        } else {
-            e.children("input").on("change", function () {
-                var that = this;
-                if (!this.checked) {
-                    if (o.children && o.children.length > 0) {
-                        var childUl = e.children("ul"),
-                            checked = this.checked;
-                        childUl.find("input").prop("checked", checked);
-                    }
-                    r.cancelParentsCheckboxCheck(that);
-                } else {
-                    r.parentsChecked(this, this.checked);
-                    if (o.children && o.children.length > 0) {
-                        var childUl = e.children("ul"),
-                            checked = this.checked;
-                        childUl.find("input").prop("checked", checked);
-                    }
-                }
-            });
-        }
-    }, i.prototype.cancelParentsCheckboxCheck = function (ele) {
-        if (!ele) {
-            return;
-        }
-        var r = this,
-            siblingInputs = r.siblingInputs(ele),
-            parentId = ele.getAttribute("data-parent-id"),
-            parentInput = null,
-            bool = true,
-            childrendInputs = null,
-            hasOneChildrenInputCheck = false;
-        if (parentId != 'undefined') {
-            parentInput = document.getElementById(parentId);
-            childrendInputs = r.currentChildrenInputs(parentInput);
-        }
-        for (var i = 0, len = siblingInputs.length; i < len; i++) {
-            if (siblingInputs[i].checked) {
-                bool = false;
-                break;
+                });
             }
-        }
-        if (!childrendInputs || childrendInputs.length == 0) {
-            hasOneChildrenInputCheck = false;
-        } else {
-            for (var j = 0, len2 = childrendInputs.length; j < len2; j++) {
-                if (childrendInputs[j].getAttribute("data-parent-id") != "undefined") {
-                    if (childrendInputs[j].checked) {
-                        console.log(1158)
-                        hasOneChildrenInputCheck = true;
-                        break;
-                    }
+        },
+        i.prototype.cancelParentsCheckboxCheck = function (ele) {
+            if (!ele) {
+                return;
+            }
+            var r = this,
+                siblingInputs = r.siblingInputs(ele),
+                parentId = ele.getAttribute("data-parent-id"),
+                parentInput = null,
+                bool = true,
+                childrendInputs = null,
+                hasOneChildrenInputCheck = false;
+            if (parentId != 'undefined') {
+                parentInput = document.getElementById(parentId);
+                childrendInputs = r.currentChildrenInputs(parentInput);
+            }
+            for (var i = 0, len = siblingInputs.length; i < len; i++) {
+                if (siblingInputs[i].checked) {
+                    bool = false;
+                    break;
                 }
             }
-        }
-        if (bool && !hasOneChildrenInputCheck) {
-            r.inputChecked(parentInput, false);
-        }
-        this.cancelParentsCheckboxCheck(parentInput);
-    }, i.prototype.siblingInputs = function (ele) {
-        var that = this;
-        if (ele) {
-            var parent = ele.parentElement,
-                parents = parent.parentElement,
-                childrens = parents.children,
-                siblingInputs = [];
-        } else {
-            return null;
-        }
-        for (var i = 0, len = childrens.length; i < len; i++) {
-            if (childrens[i] != parent) {
-                if (childrens[i].children[0].nodeName == "INPUT") {
-                    siblingInputs.push(childrens[i].children[0]);
-                }
-                if (childrens[i].children[1].nodeName == "INPUT") {
-                    siblingInputs.push(childrens[i].children[1]);
-                }
-            }
-        }
-        parent = null;
-        parents = null;
-        childrens = null;
-        return siblingInputs;
-    }, i.prototype.currentChildrenInputs = function (ele) {
-        var parent = ele.parentElement,
-            childrenInputs = [];
-        if (parent.getElementsByTagName("ul").length > 0) {
-            var uls = parent.getElementsByTagName("ul");
-            for (var i = 0, len = uls.length; i < len; i++) {
-                var inputs = uls[i].getElementsByTagName("input");
-                for (var j = 0, len2 = inputs.length; j < len2; j++) {
-                    childrenInputs.push(inputs[j]);
-                }
-            }
-        }
-        return childrenInputs;
-    }, i.prototype.inputChecked = function (ele, checked) {
-        ele.checked = checked;
-    }, i.prototype.parentsChecked = function (e, checked) {
-        var r = this,
-            i = r.options,
-            selector = i.elem,
-            currentInput = e;
-        if (currentInput && (currentInput.nodeName == "INPUT")) {
-            var parentId = currentInput.getAttribute("data-parent-id"),
-                parentInput = null;
-            setTimeout(function () {
-                r.check(currentInput, checked);
-                if (parentId) {
-                    r.parentsChecked(document.getElementById(parentId), checked);
-                }
-            }, 50);
-        }
-    }, i.prototype.findParents = function (ele, selector) {
-        var parent = ele.parentElement,
-            that = this;
-        if (selector.substr(0, 1) == "#") {
-            if (parent) {
-                if (parent.id != selector.substr(1)) {
-                    that.findParents(parent, selector);
-                } else {
-                    return parent;
-                }
-            }
-        } else if (selector.substr(0, 1) == ".") {
-            if (parent) {
-                var classnameArr = parent.className.split(" "),
-                    len = classnameArr.length,
-                    selectt = selector.substr(1),
-                    hasSelector = false;
-                if (len > 0) {
-                    for (var i = 0; i < len; i++) {
-                        if (classnameArr[i] == selectt) {
-                            hasSelector = true;
+            if (!childrendInputs || childrendInputs.length == 0) {
+                hasOneChildrenInputCheck = false;
+            } else {
+                for (var j = 0, len2 = childrendInputs.length; j < len2; j++) {
+                    if (childrendInputs[j].getAttribute("data-parent-id") != "undefined") {
+                        if (childrendInputs[j].checked) {
+                            console.log(1158)
+                            hasOneChildrenInputCheck = true;
                             break;
                         }
                     }
                 }
-                if (!hasSelector) {
-                    that.findParents(parent, selector);
-                } else if (hasSelector) {
-                    return parent;
+            }
+            if (bool && !hasOneChildrenInputCheck) {
+                r.inputChecked(parentInput, false);
+            }
+            this.cancelParentsCheckboxCheck(parentInput);
+        },
+        i.prototype.siblingInputs = function (ele) {
+            var that = this;
+            if (ele) {
+                var parent = ele.parentElement,
+                    parents = parent.parentElement,
+                    childrens = parents.children,
+                    siblingInputs = [];
+            } else {
+                return null;
+            }
+            for (var i = 0, len = childrens.length; i < len; i++) {
+                if (childrens[i] != parent) {
+                    if (childrens[i].children[0].nodeName == "INPUT") {
+                        siblingInputs.push(childrens[i].children[0]);
+                    }
+                    if (childrens[i].children[1].nodeName == "INPUT") {
+                        siblingInputs.push(childrens[i].children[1]);
+                    }
                 }
             }
-        }
-    }, i.prototype.num = 1, i.prototype.uuid = function () {
+            parent = null;
+            parents = null;
+            childrens = null;
+            return siblingInputs;
+        },
+        i.prototype.currentChildrenInputs = function (ele) {
+            var parent = ele.parentElement,
+                childrenInputs = [];
+            if (parent.getElementsByTagName("ul").length > 0) {
+                var uls = parent.getElementsByTagName("ul");
+                for (var i = 0, len = uls.length; i < len; i++) {
+                    var inputs = uls[i].getElementsByTagName("input");
+                    for (var j = 0, len2 = inputs.length; j < len2; j++) {
+                        childrenInputs.push(inputs[j]);
+                    }
+                }
+            }
+            return childrenInputs;
+        },
+        i.prototype.inputChecked = function (ele, checked) {
+            ele.checked = checked;
+        },
+        i.prototype.parentsChecked = function (e, checked) {
+            var r = this,
+                i = r.options,
+                selector = i.elem,
+                currentInput = e;
+            if (currentInput && (currentInput.nodeName == "INPUT")) {
+                var parentId = currentInput.getAttribute("data-parent-id"),
+                    parentInput = null;
+                setTimeout(function () {
+                    r.check(currentInput, checked);
+                    if (parentId) {
+                        r.parentsChecked(document.getElementById(parentId), checked);
+                    }
+                }, 50);
+            }
+        },
+        i.prototype.findParents = function (ele, selector) {
+            var parent = ele.parentElement,
+                that = this;
+            if (selector.substr(0, 1) == "#") {
+                if (parent) {
+                    if (parent.id != selector.substr(1)) {
+                        that.findParents(parent, selector);
+                    } else {
+                        return parent;
+                    }
+                }
+            } else if (selector.substr(0, 1) == ".") {
+                if (parent) {
+                    var classnameArr = parent.className.split(" "),
+                        len = classnameArr.length,
+                        selectt = selector.substr(1),
+                        hasSelector = false;
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            if (classnameArr[i] == selectt) {
+                                hasSelector = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!hasSelector) {
+                        that.findParents(parent, selector);
+                    } else if (hasSelector) {
+                        return parent;
+                    }
+                }
+            }
+        },
+        i.prototype.num = 1, i.prototype.uuid = function () {
         var that = this,
             randomStr = ['l', 'a', 'y', 'e', 'r', 'n', 'i'],
             randomNum = Math.floor(Math.random() * 6);
@@ -320,18 +323,68 @@ layui.define("jquery", function (e) {
             }
             return "layer_" + new Date().getTime() + "_" + (that.num++) + "_" + (++that.num) + "_" + str;
         }();
-    }, i.prototype.check = function (input, bool) {
-        if (bool) {
-            input.checked = true;
-        } else {
-            input.checked = false;
-        }
-    }, i.prototype.click = function (e, o) {
+    },
+        i.prototype.check = function (input, bool) {
+            if (bool) {
+                input.checked = true;
+            } else {
+                input.checked = false;
+            }
+        },
+        i.prototype.checkParentAndChild = function (elem, item) {
+            var that = this, options = that.options;
+            var checkbox = elem.children('ul li .layui-form-checkbox');
+            var li = elem.find('ul li'), licheckbox = elem.find('ul li .layui-form-checkbox i');
+            //执行选择
+            var check = function () {
+                if (elem.data('checked')) {			//默认选中
+                    li.data('checked', null);
+                    elem.data('checked', null);
+                    item.checked = null;
+                    eachChildren(item, null);
+                    licheckbox.html('');
+                    checkbox.find("i").html("");
+                    checkbox.removeClass("layui-form-checked")
+                    licheckbox.parent('div').removeClass("layui-form-checked")
+                } else {							//默认不选中
+                    li.data('checked', true);
+                    elem.data('checked', true);
+                    item.checked = true;
+                    eachChildren(item, true);
+                    licheckbox.html(t.checkbox[1]);
+                    checkbox.find("i").html(t.checkbox[1]);
+                    checkbox.addClass("layui-form-checked")
+                    licheckbox.parent('div').addClass("layui-form-checked")
+                }
+            };
+            var eachChildren = function (item, value) {
+                layui.each(item.children, function (index, it) {
+                    it.checked = value;
+                    eachChildren(it, value);
+                });
+            }
+            //如果没有设置check，则不执行
+            if (!options.check) return;
+            checkbox.on('click', check);
+        }, i.prototype.click = function (e, o) {
         var a = this,
             r = a.options;
         e.children("a").on("click", function (e) {
             layui.stope(e), r.click(o)
         })
+    }, i.prototype.getChecked = function (node) {
+        var that = this;
+        var nodes = node || that.options.nodes;
+        var checkedArr = [];
+        layui.each(nodes, function (index, item) {
+            if (item.checked != null && item.checked) {
+                checkedArr.push(item);
+            }
+            if (item.children != null && item.children.length > 0) {
+                checkedArr = checkedArr.concat(that.getChecked(item.children));
+            }
+        });
+        return checkedArr;
     }, i.prototype.spread = function (e, o) {
         var a = this,
             r = (a.options, e.children(".layui-tree-spread")),

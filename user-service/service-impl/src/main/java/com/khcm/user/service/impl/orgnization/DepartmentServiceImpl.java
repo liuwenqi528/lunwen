@@ -56,7 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         //如果所属机构ID不为空，则查询所属机构
         Optional<Integer> organizationIdOptional = Optional.ofNullable(organizationId);
         p = p.and(organizationIdOptional.map(orgId -> {
-            Organization organization = organizationRepository.getOne(organizationId);
+            Organization organization = organizationRepository.getOne(orgId);
             return qDepartment.organization.id.in(organizationRepository.getIdsById(organization.getLft(), organization.getRgt()));
         }).orElse(null));
         //如果部门名称不为空，则查询部门名称
@@ -68,9 +68,9 @@ public class DepartmentServiceImpl implements DepartmentService {
             p = p.and(qDepartment.gmtCreate.between(beginTime, endTime));
         }
         //如果父级id不为空
-        Optional<Integer> parentIdOptional = Optional.ofNullable(organizationId);
-        p = p.and(parentIdOptional.map(orgId -> {
-            return qDepartment.parent.id.eq(parentId);
+        Optional<Integer> parentIdOptional = Optional.ofNullable(parentId);
+        p = p.and(parentIdOptional.map(pId -> {
+            return qDepartment.parent.id.eq(pId);
         }).orElse(null));
 
         List<Department> departmentList = departmentRepository.findList(p);

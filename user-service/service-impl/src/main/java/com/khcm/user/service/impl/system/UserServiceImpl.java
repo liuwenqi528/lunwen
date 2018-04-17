@@ -1,11 +1,9 @@
 package com.khcm.user.service.impl.system;
 
 import com.khcm.user.common.enums.UserStatus;
-import com.khcm.user.dao.entity.business.system.Area;
 import com.khcm.user.dao.entity.business.system.QUser;
 import com.khcm.user.dao.entity.business.system.Role;
 import com.khcm.user.dao.entity.business.system.User;
-import com.khcm.user.dao.repository.master.system.AreaRepository;
 import com.khcm.user.dao.repository.master.system.RoleRepository;
 import com.khcm.user.dao.repository.master.system.UserRepository;
 import com.khcm.user.service.api.system.ConfigService;
@@ -46,9 +44,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ConfigService configService;
-
-    @Autowired
-    private AreaRepository areaRepository;
 
     @Override
     public UserDTO saveOrUpdate(UserParam userParam) {
@@ -133,39 +128,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO editUserInfo(UserInfoParam userInfoParam) {
         User user = userRepository.findOne(userInfoParam.getId());
-        Optional<Integer> areaIdOptional = Optional.ofNullable(userInfoParam.getAreaId());
-        areaIdOptional.ifPresent(areaId -> {
-            user.getExt().setArea(areaRepository.findOne(areaId));
-        });
         UserInfoMapper.MAPPER.paramToEntity(userInfoParam, user);
         return UserMapper.MAPPER.entityToDTO(userRepository.save(user));
     }
 
-    @Override
-    public UserDTO getUserAndArea(Integer uid) {
-        User user = userRepository.findOne(uid);
-        UserDTO userDTO = UserMapper.MAPPER.entityToDTO(user);
-        Optional<Area> areaOptional = Optional.ofNullable(user.getExt().getArea());
-        areaOptional.ifPresent(area -> {
-            List<AreaDTO> list = new ArrayList<>();
-            list = arrangement(area.getId(), list);
-            userDTO.setAreaDTOList(list);
-        });
-        return userDTO;
-    }
 
-    public List<AreaDTO> arrangement(Integer id, List<AreaDTO> list) {
-        Area area = areaRepository.findOne(id);
-        list.add(AreaMapper.MAPPER.entityToDTO(area));
-        Optional<Area> parentAreaOptional = Optional.ofNullable(area.getParent());
-        parentAreaOptional.ifPresent(parentArea -> {
-            arrangement(parentArea.getId(), list);
-        });
-        return list;
-    }
 
     /**
-     * update by Qimeng Duan
      * reason:使用like关键字时，仍需要加%号，才能起作用。
      *
      * @param userParam
@@ -188,13 +157,13 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotBlank(userParam.getRealname())) {
             predicate = predicate.and(qUser.ext.realname.like("%" + userParam.getRealname() + "%"));
         }
-        if (StringUtils.isNotBlank(userParam.getChannelName())) {
-            predicate = predicate.and(qUser.ext.channel.name.like("%" + userParam.getChannelName() + "%"));
-        }
         Optional<Date> optionalBeginDate = Optional.ofNullable(userParam.getBeginTime());
         predicate = predicate.and(optionalBeginDate.map(beginDate -> qUser.gmtCreate.goe(beginDate)).orElse(null));
         Optional<Date> optionalEndDate = Optional.ofNullable(userParam.getEndTime());
         predicate = predicate.and(optionalEndDate.map(endDate -> qUser.gmtCreate.loe(endDate)).orElse(null));
+
+        Optional<UserStatus> optionalUserStatus = Optional.ofNullable(userParam.getStatus());
+        predicate = predicate.and(optionalUserStatus.map(userStatus -> qUser.status.eq(userStatus)).orElse(null));
 
         //2、查询
         Page<User> page = userRepository.findPage(predicate);
@@ -298,7 +267,6 @@ public class UserServiceImpl implements UserService {
         user.getRoles().clear();
         roleIdList.forEach(roleId -> {
             Role role = roleRepository.findOne(roleId);
-            //noinspection MapOrSetKeyShouldOverrideHashCodeEquals
             user.getRoles().add(role);
         });
         userRepository.save(user);

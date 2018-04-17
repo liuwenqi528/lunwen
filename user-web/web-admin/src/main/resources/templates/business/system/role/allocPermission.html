@@ -22,6 +22,7 @@
         </div>
     </fieldset>
 </div>
+
 <script th:inline="javascript">
     var roleAuth = [[${roleVM}]].authorizations;
     var arTree,//树形列表对象
@@ -29,7 +30,7 @@
         flag = false;//记录树形列表是否点击过。如果点击过则切换系统时会提示是否保存。未点击直接进行切换
     var roleId;//记录当前角色编号。
 
-    layui.use(['layer', 'form', 'element', 'jquery'], function () {
+    layui.use(['layer', 'form', 'element', 'jquery', 'tree'], function () {
         var layer = layui.layer, form = layui.form, element = layui.element,
             $ = layui.jquery;
         $.ajax({
@@ -62,65 +63,65 @@
             }
 
         });
-    });
-
-
-    $(function () {
+        var arTree;
         roleId = $('#roleId').val();//获取角色编号
 
         var checkFlag = false;
-//        创建树形列表
-        arTree = $("#appResourceTree").tree({
-            checkbox: true,
-            onCheck: function (node, checked) {
-                //点击复选框时表示数据发生变化。将标记改为true.
-                flag = true;
-                if (checkFlag) {
-                    var isLeaf = arTree.tree('isLeaf', arTree.tree('find', node.id).target);
-                    var parent = arTree.tree('getParent', arTree.tree('find', node.id).target);
-                    if (parent != null && checked) {
-                        var targetID = parent.id;
-                        arTree.tree('check', arTree.tree('find', targetID).target);
-                    }
-                    if (!isLeaf) {
-                        var child = arTree.tree('getChildren', arTree.tree('find', node.id).target);
-                        $(child).each(function () {
-                            var childId = $(this)[0].id;
-                            if (!checked) {
-                                arTree.tree('uncheck', arTree.tree('find', childId).target);
-                            }
-                        });
-                    }
+
+        //获取树形列表数据
+        function reloadTree(code) {
+            var record = JSON.parse(window.sessionStorage.getItem(code));
+            $.ajax({
+                url: basePath + "/sys/appResource/doTreegrid?appCode=" + record.code,
+                dataType: "json",
+                type: "post",
+
+                success: function (data) {
+
+                    //根据系统编号，获取对应的资源编号集合、
+                    var resourceIds = getResourceIds();
+                    console.info(resourceIds)
+                    console.info(data)
+                    checkData(data, resourceIds);
+                    //遍历资源编号。将已有的权限进行选中
+
+                    arTree = layui.tree({
+                        elem: '#appResourceTree' //传入元素选择器
+                        , nodes: data
+                        , check: 'checkbox'
+                        , click: function (node) {
+//点击复选框时表示数据发生变化。将标记改为true.
+                            flag = true;
+                        }
+                    });
+                    flag = false;
                 }
-            },
-            onLoadSuccess: function (node, data) {
-                //根据系统编号，获取对应的资源编号集合、
-                var resourceIds = getResourceIds();
-                //遍历资源编号。将已有的权限进行选中
-                for (var i = 0; i < resourceIds.length; i++) {
-                    if (arTree.tree('find', resourceIds[i])) {
-                        arTree.tree('check', arTree.tree('find', resourceIds[i]).target);
-                    }
-                }
-                flag = false;
-            }
-        })
+            })
+            appId = record.id;//记录选则的系统编号
+        }
     });
+
+    function checkData(data, resourceIds) {
+        for (var i = 0; i < data.length; i++) {
+            if ($.inArray(data[i].id, resourceIds)>0) {
+                data[i].checked = true;
+                console.info("LLLLLL")
+            }
+            if (data[i].children != null && data[i].children.length > 0) {
+                checkData(data[i].children, resourceIds);
+            }
+        }
+    }
+
     //保存
-    function saveForm(){
+    function saveForm() {
         setAuth();
     }
+
     //重置
     function resetForm() {
-        arTree.tree('reload');
     }
-    //获取树形列表数据
-    function reloadTree(code) {
-        var record = JSON.parse(window.sessionStorage.getItem(code));
-        arTree.tree('options').url = basePath + "/sys/appResource/doTreegrid?appCode=" + record.code;
-        arTree.tree('reload');
-        appId = record.id;//记录选则的系统编号
-    }
+
 
     //设置权限
     function setAuth(code) {
@@ -185,5 +186,16 @@
     }
 </script>
 </body>
-
+<style>
+    .layui-tree li i{
+        padding:0px;
+    }
+    .layui-tree li .layui-tree-check{
+        font-size:18px;
+    }
+    .layui-tree li .layui-tree-checked{
+        border-color: #5FB878;
+        color: #fff;
+    }
+</style>
 </html>

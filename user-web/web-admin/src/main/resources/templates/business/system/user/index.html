@@ -11,7 +11,6 @@
                 <option value="phone">电话</option>
                 <option value="email">邮箱</option>
                 <option value="realname">真实姓名</option>
-                <option value="channelName">注册渠道</option>
             </select>
         </div>
         <div class="layui-inline">
@@ -22,6 +21,16 @@
                    autocomplete="off" class="layui-input">
             <input type="hidden" name="beginTime"/>
             <input type="hidden" name="endTime"/>
+        </div>
+        <div class="layui-inline">
+            <select id="status" name="status" class="layui-input">
+                <option value="">用户状态</option>
+                <option value="NORMAL">正常</option>
+                <option value="DISABLED">禁用</option>
+                <option value="LOCKED">锁定</option>
+                <option value="UNACTIVED">未激活</option>
+                <option value="CLOSED">关闭(删除)</option>
+            </select>
         </div>
         <div class="layui-inline">
             <a class="iconfont icon-soushuo layui-btn layui-btn-sm" lay-submit lay-filter="userSearch" id="userSearch">搜索</a>
@@ -93,14 +102,10 @@
             , url: basePath + '/sys/user/doDatagrid?orderBy=id=desc'
             , cols: [[ //表头
                 {field: 'id', type: 'checkbox'}
-                , {field: 'username', title: '用户名', width: '9%'}
-                , {field: 'nickname', title: '昵称', width: '9%'}
-                , {field: 'realname', title: '真实姓名', width: '9%'}
-                , {field: 'email', title: '邮箱', width: '11%'}
-                , {field: 'phone', title: '电话', width: '9%'}
-                , {field: 'channelName', title: '注册渠道', width: '10%'}
+                , {field: 'username', title: '用户名', width: '15%'}
+                , {field: 'phone', title: '电话', width: '15%'}
                 , {
-                    field: 'status', title: '状态', width: '6%', align: 'center', templet: function (row) {
+                    field: 'status', title: '状态', width: '10%', align: 'center', templet: function (row) {
                         if (row.status == "NORMAL") {
                             return '<span  class="layui-btn layui-btn-sm xy-button-light-green us">正常</span>'
                         } else if (row.status == "DISABLED") {
@@ -114,9 +119,8 @@
                         }
                     }
                 }
-                , {field: 'gmtCreate', title: '创建时间', width: '10%'}
-                , {field: 'loginTime', title: '最后登录日期', width: '10%'}
-                , {title: '操作',align: 'center',width: '17%',  templet:function(row){
+                , {field: 'loginTime', title: '最后登录日期', width: '15%'}
+                , {title: '操作',align: 'center',width: '20%',  templet:function(row){
                     var btn = `<button class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="userInfo" title="详情"></button>
                                 <button class="layui-btn ${row.status == 'CLOSED' ? 'layui-btn-disabled' : 'layui-btn-normal'} layui-btn-sm iconfont icon-xiugai1" lay-event="userEdit" title="编辑" ${row.status == 'CLOSED' ? 'disabled' : ''}></button>
                                 <button class="layui-btn ${row.status == 'CLOSED' ? 'layui-btn-disabled' : 'layui-btn-danger'} layui-btn-sm iconfont icon-shanchu" lay-event="userRemove" title="删除" ${row.status == 'CLOSED' ? 'disabled' : ''}></button>

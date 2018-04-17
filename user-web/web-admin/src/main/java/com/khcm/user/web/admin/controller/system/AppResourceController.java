@@ -43,14 +43,6 @@ public class AppResourceController {
 
     @Autowired
     private ResourceService resourceService;
-    @Autowired
-    private AppService appService;
-
-    @RequiresPermissions("sys:appResource:view")
-    @GetMapping
-    public String toIndexPage() {
-        return BASE_PATH + "index";
-    }
 
     @RequiresPermissions("sys:appResource:view")
     @RequestMapping("doTreegrid")
@@ -62,88 +54,7 @@ public class AppResourceController {
         return ResourceDTOMapper.MAPPER.dtoToVM(resources);
     }
 
-    @RequiresPermissions("sys:appResource:add")
-    @RequestMapping("/toAddPage")
-    public String toAddPage(Integer id, String appCode, Model model) {
-        if (Objects.nonNull(id)) {
-            ResourceDTO resourceDTO = resourceService.getById(id);
-            model.addAttribute("resourceVM", ResourceDTOMapper.MAPPER.dtoToVM(resourceDTO));
-        } else {
-            AppDTO appDTO = appService.getByCode(appCode);
-            model.addAttribute("appVM", AppDTOMapper.MAPPER.dtoToVM(appDTO));
-        }
-        return BASE_PATH + "add";
-    }
 
-    @RequiresPermissions("sys:appResource:add")
-    @RequestMapping("/doSave")
-    @ResponseBody
-    @OperationLog(name="保存系统资源信息")
-    public ResultVM doSave(ResourcePM resourcePM) {
-        ResourceParam resourceParam = ResourceDTOMapper.MAPPER.pmToParam(resourcePM);
-        resourceService.saveOrUpdate(resourceParam);
-        return VMUtils.resultSuccess();
-    }
-
-    @RequiresPermissions("sys:appResource:edit")
-    @RequestMapping("/toEditPage")
-    public String toEditPage(Integer id, Model model) {
-        if (Objects.nonNull(id)) {
-            ResourceDTO resourceDTO = resourceService.getById(id);
-            model.addAttribute("resourceVM", ResourceDTOMapper.MAPPER.dtoToVM(resourceDTO));
-        }
-        return BASE_PATH + "edit";
-    }
-
-    @RequiresPermissions("sys:appResource:info")
-    @RequestMapping("/toInfoPage")
-    public String toInfoPage(Integer id, Model model) {
-        if (Objects.nonNull(id)) {
-            ResourceDTO resourceDTO = resourceService.getById(id);
-            model.addAttribute("resourceVM", ResourceDTOMapper.MAPPER.dtoToVM(resourceDTO));
-        }
-        return BASE_PATH + "info";
-    }
-
-    @RequiresPermissions("sys:appResource:edit")
-    @RequestMapping("/doUpdate")
-    @ResponseBody
-    @OperationLog(name="修改系统资源信息")
-    public ResultVM doUpdate(ResourcePM resourcePM) {
-        ResourceParam resourceParam = ResourceDTOMapper.MAPPER.pmToParam(resourcePM);
-        resourceService.saveOrUpdate(resourceParam);
-        return VMUtils.resultSuccess();
-    }
-
-
-    @RequiresPermissions("sys:appResource:remove")
-    @RequestMapping("/doRemove")
-    @ResponseBody
-    @OperationLog(name="删除系统资源信息")
-    public ResultVM doRemove(String ids) {
-        if (StringUtils.isNotBlank(ids)) {
-            List<Integer> idList = Arrays.stream(ids.split(",")).map(id -> Integer.valueOf(id)).collect(Collectors.toList());
-            resourceService.remove(idList);
-        }
-        return VMUtils.resultSuccess();
-    }
-
-    /**@author Liuwenqi
-     * @date 2018-02-26
-     * @param resourcePM
-     * @return
-     * changed by liuwenqi on 2018-02-01
-     * 用于验证系统编码或系统名称是否重复
-     */
-    @RequiresPermissions("sys:appResource:view")
-    @RequestMapping("/doValidate")
-    @ResponseBody
-    public ResultVM doValidate(ResourcePM resourcePM) {
-        ResourceParam resourceParam = ResourceDTOMapper.MAPPER.pmToParam(resourcePM);
-        ResourceDTO resourceDTO = resourceService.getOne(resourceParam);
-        ResultVM resultVM = Optional.ofNullable(resourceDTO).map(ar->VMUtils.resultFailure()).orElse(VMUtils.resultSuccess());
-        return resultVM;
-    }
 
 
 }

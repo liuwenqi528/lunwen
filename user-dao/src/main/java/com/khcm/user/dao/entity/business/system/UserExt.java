@@ -45,14 +45,6 @@ public class UserExt extends BaseEntity {
     @OneToOne(mappedBy = "ext")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    private Channel channel;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_id", foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-    private Area area;
-
     public enum Sex {
         /**
          * MALE:男；FEMALE：女；UNKOWN：未知（保密）

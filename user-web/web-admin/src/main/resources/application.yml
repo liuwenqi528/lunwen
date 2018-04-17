@@ -31,16 +31,6 @@ spring:
 
 shiro:
   cipherKey: fPimdozRt+SSSbZS8/HARA==
-#  cas:
-#    serviceUrl: http://localhost:${server.port}${server.context-path}
-#    callbackUrl: http://localhost:${server.port}${server.context-path}/callback
-#    preffixUrl: https://sso.sdkhcm.com/xueyuan-cas
-#    loginUrl: https://sso.sdkhcm.com/xueyuan-cas/login
-#    logoutUrl: https://sso.sdkhcm.com/xueyuan-cas/logout
-#    preffixUrl: https://sso.xueyuan.com:8443
-#    loginUrl: https://sso.xueyuan.com:8443/login
-#    logoutUrl: https://sso.xueyuan.com:8443/logout
-
 logging:
   path: log/
   file: user-admin.log

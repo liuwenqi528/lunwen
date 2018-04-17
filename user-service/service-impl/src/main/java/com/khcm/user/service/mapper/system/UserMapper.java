@@ -37,7 +37,6 @@ public interface UserMapper extends EntityMapper<User, UserDTO, UserParam> {
     @Mapping(target = "age", source = "ext.age")
     @Mapping(target = "sex", source = "ext.sex")
     @Mapping(target = "roleIds", expression = "java(getRoleIds(user.getRoles()))")
-    @Mapping(target = "channelName", source = "ext.channel.name")
     UserDTO entityToDTO(User user);
 
     @Override
