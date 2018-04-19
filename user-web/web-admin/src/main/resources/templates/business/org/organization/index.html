@@ -69,11 +69,6 @@
                 var param = "";
                 if (id != undefined) {
                     param = "?id=" + id;
-                } else {
-                    var row = orgTreegrid.treegrid("getSelected");
-                    if (row != null) {
-                        param = "?id=" + row.id;
-                    }
                 }
                 openLayer('添加组织机构', basePath + '/org/organization/toAddPage' + param);
             },
@@ -81,14 +76,11 @@
                 var param = "";
                 if (id != undefined) {
                     param = "?id=" + id;
+                    openLayer('编辑组织机构', basePath + '/org/organization/toEditPage' + param);
                 } else {
-                    var row = orgTreegrid.treegrid("getSelected");
-                    var param = "";
-                    if (row != null) {
-                        param = "?id=" + row.id;
-                    }
+                    layui.msg("选择一条数据进行修改")
                 }
-                openLayer('编辑组织机构', basePath + '/org/organization/toEditPage' + param);
+
             },
             orgRemove: function (id) {
                 layer.confirm('是否确认删除?', {
@@ -100,7 +92,8 @@
                         dataType: "json",
                         type: "post",
                         success: function (data) {
-                            reloadTree("#organizationTreegrid", data);
+                            layui.msg(data.retInfo())
+                            organizationTreegrid();
                         }
                     })
                 });

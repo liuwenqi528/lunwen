@@ -15,8 +15,6 @@ public class RolePM  extends BasePM{
 
     private String name;
 
-    private Integer priority;
-
     private String description;
 
     private String beginTime;

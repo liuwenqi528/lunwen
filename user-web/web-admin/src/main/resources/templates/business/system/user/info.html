@@ -43,12 +43,6 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">注册渠道：</label>
-        <div class="layui-input-block">
-            <p class="layui-info" th:text="${userVM.channelName}"></p>
-        </div>
-    </div>
-    <div class="layui-form-item">
         <label class="layui-form-label">创建时间：</label>
         <div class="layui-input-block">
             <p class="layui-info" th:text="${#dates.format(userVM.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}"></p>

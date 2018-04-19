@@ -6,8 +6,6 @@ import com.khcm.user.web.admin.shiro.AdminFormAuthenticationFilter;
 import com.khcm.user.web.admin.shiro.AdminRealm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SubjectFactory;
@@ -19,10 +17,8 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.DefaultWebSubjectFactory;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,9 +40,6 @@ public class ShiroConfig {
 
     @Value("${shiro.cipherKey}")
     private String cipherKey;
-
-    @Autowired
-    private EhCacheCacheManager ehCacheCacheManager;
 
     /**
      * 授权拦截
@@ -94,7 +87,6 @@ public class ShiroConfig {
         securityManager.setSubjectFactory(subjectFactory());
         securityManager.setRealm(getRealm());
         securityManager.setRememberMeManager(rememberMeManager());
-        securityManager.setCacheManager(cacheManager());
         securityManager.setSessionManager(sessionManager());
 
         return securityManager;
@@ -153,17 +145,6 @@ public class ShiroConfig {
         return simpleCookie;
     }
 
-    /**
-     * 缓存管理
-     *
-     * @return
-     */
-    @Bean
-    public CacheManager cacheManager() {
-        EhCacheManager cacheManager = new EhCacheManager();
-        cacheManager.setCacheManager(ehCacheCacheManager.getCacheManager());
-        return cacheManager;
-    }
 
     /**
      * 开启Shiro注解

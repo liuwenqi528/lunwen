@@ -14,16 +14,25 @@ import java.util.Date;
 public class UserParam {
 
     private Integer id;
+
     private String username;
+
     private String nickname;
+
     private String password;
+
     private String email;
+
     private String phone;
+
     private Boolean admin;
+
     private String realname;
+
     private Date beginTime;
+
     private Date endTime;
+
     private UserStatus status;
-    private String registerIp;
 
 }

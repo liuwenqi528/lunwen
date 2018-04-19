@@ -32,8 +32,6 @@ public class RoleUserDTO implements Serializable{
     @JSONField(format = DateUtils.STANDARD_DATETIME)
     private Date gmtModified;
 
-    private Integer priority;
-
     private String description;
 
     private List<Integer> userIds;

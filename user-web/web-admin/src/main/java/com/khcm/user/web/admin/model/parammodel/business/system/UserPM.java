@@ -18,9 +18,9 @@ import java.util.Date;
 @Setter
 public class UserPM extends BasePM implements Serializable {
 
-    private String username;
-
     private Integer id;
+
+    private String username;
 
     private String password;
 
@@ -33,20 +33,18 @@ public class UserPM extends BasePM implements Serializable {
     private String nickname;
 
     private String realname;
+
     private Integer age;
+
     private String sex;
 
     private String birthday;
 
     private String idcard;
 
-    private Integer areaId;
-
     private String beginTime;
 
     private String endTime;
-
-    private String channelName;
 
     private UserStatus status;
 

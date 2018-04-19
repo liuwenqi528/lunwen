@@ -36,8 +36,6 @@ public class UserDTO implements Serializable {
 
     private String salt;
 
-    private String avatar;
-
     private Boolean admin;
 
     private UserStatus status;
@@ -59,7 +57,9 @@ public class UserDTO implements Serializable {
     private String realname;
 
     private Date birthday;
+
     private Integer age;
+
     private String sex;
 
     private String idcard;

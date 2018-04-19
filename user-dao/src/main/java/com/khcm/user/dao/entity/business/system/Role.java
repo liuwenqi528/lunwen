@@ -24,9 +24,6 @@ public class Role extends BaseEntity {
     private String name;
 
     @Column
-    private Integer priority;
-
-    @Column
     private String description;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)

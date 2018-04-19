@@ -28,13 +28,11 @@ spring:
   thymeleaf:
     cache: false
     mode: LEGACYHTML5
-
 shiro:
   cipherKey: fPimdozRt+SSSbZS8/HARA==
 logging:
   path: log/
   file: user-admin.log
-
 server:
   context-path: /center-user
   port: 8090
