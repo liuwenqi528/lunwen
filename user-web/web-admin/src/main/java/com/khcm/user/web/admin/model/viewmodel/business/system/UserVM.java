@@ -19,6 +19,7 @@ public class UserVM {
 
     @JSONField(format = DateUtils.STANDARD_DATETIME)
     private Date gmtCreate;
+
     @JSONField(format = DateUtils.STANDARD_DATETIME)
     private Date gmtModified;
 
@@ -50,8 +51,6 @@ public class UserVM {
 
     private Integer errorCount;
 
-    private String registerIp;
-
     private String nickname;
 
     private String realname;
@@ -68,4 +67,5 @@ public class UserVM {
     private List<Integer> roleIds;
 
     private String statusName;
+
 }

@@ -42,7 +42,6 @@ public class User extends BaseEntity {
     @Column(length = 32)
     private String salt;
 
-
     @Column(name = "is_admin")
     private Boolean admin;
 
@@ -59,13 +58,6 @@ public class User extends BaseEntity {
 
     @Column(name = "login_count")
     private Integer loginCount;
-
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "platform")
-    private PlatformEnum loginPlatform;
-
-    @Column(name = "login_device_id", length = 64)
-    private String loginDeviceId;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "error_time")

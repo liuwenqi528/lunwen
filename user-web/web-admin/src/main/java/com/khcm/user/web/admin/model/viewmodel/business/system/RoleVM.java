@@ -22,8 +22,6 @@ public class RoleVM {
 
     private String name;
 
-    private Integer priority;
-
     private String description;
 
     @JSONField(format = DateUtils.STANDARD_DATETIME)
@@ -35,6 +33,5 @@ public class RoleVM {
     private List<Integer> userIds;
 
     private Set<AuthorizationVM> authorizations;
-//    private List<Integer> authorizationIds;
 
 }

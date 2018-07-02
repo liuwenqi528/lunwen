@@ -34,8 +34,6 @@ public class RoleDTO implements Serializable {
 
     private List<Integer> userIds;
 
-    private Integer priority;
-
     private String description;
 
 }

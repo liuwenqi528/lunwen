@@ -52,6 +52,12 @@ public class AdminFormAuthenticationFilter extends FormAuthenticationFilter {
         return org.apache.shiro.web.util.WebUtils.getCleanParam(request, getCaptchaParam());
     }
 
+    /**
+     * 获取登陆信息，生成Token
+     * @param request
+     * @param response
+     * @return
+     */
     @Override
     protected CaptchaAuthenticationToken createToken(ServletRequest request, ServletResponse response) {
         String username = getUsername(request);

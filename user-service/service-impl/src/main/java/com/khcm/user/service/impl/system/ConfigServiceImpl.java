@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @Slf4j
-@CacheConfig(cacheNames = "user")
 public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
@@ -27,11 +26,9 @@ public class ConfigServiceImpl implements ConfigService {
      * @return
      */
     @Override
-    @Cacheable
     public ConfigLoginDTO getLoginConfig() {
         Config config = configRepository.findByType(ConfigType.LOGIN);
         return ConfigLoginDTO.of(config.getItems());
     }
-
 
 }

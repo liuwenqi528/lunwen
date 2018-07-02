@@ -16,8 +16,6 @@ public class RoleParam {
 
     private String name;
 
-    private Integer priority;
-
     private String description;
 
     private Date beginTime;

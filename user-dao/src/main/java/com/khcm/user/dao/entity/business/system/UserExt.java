@@ -27,9 +27,6 @@ public class UserExt extends BaseEntity {
     @Column(length = 36)
     private String realname;
 
-    @Column(length = 255)
-    private String avatar;
-
     @Column(length = 20)
     private String idcard;
 

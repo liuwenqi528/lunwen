@@ -21,7 +21,6 @@ import java.util.Set;
 /**
  * 自定义 Realm
  *
- * @author wangtao
  * @date 2017/8/24
  */
 @EnableConfigurationProperties(AdminConfig.class)
@@ -82,10 +81,8 @@ public class AdminRealm extends AuthorizingRealm {
         Principal user = (Principal) principals.getPrimaryPrincipal();
 
         if (user != null) {
-
             Set<String> permissions = authorizationService.getAppPermsByUserId(user.getUserId(), adminConfig.getAppCode());
             authorizationInfo.addStringPermissions(permissions);
-
         }
 
         return authorizationInfo;

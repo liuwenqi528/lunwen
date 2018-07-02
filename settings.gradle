@@ -9,8 +9,6 @@ include 'user-service:service-api'
 findProject(':user-service:service-api')?.name = 'service-api'
 include 'user-web:web-admin'
 findProject(':user-web:web-admin')?.name = 'web-admin'
-include 'user-web:web-rest'
-findProject(':user-web:web-rest')?.name = 'web-rest'
 include 'user-web:web-common'
 findProject(':user-web:web-common')?.name = 'web-common'
 

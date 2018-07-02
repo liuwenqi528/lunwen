@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-type" content="text/html;charset=utf-8">
-    <title>学缘网企业后台 - 登录入口</title>
+    <title>统一用户管理中心系统 - 登录入口</title>
     <link rel="stylesheet" href="../static/css/login.css" th:href="@{/css/login.css}">
     <script type="text/javascript" src="../static/js/jquery-1.8.1.min.js" th:src="@{/js/jquery-1.8.1.min.js}"></script>
     <style>
@@ -70,10 +70,6 @@
                             <button class="w-button w-button-account js-loginbtn" type="submit" tabindex="4">登 录
                             </button>
                         </div>
-                        <div class="loginact">
-                            <a href="https://mail.qiye.163.com/mailapp/qiyeurs/?from=http%3A%2F%2Fmail.qiye.163.com%2F#/resetPwd"
-                               target="_blank">忘记密码了？</a>
-                        </div>
                     </form>
                 </div>
                 <div class="js-speedbox">
@@ -92,11 +88,8 @@
      style="position: absolute;left: -999em;top: -999em;width: 0;height: 0">
 
 <script type="text/javascript">
-    var gDocHeight = $('body').height();
-    //初始化页面垂直居中
-    resizeBody();
-
     function resizeBody() {
+        var gDocHeight = $('body').height();
         var winHeight = $(window).height();
         var heightGap = winHeight - gDocHeight;
         if (heightGap > 5) {
@@ -107,7 +100,8 @@
         var winWidth = $(window).width();
         $(".g-wrap").width(winWidth >= 960 ? 960 : winWidth);
     }
-
+    //初始化页面垂直居中
+    resizeBody();
     $(window).resize(function () {
         var winWidth = $(window).width();
         if (winWidth <= 500) {
@@ -134,9 +128,10 @@
         var password = getCookie("password");
         $("input[name='username']").val(username);
         $("input[name='password']").val(password);
-        /*if(username && password){
-            $("button.w-button").click();
-        }*/
+        if(username && password){
+            $(":checkbox").attr('checked',true);
+            // $("button.w-button").click();
+        }
     })
     //当复选框钩选/不勾选时，保存/删除用户信息cookie失效期设置为15天
     $(function(){

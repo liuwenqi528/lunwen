@@ -124,7 +124,7 @@
                     var btn = `<button class="layui-btn layui-btn-sm iconfont icon-chakan" lay-event="userInfo" title="详情"></button>
                                 <button class="layui-btn ${row.status == 'CLOSED' ? 'layui-btn-disabled' : 'layui-btn-normal'} layui-btn-sm iconfont icon-xiugai1" lay-event="userEdit" title="编辑" ${row.status == 'CLOSED' ? 'disabled' : ''}></button>
                                 <button class="layui-btn ${row.status == 'CLOSED' ? 'layui-btn-disabled' : 'layui-btn-danger'} layui-btn-sm iconfont icon-shanchu" lay-event="userRemove" title="删除" ${row.status == 'CLOSED' ? 'disabled' : ''}></button>
-                                <button class="layui-btn ${(row.admin) || (row.status == 'CLOSED') ?'layui-btn-disabled':'xy-button-light-green'} layui-btn-sm iconfont icon-shezhijiaose" lay-event="setRole" title="设置角色" ${(row.admin) || (row.status == 'CLOSED') ? 'disabled' : ''}></button>`;
+                                <button class="layui-btn ${(row.admin) || (row.status == 'CLOSED') ?'layui-btn-disabled':'xy-button-light-green'} layui-btn-sm iconfont icon-shezhijiaose" lay-event="setRole" title="分配角色" ${(row.admin) || (row.status == 'CLOSED') ? 'disabled' : ''}></button>`;
                     return btn;
                 }}
             ]]
@@ -190,7 +190,7 @@
                 openLayer('用户详情', basePath + '/sys/user/toInfoPage?id=' + id,[]);
             }, setRole: function (id) {
                 //设置角色
-                openLayer('设置角色', basePath + '/sys/user/toSetRolePage?id=' + id,['保存','重置']);
+                openLayer('分配角色', basePath + '/sys/user/toSetRolePage?id=' + id,['保存','重置']);
             }
         };
         //上部按钮点击事件
