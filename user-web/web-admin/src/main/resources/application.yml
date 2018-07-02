@@ -9,8 +9,8 @@ spring:
   datasource:
     master:
       driverClassName: com.mysql.jdbc.Driver
-      url: jdbc:mysql://bdm256204263.my3w.com:3306/bdm256204263_db?serverTimezone=GMT&characterEncoding=utf8
-      username: bdm256204263
+      url: jdbc:mysql://127.0.0.1:3306/bdm256204263_db?serverTimezone=GMT&characterEncoding=utf8
+      username: root
       password: mama0927
   jpa:
     hibernate:

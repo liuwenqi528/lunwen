@@ -30,9 +30,9 @@
             <div class="layui-input-inline">
                 <input type="text" name="criteria.timeRange" id="begin_success" placeholder="选择日期范围"
                        autocomplete="off" class="layui-input">
-                <input type="hidden" name="criteria.date">
-                <input type="hidden" name="criteria.beginTime"/>
-                <input type="hidden" name="criteria.endTime"/>
+                <input type="hidden" name="date">
+                <input type="hidden" name="beginTime"/>
+                <input type="hidden" name="endTime"/>
             </div>
             <div class="layui-form-mid">&nbsp;</div>
             <div class="layui-input-inline">
@@ -80,6 +80,7 @@
             $(this).addClass("changeBtn");
            $("a:not(#today_success)").removeClass("changeBtn");
             var today = parseDateToStr(0);
+            console.info(today);
             $("input[name='date']").val(today);
             $("#begin_success").val('');//将日期范围的值置为空
             $("#successSearch").click();//执行搜索
